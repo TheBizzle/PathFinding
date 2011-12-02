@@ -162,14 +162,13 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
 object BiHashMap {
 
     def apply[A: Manifest, B: Manifest] (tupSeq: (A, B)*) : BiHashMap[A, B] = {
-        applyHelper(new BiHashMap[A, B](), tupSeq.seq.toList)
-    }
-
-    private def applyHelper[A,B] (retMap: BiHashMap[A,B], tupList: List[(A, B)]) : BiHashMap[A, B] = {
-        tupList match {
-            case (a, b)::t => { retMap.put(a, b); applyHelper(retMap, t) }
-            case Nil => retMap
+        def applyHelper[A,B] (retMap: BiHashMap[A,B], tupList: List[(A, B)]) : BiHashMap[A, B] = {
+            tupList match {
+                case (a, b)::t => { retMap.put(a, b); applyHelper(retMap, t) }
+                case Nil => retMap
+            }
         }
+        applyHelper(new BiHashMap[A, B](), tupSeq.seq.toList)
     }
 
 //    Sadly, this version cannot be used (and, thus, BiHashMaps can't be factory-generated

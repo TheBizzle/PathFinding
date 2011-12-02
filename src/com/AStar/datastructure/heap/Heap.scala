@@ -36,16 +36,15 @@ class Heap[T : Manifest] protected (ordering: (T, T) => Int, elemArr: Array[Opti
     }
 
     private def arrTransfer(newArr: Array[Option[T]], originalArr: Array[Option[T]]) : Array[Option[T]] = {
-        arrTransferHelper(newArr, originalArr, originalArr.size, 0)
-    }
-
-    private def arrTransferHelper(newArr: Array[Option[T]], originalArr: Array[Option[T]], originalSize: Int, counter: Int) : Array[Option[T]] = {
-        if (counter < (originalSize - 1)) {
-            newArr(counter) = originalArr(counter)
-            arrTransferHelper(newArr, originalArr, originalSize, counter + 1)
+        def arrTransferHelper(newArr: Array[Option[T]], originalArr: Array[Option[T]], originalSize: Int, counter: Int) : Array[Option[T]] = {
+            if (counter < (originalSize - 1)) {
+                newArr(counter) = originalArr(counter)
+                arrTransferHelper(newArr, originalArr, originalSize, counter + 1)
+            }
+            else
+                newArr
         }
-        else
-            newArr
+        arrTransferHelper(newArr, originalArr, originalArr.size, 0)
     }
 
     private def heapUp(elemIndex: Int) {
@@ -100,14 +99,13 @@ class Heap[T : Manifest] protected (ordering: (T, T) => Int, elemArr: Array[Opti
     // Sadly, it's preferable to just run this every time we want the size, rather than
     // juggling 'size' vals on the Heap reconstruction that occurs after each array resize
     def size : Int = {
+        def sizeHelper(arr: Array[Option[T]], currentSize: Int) : Int = {
+            if ((arr.size > currentSize) && (!arr(currentSize).isEmpty))
+                sizeHelper(arr, currentSize + 1)
+            else
+                currentSize
+        }
         sizeHelper(heapArr, 0)
-    }
-
-    private def sizeHelper(arr: Array[Option[T]], currentSize: Int) : Int = {
-        if ((arr.size > currentSize) && (!arr(currentSize).isEmpty))
-            sizeHelper(arr, currentSize + 1)
-        else
-            currentSize
     }
 
     def isEmpty : Boolean = {

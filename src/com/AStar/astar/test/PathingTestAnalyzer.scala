@@ -39,20 +39,16 @@ object PathingTestAnalyzer {
     }
 
     private def eatBreadcrumbsForPath(breadcrumbs: Array[Array[Coordinate]], goal: Coordinate) : List[Coordinate] = {
-        breadcrumbsHelper(breadcrumbs, breadcrumbs(goal.x)(goal.y)).reverse
-    }
-
-    private def breadcrumbsHelper(breadcrumbs: Array[Array[Coordinate]], current: Coordinate) : List[Coordinate] = {
-
-        val next = breadcrumbs(current.x)(current.y)
-
-        current :: {
-            if ((next.x > -1) && (next.y > -1))
-                breadcrumbsHelper(breadcrumbs, next)
-            else
-                Nil
+        def breadcrumbsHelper(breadcrumbs: Array[Array[Coordinate]], current: Coordinate) : List[Coordinate] = {
+            val next = breadcrumbs(current.x)(current.y)
+            current :: {
+                if ((next.x > -1) && (next.y > -1))
+                    breadcrumbsHelper(breadcrumbs, next)
+                else
+                    Nil
+            }
         }
-
+        breadcrumbsHelper(breadcrumbs, breadcrumbs(goal.x)(goal.y)).reverse
     }
 
 }
