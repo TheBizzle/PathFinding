@@ -1,8 +1,8 @@
-package astar.test
+package astar_base.tester
 
-import astar.StepData
 import coordinate.Coordinate
 import pathingmap.PathingMap
+import astar_base.StepData
 
 /**
  * Created by IntelliJ IDEA.

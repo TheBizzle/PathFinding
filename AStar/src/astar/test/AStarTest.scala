@@ -1,6 +1,6 @@
 import astar.AStar
 import astar.test.mapstring._
-import astar.test.PathingTestAnalyzer
+import astar_base.tester.PathingTestAnalyzer
 
 /**
  * Created by IntelliJ IDEA.

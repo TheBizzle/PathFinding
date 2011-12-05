@@ -1,11 +1,11 @@
 package astar
 
 //import collection.mutable.PriorityQueue
-import java.security.InvalidParameterException
 import pathingmap.pathingmapdata.PathingMapString
 import pathingmap.PathingMap
 import datastructure.priorityqueue.PriorityQueue
 import coordinate._
+import astar_base._
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,11 +22,9 @@ import coordinate._
 // Heuristic estimate   (from current to destination)   h(x)
 // Total combined cost  (from origin to destination)    f(x) = g(x) + h(x)
 
-object AStar {
+object AStar extends AStarBase(1) with AStarLike {
 
-    private val ScalingFactor = 1                 // How much of the map you're willing to query (from 0 to 1)
-
-    def apply(mapString: PathingMapString) : StepData = {
+    override def apply(mapString: PathingMapString) : StepData = {
 
         val (start, goal, pathingMap) = PathingMap(mapString)
 
@@ -50,11 +48,7 @@ object AStar {
 
     }
 
-    private def calculateMaxIters(colCount: Int, rowCount: Int) : Int = {
-        math.floor(colCount * rowCount * ScalingFactor).toInt
-    }
-
-    private def iterate(stepData: StepData, iters: Int, maxIters: Int) : StepData = {
+    override protected def iterate(stepData: StepData, iters: Int, maxIters: Int) : StepData = {
 
         import stepData._
 
@@ -81,32 +75,12 @@ object AStar {
 
     }
 
-    private def generateNewStepData(stepData: StepData, freshLoc: Coordinate) : StepData = {
+    override protected def generateNewStepData(stepData: StepData, freshLoc: Coordinate) : StepData = {
         import stepData._
         new StepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr)
     }
 
-    /**
-     * Some serious spaghetti!
-     * Returns the first location in "queue" that hasn't already been examined (as determined by checking "beenThere").
-     */
-    private def getFreshLoc(queue: PriorityQueue[PriorityCoordinate], beenThere: Array[Array[Boolean]]): PriorityCoordinate = {
-        queue.dequeue() match {
-            case None => throw new InvalidParameterException
-            case Some(loc) => {
-                if (beenThere(loc.x)(loc.y)) {
-                    if (!queue.isEmpty)
-                        getFreshLoc(queue, beenThere)
-                    else
-                        throw new InvalidParameterException
-                }
-                else
-                    loc     // Exit point (success)
-            }
-        }
-    }
-
-    private def step(stepData: StepData) : StepData = {
+    override protected def step(stepData: StepData) : StepData = {
 
         import stepData._
 
@@ -137,19 +111,6 @@ object AStar {
 
         stepData
 
-    }
-
-    private def initialize2DArr[T: Manifest](cols: Int, rows: Int, defaultVal: T) : Array[Array[T]] = {
-        new Array[Array[T]](cols) map ( x => new Array[T](rows) map (y => defaultVal) )
-    }
-
-    private def queueDoesContain(coord: Coordinate, queue: PriorityQueue[PriorityCoordinate]) : Boolean = {
-        queue.foreach { case(x) => if (x == coord) true }
-        false
-    }
-
-    private def manhattanDistance(start: Coordinate,  end: Coordinate) : Int = {
-        math.abs(start.x - end.x) + math.abs(start.y - end.y)
     }
 
 }

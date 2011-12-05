@@ -1,4 +1,4 @@
-package astar
+package astar_base
 
 //import collection.mutable.PriorityQueue
 import coordinate.{PriorityCoordinate, Coordinate}
