@@ -9,6 +9,8 @@ import astar_base.tester.PathingTestAnalyzer
  * Time: 11:08 PM
  */
 
+// At some point, turn this stuff into real tests using ScalaTest.
+// Refactor it into AStarBase, and also create individual tests for the different things that extend AStarBase
 PathingTestAnalyzer(AStar(TestMapString))
 PathingTestAnalyzer(AStar(TestMapString2))
 PathingTestAnalyzer(AStar(TestMapString3))

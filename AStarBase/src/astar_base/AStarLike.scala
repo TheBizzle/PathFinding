@@ -48,8 +48,4 @@ trait AStarLike {
         false
     }
 
-    protected def manhattanDistance(start: Coordinate,  end: Coordinate) : Int = {
-        math.abs(start.x - end.x) + math.abs(start.y - end.y)
-    }
-
 }

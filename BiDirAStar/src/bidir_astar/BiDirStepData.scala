@@ -30,3 +30,13 @@ class BiDirStepData(currentLocation: Coordinate,
     val othersBreadcrumbArr = othersBreadcrumbs
 
 }
+
+
+object BiDirStepData {
+    def apply(freshLoc: Coordinate, stepData: BiDirStepData) : BiDirStepData = {
+        import stepData._
+        new BiDirStepData(freshLoc, goal, beenThereArr, queue, pathingMap,
+                          costArr, heuristicArr, totalArr, breadcrumbArr,
+                          othersLoc, othersBreadcrumbArr)
+    }
+}

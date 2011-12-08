@@ -6,6 +6,7 @@ import pathingmap.PathingMap
 import datastructure.priorityqueue.PriorityQueue
 import coordinate._
 import astar_base._
+import heuristic.{HeuristicBundle, HeuristicLib}
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,7 +23,7 @@ import astar_base._
 // Heuristic estimate   (from current to destination)   h(x)
 // Total combined cost  (from origin to destination)    f(x) = g(x) + h(x)
 
-object AStar extends AStarBase(1) with AStarLike {
+object AStar extends AStarBase(1.0, HeuristicLib.manhattanDistance) with AStarLike {
 
     override def apply(mapString: PathingMapString) : StepData = {
 
@@ -40,7 +41,7 @@ object AStar extends AStarBase(1) with AStarLike {
         val breadcrumbArr = initialize2DArr(colCount, rowCount, new Coordinate(-1, -1))
 
         costArr(start.x)(start.y) = 0
-        heuristicArr(start.x)(start.y) = manhattanDistance(start, goal)
+        heuristicArr(start.x)(start.y) = heuristic(new HeuristicBundle(start, goal))
         totalArr(start.x)(start.y) = costArr(start.x)(start.y) + heuristicArr(start.x)(start.y)
 
         queue.enqueue(new PriorityCoordinate(start, totalArr(start.x)(start.y)))
@@ -64,20 +65,15 @@ object AStar extends AStarBase(1) with AStarLike {
             //println(stepData.queue.toString() + "\n\n")
 
             if (freshLoc == goal)
-                return generateNewStepData(stepData, freshLoc)  // Exit point (success)
+                return StepData(freshLoc, stepData)  // Exit point (success)
 
             beenThereArr(freshLoc.x)(freshLoc.y) = true
-            iterate(step(generateNewStepData(stepData, freshLoc)), iters + 1, maxIters)
+            iterate(step(StepData(freshLoc, stepData)), iters + 1, maxIters)
 
         }
         else
-            generateNewStepData(stepData, new Coordinate(-1, -1))  // Exit point (failure)
+            StepData(new Coordinate(-1, -1), stepData)  // Exit point (failure)
 
-    }
-
-    override protected def generateNewStepData(stepData: StepData, freshLoc: Coordinate) : StepData = {
-        import stepData._
-        new StepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr)
     }
 
     override protected def step(stepData: StepData) : StepData = {
@@ -97,7 +93,7 @@ object AStar extends AStarBase(1) with AStarLike {
 
                 if (!doesContainNeighbor || (newCost < costArr(x)(y))) {
                     costArr(x)(y) = newCost
-                    heuristicArr(x)(y) = manhattanDistance(neighbor, goal)
+                    heuristicArr(x)(y) = heuristic(new HeuristicBundle(neighbor, goal))
                     totalArr(x)(y) = costArr(x)(y) + heuristicArr(x)(y)
                     breadcrumbArr(x)(y) = new Coordinate(loc.x, loc.y)
                 }

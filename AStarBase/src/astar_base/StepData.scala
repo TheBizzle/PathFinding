@@ -32,3 +32,10 @@ class StepData(currentLocation: Coordinate,
     val breadcrumbArr = breadcrumbs
 
 }
+
+object StepData {
+    def apply(freshLoc: Coordinate, stepData: StepData) : StepData = {
+        import stepData._
+        new StepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr)
+    }
+}
