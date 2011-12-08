@@ -11,7 +11,7 @@ import coordinate.{Coordinate, PriorityCoordinate}
  * Time: 11:04 PM
  */
 
-trait AStarLike[T >: StepData] {
+trait AStarLike[T <: StepData] {
 
     self:AStarBase[T] =>
 

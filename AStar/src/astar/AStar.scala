@@ -7,6 +7,7 @@ import datastructure.priorityqueue.PriorityQueue
 import coordinate._
 import astar_base._
 import heuristic.{HeuristicBundle, HeuristicLib}
+import statuses._
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +26,7 @@ import heuristic.{HeuristicBundle, HeuristicLib}
 
 object AStar extends AStarBase[StepData](1.0, HeuristicLib.manhattanDistance) {
 
-    override def apply(mapString: PathingMapString) : StepData = {
+    override def apply(mapString: PathingMapString) : ExecutionStatus[StepData] = {
 
         val (start, goal, pathingMap) = PathingMap(mapString)
 
@@ -45,11 +46,23 @@ object AStar extends AStarBase[StepData](1.0, HeuristicLib.manhattanDistance) {
         totalArr(start.x)(start.y) = costArr(start.x)(start.y) + heuristicArr(start.x)(start.y)
 
         queue.enqueue(new PriorityCoordinate(start, totalArr(start.x)(start.y)))
-        iterate(new StepData(start, goal, beenThere, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr), 0, calculateMaxIters(colCount, rowCount))
+        execute(new StepData(start, goal, beenThere, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr), 0, calculateMaxIters(colCount, rowCount))
 
     }
 
-    override protected def iterate(stepData: StepData, iters: Int, maxIters: Int) : StepData = {
+    override protected def execute(stepData: StepData, iters: Int, maxIters: Int) : ExecutionStatus[StepData] = {
+
+        val decision = decide(stepData, iters, maxIters)
+
+        decision match {
+            case Continue(x: StepData) => execute(step(x), iters + 1, maxIters)
+            case Success(_)  => decision
+            case Failure(_)  => decision
+        }
+
+    }
+
+    override protected def decide(stepData: StepData, iters: Int, maxIters: Int) : ExecutionStatus[StepData] = {
 
         import stepData._
 
@@ -65,14 +78,14 @@ object AStar extends AStarBase[StepData](1.0, HeuristicLib.manhattanDistance) {
             //println(stepData.queue.toString() + "\n\n")
 
             if (freshLoc == goal)
-                return StepData(freshLoc, stepData)  // Exit point (success)
+                return Success(StepData(freshLoc, stepData))  // Exit point (success)
 
             beenThereArr(freshLoc.x)(freshLoc.y) = true
-            iterate(step(StepData(freshLoc, stepData)), iters + 1, maxIters)
+            Continue(StepData(freshLoc, stepData))
 
         }
         else
-            StepData(new Coordinate(-1, -1), stepData)  // Exit point (failure)
+            Failure(StepData(new Coordinate(-1, -1), stepData))  // Exit point (failure)
 
     }
 

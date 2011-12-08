@@ -2,6 +2,7 @@ package astar_base.tester
 
 import coordinate.Coordinate
 import pathingmap.PathingMap
+import astar_base.statuses._
 import astar_base.StepData
 
 /**
@@ -13,17 +14,11 @@ import astar_base.StepData
 
 object PathingTestAnalyzer {
 
-    def apply(stepData: StepData) {
-
-        import stepData._
-
-        if ((loc.x > -1) && (loc.y > -1)) {
-            println("Success!")
-            retracePath(breadcrumbArr, goal, pathingMap)
+    def apply(status: ExecutionStatus[StepData]) {
+        status match {
+            case Success(x) => { println("Success!"); retracePath(x.breadcrumbArr, x.goal, x.pathingMap) }
+            case _ => println("Failed to find a solution....\n\n")
         }
-        else
-            println("Failed to find a solution....\n\n")
-        
     }
 
     private def retracePath(breadcrumbs: Array[Array[Coordinate]], goal: Coordinate, pathingMap: PathingMap) {
