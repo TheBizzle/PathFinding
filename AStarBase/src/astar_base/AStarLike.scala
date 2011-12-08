@@ -11,12 +11,12 @@ import coordinate.{Coordinate, PriorityCoordinate}
  * Time: 11:04 PM
  */
 
-trait AStarLike {
+trait AStarLike[T >: StepData] {
 
-    self:AStarBase =>
+    self:AStarBase[T] =>
 
     protected def calculateMaxIters(colCount: Int, rowCount: Int) : Int = {
-        math.floor(colCount * rowCount * ScalingFactor).toInt
+        math.floor(colCount * rowCount * scalingFactor).toInt
     }
 
     /**

@@ -2,7 +2,6 @@ package bidir_astar
 
 import pathingmap.pathingmapdata.PathingMapString
 import astar_base._
-import coordinate.Coordinate
 import heuristic.HeuristicLib
 
 /**
@@ -15,21 +14,33 @@ import heuristic.HeuristicLib
 // Basically, runs two AStar processes asychronously, and they pass each other their updated beenThere arrays and current locations.
 // If one reaches a location that the other has reached, or if the current locations are next to each other, it returns.
 
-object BiDirAStar extends AStarBase(0.8, HeuristicLib.manhattanDistance) with AStarLike {
+object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDistance) {
 
-    override def apply(mapString: PathingMapString) : StepData = {
+    override def apply(mapString: PathingMapString) : BiDirStepData = {
 
-        null
-
-    }
-
-    override protected def iterate(stepData: StepData, iters: Int, maxIters: Int) : StepData = {
+        // Initialize data
+        // Manage actors
 
         null
 
     }
 
-    override protected def step(stepData: StepData) : StepData = {
+    private def leadActorsToSuccess() : BiDirStepData = {
+
+        // Create two actors
+        // Iterate on each until end
+
+        null
+
+    }
+
+    override protected def iterate(stepData: BiDirStepData, iters: Int, maxIters: Int) : BiDirStepData = {
+
+        null
+
+    }
+
+    override protected def step(stepData: BiDirStepData) : BiDirStepData = {
         null
     }
 

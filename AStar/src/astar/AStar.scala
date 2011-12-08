@@ -23,7 +23,7 @@ import heuristic.{HeuristicBundle, HeuristicLib}
 // Heuristic estimate   (from current to destination)   h(x)
 // Total combined cost  (from origin to destination)    f(x) = g(x) + h(x)
 
-object AStar extends AStarBase(1.0, HeuristicLib.manhattanDistance) with AStarLike {
+object AStar extends AStarBase[StepData](1.0, HeuristicLib.manhattanDistance) {
 
     override def apply(mapString: PathingMapString) : StepData = {
 

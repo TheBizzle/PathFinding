@@ -10,13 +10,13 @@ import pathingmap.pathingmapdata.PathingMapString
  * Time: 11:15 PM
  */
 
-abstract class AStarBase(scalingFactor: Double, heuristicFunc: HeuristicBundle => Int) {
+abstract class AStarBase[T >: StepData](branchingFactor: Double, heuristicFunc: HeuristicBundle => Int) extends AStarLike[T] {
 
-    protected val ScalingFactor = scalingFactor        // How much of the map you're willing to query (from 0 to 1)
+    protected val scalingFactor = branchingFactor        // How much of the map you're willing to query (from 0 to 1)
     protected val heuristic = heuristicFunc            // The heuristic function that A* will be using
 
-    def apply(mapString: PathingMapString) : StepData
-    protected def iterate(stepData: StepData, iters: Int, maxIters: Int) : StepData
-    protected def step(stepData: StepData) : StepData
+    def apply(mapString: PathingMapString) : T
+    protected def iterate(stepData: T, iters: Int, maxIters: Int) : T
+    protected def step(stepData: T) : T
 
 }
