@@ -34,8 +34,13 @@ case class StartToGoal[T <: BiDirStepData]
                        decideFunc: (T, Int, Int) => ExecutionStatus[T], stepFunc: T => T)
                        extends BiDirActor[T](exeStatus, itrs, maxItrs, decideFunc, stepFunc) {
     def act() {
-        val (actStatus, actIters) = moveAndMutate()
-        sender ! new StartToGoal(actStatus, actIters, maxIters, decide, step)
+        react {
+            case "start" => {
+                val (actStatus, actIters) = moveAndMutate()
+                reply(new StartToGoal(actStatus, actIters, maxIters, decide, step))
+            }
+        }
+
     }
 
 }
@@ -46,8 +51,12 @@ case class GoalToStart[T <: BiDirStepData]
                        extends BiDirActor[T](exeStatus, itrs, maxItrs, decideFunc, stepFunc) {
 
     def act() {
-        val (actStatus, actIters) = moveAndMutate()
-        sender ! new GoalToStart(actStatus, actIters, maxIters, decide, step)
+        react {
+            case "start" => {
+                val (actStatus, actIters) = moveAndMutate()
+                reply(new GoalToStart(actStatus, actIters, maxIters, decide, step))
+            }
+        }
     }
 
 }

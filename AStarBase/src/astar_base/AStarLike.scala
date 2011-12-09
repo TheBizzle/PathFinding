@@ -31,7 +31,7 @@ trait AStarLike[T <: StepData] {
                     if (!queue.isEmpty)
                         getFreshLoc(queue, beenThere)
                     else
-                        throw new InvalidParameterException
+                        throw new InvalidParameterException("Cannot pop!  Queue is empty!")
                 }
                 else
                     loc     // Exit point (success)

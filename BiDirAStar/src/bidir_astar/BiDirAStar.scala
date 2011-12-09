@@ -8,7 +8,6 @@ import datastructure.priorityqueue.PriorityQueue
 import coordinate._
 import pathingmap.PathingMap
 import astar_base.statuses._
-import scala.actors.Actor
 import java.security.InvalidParameterException
 
 /**
@@ -53,18 +52,11 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
     }
 
     override protected def execute(stepData: BiDirStepData, iters: Int, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
-
-        val director = new BiDirDirector(stepData.clone(), stepData.cloneForBiBackwards(), iters, maxIters, decide, step)
-        director.start()
-
-        val response = (director !! "begin")
-        val responseVal = response()
-
-        responseVal match {
+        val director = new BiDirDirector(decide, step)
+        director.direct(stepData.clone(), stepData.cloneForBiBackwards(), iters, maxIters) match {
             case es: ExecutionStatus[BiDirStepData] => es
             case _ => throw new InvalidParameterException
         }
-
     }
 
     override protected def decide(stepData: BiDirStepData, iters: Int = 0, maxIters: Int) : ExecutionStatus[BiDirStepData] = {

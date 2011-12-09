@@ -1,9 +1,7 @@
 package bidir_astar.actors
 
-import actors.Actor
 import bidir_astar.BiDirStepData
 import astar_base.statuses._
-import java.security.InvalidParameterException
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,74 +10,46 @@ import java.security.InvalidParameterException
  * Time: 4:19 PM
  */
 
-class BiDirDirector[T <: BiDirStepData]
-                   (forwardStepData: T, backwardsStepData: T, iters: Int, maxIters: Int,
-                    decisionFunc: (T, Int, Int) => ExecutionStatus[T], stepFunc: T => T) extends Actor {
+class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int, Int) => ExecutionStatus[T], stepFunc: T => T) {
 
     val decide = decisionFunc
     val step = stepFunc
 
-    var startGoalActor: Option[StartToGoal[T]] = Some(new StartToGoal[T](Continue(forwardStepData), iters, maxIters, decide, step))
-    var goalStartActor: Option[GoalToStart[T]] = Some(new GoalToStart[T](Continue(backwardsStepData), iters, maxIters, decide, step))
-    var isStarted = false
-
-    def act() {
-
-        startGoalActor.get.start()
-        goalStartActor.get.start()
-
-        loop {
-            react {
-                case "begin" => isStarted = true
-                case x: StartToGoal[T] => {
-                    if (isStarted) {
-                        startGoalActor = Some(x)
-                        goalStartActor match {
-                            case None => // Must wait until both actors are ready
-                            case Some(y) => takeAction(x, y)
-                        }
-                    }
-                    else throw new InvalidParameterException("Message the director with \"begin\" before sending it messages!")
-                }
-                case x: GoalToStart[T] => {
-                    if (isStarted) {
-                        goalStartActor = Some(x)
-                        startGoalActor match {
-                            case None => // Must wait until both actors are ready
-                            case Some(y) => takeAction(y, x)
-                        }
-                    }
-                    else throw new InvalidParameterException("Message the director with \"begin\" before sending it messages!")
-                }
-                case _ => throw new InvalidParameterException
-            }
-        }
-
+    def direct(forwardStepData: T, backwardsStepData: T, iters: Int, maxIters: Int) : ExecutionStatus[T] = {
+        val stg = new StartToGoal[T](Continue(forwardStepData), iters, maxIters, decide, step)
+        val gts = new GoalToStart[T](Continue(backwardsStepData), iters, maxIters, decide, step)
+        evaluateActions(stg, gts)
     }
 
-    private def takeAction(stg: StartToGoal[T], gts: GoalToStart[T]) {
-        stg.status match {
-            case Failure(x)  => reply(Failure(x))
-            case Success(x)  => reply(Success(x))
+    private def evaluateActions(stg: StartToGoal[T], gts: GoalToStart[T]) : ExecutionStatus[T] = {
+
+        val (resultStg, resultGts) = runActionsForResult(stg, gts)
+
+        resultStg.status match {
+            case Failure(x)  => Failure(x)
+            case Success(x)  => Success(x)
             case Continue(x) =>
-                gts.status match {
-                    case Failure(y)  => reply(Failure(y))
-                    case Success(y)  => reply(Success(y))
-                    case Continue(y) => continueSearch(stg, gts)
+                resultGts.status match {
+                    case Failure(y)  => Failure(y)
+                    case Success(y)  => Success(y)
+                    case Continue(y) => { val (neoStg, neoGts) = shareDataAndMutate(resultStg, resultGts); evaluateActions(neoStg, neoGts) }
                 }
         }
+
     }
 
+    def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : (StartToGoal[T], GoalToStart[T]) = {
 
-    private def continueSearch(stg: StartToGoal[T], gts: GoalToStart[T]) {
+        stg.start()
+        val stgFuture = (stg !! "start")
 
-        startGoalActor = None
-        goalStartActor = None
+        gts.start()
+        val gtsFuture = (gts !! "start")
 
-        val (startActor, endActor) = shareDataAndMutate(stg, gts)
+        val stgVal = stgFuture()
+        val gtsVal = gtsFuture()
 
-        startActor.start()
-        endActor.start()
+        (stgVal.asInstanceOf[StartToGoal[T]], gtsVal.asInstanceOf[GoalToStart[T]])
 
     }
 
@@ -95,6 +65,7 @@ class BiDirDirector[T <: BiDirStepData]
         stgStepData.mergeShared(gtsStepData.loc, gtsStepData.breadcrumbArr)
         gtsStepData.mergeShared(stgStepData.loc, stgStepData.breadcrumbArr)
 
+        // Actually, I find this whole function displeasing
         val neoStg = new StartToGoal[T](Continue(stgStepData), stg.iters, stg.maxIters, stg.decide, stg.step)
         val neoGts = new GoalToStart[T](Continue(gtsStepData), gts.iters, gts.maxIters, gts.decide, gts.step)
 
