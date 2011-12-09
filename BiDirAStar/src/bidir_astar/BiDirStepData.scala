@@ -26,20 +26,26 @@ class BiDirStepData(currentLocation: Coordinate,
                     othersBreadcrumbs: Array[Array[Coordinate]])
                     extends StepData(currentLocation, goalLocation, beenThere, pQueue, pMap, costArray, heuristicArray, totalArray, breadcrumbs) {
 
-    val othersLoc = othersCurrentLocation
-    val othersBreadcrumbArr = othersBreadcrumbs
+    // Shame on me!  Shaaaaame!
+    private var othersLoc = othersCurrentLocation
+    private var othersBreadcrumbArr = othersBreadcrumbs
 
-    override def clone() : BiDirStepData = {
+    override def clone() : this.type = {
         new BiDirStepData(loc.clone(), goal.clone(), beenThereArr.clone(), queue.clone(),
                           pathingMap.clone(), costArr.clone(), heuristicArr.clone(), totalArr.clone(),
                           breadcrumbArr.clone(), othersLoc.clone(), othersBreadcrumbArr.clone())
     }
 
-    def cloneForBiBackwards() : BiDirStepData = {
+    def cloneForBiBackwards() : this.type = {
         val neoStart = loc.clone()
         new BiDirStepData(goal.clone(), neoStart, beenThereArr.clone(), queue.clone(),
                           pathingMap.clone(), costArr.clone(), heuristicArr.clone(), totalArr.clone(),
                           breadcrumbArr.clone(), neoStart, othersBreadcrumbArr.clone())
+    }
+
+    def mergeShared(oLoc: Coordinate, oBreadcrumbs: Array[Array[Coordinate]]) {
+        othersLoc = oLoc.clone()
+        othersBreadcrumbArr = oBreadcrumbs.clone()
     }
 
 }
@@ -52,12 +58,6 @@ object BiDirStepData {
         new BiDirStepData(freshLoc, goal, beenThereArr, queue, pathingMap,
         costArr, heuristicArr, totalArr, breadcrumbArr,
         othersLoc, othersBreadcrumbArr)
-    }
-
-    def importShared(stepData: BiDirStepData, oLoc: Coordinate, oBreadcrumbs: Array[Array[Coordinate]]) : BiDirStepData = {
-        import stepData._
-        new BiDirStepData(loc, goal, beenThereArr, queue, pathingMap,
-                          costArr, heuristicArr, totalArr, breadcrumbArr, oLoc.clone(), oBreadcrumbs.clone())
     }
 
 }

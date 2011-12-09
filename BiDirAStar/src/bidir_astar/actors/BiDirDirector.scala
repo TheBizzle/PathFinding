@@ -75,16 +75,20 @@ class BiDirDirector[+T <: BiDirStepData](stepData: T, iters: Int, maxIters: Int,
 
     }
 
+    /**
+     * Above, on success, we need to merge the breadcrumbs!
+     */
     private def shareDataAndMutate(stg: StartToGoal[T], gts: GoalToStart[T]) : (StartToGoal[T], GoalToStart[T]) = {
         
         val stgStepData = stg.status.stepData
         val gtsStepData = gts.status.stepData
 
-        val neoStgStepData = BiDirStepData.importShared(stgStepData, gtsStepData.loc, gtsStepData.breadcrumbArr)
-        val neoGtsStepData = BiDirStepData.importShared(gtsStepData, stgStepData.loc, stgStepData.breadcrumbArr)
+        // I find this very displeasing
+        stgStepData.mergeShared(gtsStepData.loc, gtsStepData.breadcrumbArr)
+        gtsStepData.mergeShared(stgStepData.loc, stgStepData.breadcrumbArr)
 
-        val neoStg = new StartToGoal[T](Continue(neoStgStepData), stg.iters, stg.maxIters, stg.decide, stg.step)
-        val neoGts = new GoalToStart[T](Continue(neoGtsStepData), gts.iters, gts.maxIters, gts.decide, gts.step)
+        val neoStg = new StartToGoal[T](Continue(stgStepData), stg.iters, stg.maxIters, stg.decide, stg.step)
+        val neoGts = new GoalToStart[T](Continue(gtsStepData), gts.iters, gts.maxIters, gts.decide, gts.step)
 
         (neoStg, neoGts)
         
