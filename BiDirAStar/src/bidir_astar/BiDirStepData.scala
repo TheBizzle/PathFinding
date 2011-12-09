@@ -30,13 +30,13 @@ class BiDirStepData(currentLocation: Coordinate,
     private var othersLoc = othersCurrentLocation
     private var othersBreadcrumbArr = othersBreadcrumbs
 
-    override def clone() : this.type = {
+    override def clone() : BiDirStepData = {
         new BiDirStepData(loc.clone(), goal.clone(), beenThereArr.clone(), queue.clone(),
                           pathingMap.clone(), costArr.clone(), heuristicArr.clone(), totalArr.clone(),
                           breadcrumbArr.clone(), othersLoc.clone(), othersBreadcrumbArr.clone())
     }
 
-    def cloneForBiBackwards() : this.type = {
+    def cloneForBiBackwards() : BiDirStepData = {
         val neoStart = loc.clone()
         new BiDirStepData(goal.clone(), neoStart, beenThereArr.clone(), queue.clone(),
                           pathingMap.clone(), costArr.clone(), heuristicArr.clone(), totalArr.clone(),

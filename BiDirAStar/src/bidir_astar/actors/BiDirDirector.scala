@@ -12,15 +12,16 @@ import java.security.InvalidParameterException
  * Time: 4:19 PM
  */
 
-class BiDirDirector[+T <: BiDirStepData](stepData: T, iters: Int, maxIters: Int,
-                                         decisionFunc: (T, Int, Int) => ExecutionStatus[T],
-                                         stepFunc: T => T) extends Actor {
+class BiDirDirector[T <: BiDirStepData]
+                   (forwardStepData: T, backwardsStepData: T, iters: Int, maxIters: Int,
+                    decisionFunc: (T, Int, Int) => ExecutionStatus[T], stepFunc: T => T) extends Actor {
 
     val decide = decisionFunc
     val step = stepFunc
-    
-    var startGoalActor: Option[StartToGoal[T]] = Some(new StartToGoal(Continue(stepData.clone()), iters, maxIters, decide, step))
-    var goalStartActor: Option[GoalToStart[T]] = Some(new GoalToStart(Continue(stepData.cloneForBiBackwards()), iters, maxIters, decide, step))
+
+    var startGoalActor: Option[StartToGoal[T]] = Some(new StartToGoal[T](Continue(forwardStepData), iters, maxIters, decide, step))
+    var goalStartActor: Option[GoalToStart[T]] = Some(new GoalToStart[T](Continue(backwardsStepData), iters, maxIters, decide, step))
+    var isStarted = false
 
     def act() {
 
@@ -29,19 +30,26 @@ class BiDirDirector[+T <: BiDirStepData](stepData: T, iters: Int, maxIters: Int,
 
         loop {
             react {
+                case "begin" => isStarted = true
                 case x: StartToGoal[T] => {
-                    startGoalActor = Some(x)
-                    goalStartActor match {
-                        case None => // Must wait until both actors are ready
-                        case Some(y) => takeAction(x, y)
+                    if (isStarted) {
+                        startGoalActor = Some(x)
+                        goalStartActor match {
+                            case None => // Must wait until both actors are ready
+                            case Some(y) => takeAction(x, y)
+                        }
                     }
+                    else throw new InvalidParameterException("Message the director with \"begin\" before sending it messages!")
                 }
                 case x: GoalToStart[T] => {
-                    goalStartActor = Some(x)
-                    startGoalActor match {
-                        case None => // Must wait until both actors are ready
-                        case Some(y) => takeAction(y, x)
+                    if (isStarted) {
+                        goalStartActor = Some(x)
+                        startGoalActor match {
+                            case None => // Must wait until both actors are ready
+                            case Some(y) => takeAction(y, x)
+                        }
                     }
+                    else throw new InvalidParameterException("Message the director with \"begin\" before sending it messages!")
                 }
                 case _ => throw new InvalidParameterException
             }
@@ -51,12 +59,12 @@ class BiDirDirector[+T <: BiDirStepData](stepData: T, iters: Int, maxIters: Int,
 
     private def takeAction(stg: StartToGoal[T], gts: GoalToStart[T]) {
         stg.status match {
-            case Failure(x)  => sender ! Failure(x)
-            case Success(x)  => sender ! Success(x)
+            case Failure(x)  => reply(Failure(x))
+            case Success(x)  => reply(Success(x))
             case Continue(x) =>
                 gts.status match {
-                    case Failure(y)  => sender ! Failure(y)
-                    case Success(y)  => sender ! Success(y)
+                    case Failure(y)  => reply(Failure(y))
+                    case Success(y)  => reply(Success(y))
                     case Continue(y) => continueSearch(stg, gts)
                 }
         }
