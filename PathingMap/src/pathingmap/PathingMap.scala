@@ -55,6 +55,10 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
 
     }
 
+    override def clone() : PathingMap = {
+        new PathingMap(colCount, rowCount, pathingMap.clone())
+    }
+
 }
 
 object PathingMap {

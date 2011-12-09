@@ -13,6 +13,6 @@ sealed abstract class ExecutionStatus[+T <: StepData](data: T) {
     val stepData = data
 }
 
-case class Continue[T <: StepData](sd: T) extends ExecutionStatus[T](sd)
-case class Success[T <: StepData](sd: T) extends ExecutionStatus[T](sd)
-case class Failure[T <: StepData](sd: T) extends ExecutionStatus[T](sd)
+case class Continue[+T <: StepData](sd: T) extends ExecutionStatus[T](sd)
+case class Success[+T <: StepData](sd: T) extends ExecutionStatus[T](sd)
+case class Failure[+T <: StepData](sd: T) extends ExecutionStatus[T](sd)

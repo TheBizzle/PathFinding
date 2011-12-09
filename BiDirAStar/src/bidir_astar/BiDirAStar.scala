@@ -1,12 +1,15 @@
 package bidir_astar
 
+import actors.BiDirDirector
 import pathingmap.pathingmapdata.PathingMapString
 import astar_base._
 import heuristic.{HeuristicBundle, HeuristicLib}
 import datastructure.priorityqueue.PriorityQueue
-import coordinate.{Coordinate, PriorityCoordinateOrdering, PriorityCoordinate}
+import coordinate._
 import pathingmap.PathingMap
 import astar_base.statuses._
+import scala.actors.Actor
+import java.security.InvalidParameterException
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,7 +21,7 @@ import astar_base.statuses._
 // Basically, runs two AStar processes asychronously, and they pass each other their updated beenThere arrays and current locations.
 // If one reaches a location that the other has reached, or if the current locations are next to each other, it returns.
 
-object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDistance) {
+object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDistance) with Actor {
 
     override def apply(mapString: PathingMapString) : ExecutionStatus[BiDirStepData] = {
 
@@ -45,23 +48,25 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
         queue.enqueue(new PriorityCoordinate(start, totalArr(start.x)(start.y)))
         execute(new BiDirStepData(start, goal, beenThere, queue, pathingMap,
                                   costArr, heuristicArr, totalArr, breadcrumbArr,
-                                  otherLoc, otherBreadcrumbs), 0, calculateMaxIters(colCount, rowCount))
+                                  otherLoc, otherBreadcrumbs), maxIters = calculateMaxIters(colCount, rowCount))
 
     }
+
+    def act() {}
 
     override protected def execute(stepData: BiDirStepData, iters: Int, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
 
-        // Create two actors, maybe a director?
-        // Run them, use their response actors to determine how to act next
-            // AStarSuccess  -> Compile and return the two finalized StepData
-            // AStarContinue -> Run the two new actors
-            // AStarFailure  -> Report failure with crap Coordinate
-        
-        null
+        val director = new BiDirDirector(stepData, iters, maxIters, decide, step)
+        director.start()
+
+        react {
+            case es: ExecutionStatus[BiDirStepData] => es
+            case _ => throw new InvalidParameterException
+        }
 
     }
 
-    override protected def decide(stepData: BiDirStepData, iters: Int, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
+    override protected def decide(stepData: BiDirStepData, iters: Int = 0, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
 
         import stepData._
 
@@ -119,8 +124,6 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
 
         stepData
 
-        null
-        
     }
 
 }

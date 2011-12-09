@@ -16,4 +16,8 @@ class Coordinate(xLoc: Int, yLoc: Int) {
         "(" + x + "," + y + ")"
     }
 
+    override def clone() : Coordinate = {
+        new Coordinate(x, y)
+    }
+
 }

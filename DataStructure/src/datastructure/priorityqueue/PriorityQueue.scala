@@ -25,4 +25,8 @@ class PriorityQueue[T : Manifest] protected (ordering: (T, T) => Int, elemArr: A
         remove()
     }
 
+    override def clone() : PriorityQueue[T] = {
+        new PriorityQueue[T](orderProp, heapArr.clone())
+    }
+
 }

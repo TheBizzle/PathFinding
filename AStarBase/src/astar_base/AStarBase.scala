@@ -17,7 +17,7 @@ abstract class AStarBase[T <: StepData](branchingFactor: Double, heuristicFunc: 
     protected val heuristic = heuristicFunc              // The heuristic function that A* will be using
 
     def apply(mapString: PathingMapString) : ExecutionStatus[T]
-    protected def execute(stepData: T,  iters: Int, maxIters: Int) : ExecutionStatus[T]
+    protected def execute(stepData: T,  iters: Int = 0, maxIters: Int) : ExecutionStatus[T]
     protected def decide(stepData: T, iters: Int, maxIters: Int) : ExecutionStatus[T]
     protected def step(stepData: T) : T
 

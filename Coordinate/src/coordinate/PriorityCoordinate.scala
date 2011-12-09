@@ -19,6 +19,10 @@ class PriorityCoordinate(xLoc: Int, yLoc: Int, priorityVal: Int) extends Coordin
          super.toString + ":" + priority
     }
 
+    override def clone() : PriorityCoordinate = {
+        new PriorityCoordinate(x, y, priority)
+    }
+
     override def equals(that: Any) : Boolean = {
         if (that.isInstanceOf[Coordinate]) {
             val coord = that.asInstanceOf[Coordinate]

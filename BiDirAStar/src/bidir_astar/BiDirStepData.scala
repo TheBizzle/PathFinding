@@ -29,14 +29,35 @@ class BiDirStepData(currentLocation: Coordinate,
     val othersLoc = othersCurrentLocation
     val othersBreadcrumbArr = othersBreadcrumbs
 
+    override def clone() : BiDirStepData = {
+        new BiDirStepData(loc.clone(), goal.clone(), beenThereArr.clone(), queue.clone(),
+                          pathingMap.clone(), costArr.clone(), heuristicArr.clone(), totalArr.clone(),
+                          breadcrumbArr.clone(), othersLoc.clone(), othersBreadcrumbArr.clone())
+    }
+
+    def cloneForBiBackwards() : BiDirStepData = {
+        val neoStart = loc.clone()
+        new BiDirStepData(goal.clone(), neoStart, beenThereArr.clone(), queue.clone(),
+                          pathingMap.clone(), costArr.clone(), heuristicArr.clone(), totalArr.clone(),
+                          breadcrumbArr.clone(), neoStart, othersBreadcrumbArr.clone())
+    }
+
 }
 
 
 object BiDirStepData {
+
     def apply(freshLoc: Coordinate, stepData: BiDirStepData) : BiDirStepData = {
         import stepData._
         new BiDirStepData(freshLoc, goal, beenThereArr, queue, pathingMap,
-                          costArr, heuristicArr, totalArr, breadcrumbArr,
-                          othersLoc, othersBreadcrumbArr)
+        costArr, heuristicArr, totalArr, breadcrumbArr,
+        othersLoc, othersBreadcrumbArr)
     }
+
+    def importShared(stepData: BiDirStepData, oLoc: Coordinate, oBreadcrumbs: Array[Array[Coordinate]]) : BiDirStepData = {
+        import stepData._
+        new BiDirStepData(loc, goal, beenThereArr, queue, pathingMap,
+                          costArr, heuristicArr, totalArr, breadcrumbArr, oLoc.clone(), oBreadcrumbs.clone())
+    }
+
 }

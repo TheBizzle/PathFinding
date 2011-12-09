@@ -46,11 +46,13 @@ object AStar extends AStarBase[StepData](1.0, HeuristicLib.manhattanDistance) {
         totalArr(start.x)(start.y) = costArr(start.x)(start.y) + heuristicArr(start.x)(start.y)
 
         queue.enqueue(new PriorityCoordinate(start, totalArr(start.x)(start.y)))
-        execute(new StepData(start, goal, beenThere, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr), 0, calculateMaxIters(colCount, rowCount))
+        execute(new StepData(start, goal, beenThere, queue, pathingMap,
+                             costArr, heuristicArr, totalArr, breadcrumbArr),
+                maxIters = calculateMaxIters(colCount, rowCount))
 
     }
 
-    override protected def execute(stepData: StepData, iters: Int, maxIters: Int) : ExecutionStatus[StepData] = {
+    override protected def execute(stepData: StepData, iters: Int = 0, maxIters: Int) : ExecutionStatus[StepData] = {
 
         val decision = decide(stepData, iters, maxIters)
 
