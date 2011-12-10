@@ -54,7 +54,7 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
     override protected def execute(stepData: BiDirStepData, iters: Int, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
         val director = new BiDirDirector(decide(_: BiDirStepData, _: Int, maxIters), step) // decide() gets partially applied
         director.direct(stepData.clone(), stepData.cloneForBiBackwards(), iters) match {
-            case es: ExecutionStatus[BiDirStepData] => es
+            case status: ExecutionStatus[BiDirStepData] => status
             case _ => throw new InvalidParameterException
         }
     }
@@ -75,10 +75,10 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
             //println(stepData.queue.toString() + "\n\n")
 
             if (freshLoc == goal)
-                return Success(BiDirStepData(freshLoc, stepData))  // Exit point (success)
+                return Success(BiDirStepData(freshLoc, stepData))     // Exit point (success)
 
             beenThereArr(freshLoc.x)(freshLoc.y) = true
-            Continue((BiDirStepData(freshLoc, stepData)))
+            Continue((BiDirStepData(freshLoc, stepData)))             // Exit point (only to return again soon)
 
         }
         else

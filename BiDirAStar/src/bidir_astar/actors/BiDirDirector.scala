@@ -53,9 +53,6 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
 
     }
 
-    /**
-     * Above, on success, we need to merge the breadcrumbs!
-     */
     private def shareDataAndMutate(stg: StartToGoal[T], gts: GoalToStart[T]) : (StartToGoal[T], GoalToStart[T]) = {
         
         val stgStepData = stg.status.stepData

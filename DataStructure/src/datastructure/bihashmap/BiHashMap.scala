@@ -160,7 +160,6 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
 }
 
 object BiHashMap {
-
     def apply[A: Manifest, B: Manifest] (tupSeq: (A, B)*) : BiHashMap[A, B] = {
         def applyHelper[A,B] (retMap: BiHashMap[A,B], tupList: List[(A, B)]) : BiHashMap[A, B] = {
             tupList match {
@@ -170,21 +169,4 @@ object BiHashMap {
         }
         applyHelper(new BiHashMap[A, B](), tupSeq.seq.toList)
     }
-
-//    Sadly, this version cannot be used (and, thus, BiHashMaps can't be factory-generated
-//    from heterogeneous tuple sequences) because, at run time, thanks to type erasure, the necessary
-//    information just isn't there to determine which map to put things into.  Maybe one day....  Probably not.
-//
-//    private def applyHelper[A,B] (retMap: BiHashMap[A,B], tupSeq: Seq[(Any,  Any)]) : BiHashMap[A, B] = {
-//        if (tupSeq.size > 0) {
-//            tupSeq.head match {
-//                case (a: A, b: B) => { retMap.put(a, b); applyHelper(retMap, tupSeq.tail) }
-//                case (b: B, a: A) => { retMap.put(b, a); applyHelper(retMap, tupSeq.tail) }
-//                case _ => throw new InvalidParameterException;
-//            }
-//        }
-//        else
-//            retMap
-//    }
-
 }

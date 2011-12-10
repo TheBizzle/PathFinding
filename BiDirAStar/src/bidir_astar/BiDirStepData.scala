@@ -52,12 +52,10 @@ class BiDirStepData(currentLocation: Coordinate,
 
 
 object BiDirStepData {
-
     def apply(freshLoc: Coordinate, stepData: BiDirStepData) : BiDirStepData = {
         import stepData._
         new BiDirStepData(freshLoc, goal, beenThereArr, queue, pathingMap,
-        costArr, heuristicArr, totalArr, breadcrumbArr,
-        othersLoc, othersBreadcrumbArr)
+                          costArr, heuristicArr, totalArr, breadcrumbArr,
+                          othersLoc, othersBreadcrumbArr)
     }
-
 }
