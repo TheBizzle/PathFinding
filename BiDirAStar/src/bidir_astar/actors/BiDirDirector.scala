@@ -10,14 +10,14 @@ import astar_base.statuses._
  * Time: 4:19 PM
  */
 
-class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int, Int) => ExecutionStatus[T], stepFunc: T => T) {
+class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatus[T], stepFunc: T => T) {
 
     val decide = decisionFunc
     val step = stepFunc
 
-    def direct(forwardStepData: T, backwardsStepData: T, iters: Int, maxIters: Int) : ExecutionStatus[T] = {
-        val stg = new StartToGoal[T](Continue(forwardStepData), iters, maxIters, decide, step)
-        val gts = new GoalToStart[T](Continue(backwardsStepData), iters, maxIters, decide, step)
+    def direct(forwardStepData: T, backwardsStepData: T, iters: Int) : ExecutionStatus[T] = {
+        val stg = new StartToGoal[T](Continue(forwardStepData), iters, decide, step)
+        val gts = new GoalToStart[T](Continue(backwardsStepData), iters, decide, step)
         evaluateActions(stg, gts)
     }
 
@@ -66,8 +66,8 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int, Int) => Execution
         gtsStepData.mergeShared(stgStepData.loc, stgStepData.breadcrumbArr)
 
         // Actually, I find this whole function displeasing
-        val neoStg = new StartToGoal[T](Continue(stgStepData), stg.iters, stg.maxIters, stg.decide, stg.step)
-        val neoGts = new GoalToStart[T](Continue(gtsStepData), gts.iters, gts.maxIters, gts.decide, gts.step)
+        val neoStg = new StartToGoal[T](Continue(stgStepData), stg.iters, stg.decide, stg.step)
+        val neoGts = new GoalToStart[T](Continue(gtsStepData), gts.iters, gts.decide, gts.step)
 
         (neoStg, neoGts)
         
