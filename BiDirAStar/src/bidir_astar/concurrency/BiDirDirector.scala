@@ -32,7 +32,7 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
                 resultGts.status match {
                     case Failure(y)  => Failure(y)
                     case Success(y)  => Success(y)
-                    case Continue(y) => { val (neoStg, neoGts) = shareDataAndMutate(resultStg, resultGts); evaluateActions(neoStg, neoGts) }
+                    case Continue(y) => { val (neoStg, neoGts) = shareDataAndTransform(resultStg, resultGts); evaluateActions(neoStg, neoGts) }
                 }
         }
 
@@ -53,7 +53,7 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
 
     }
 
-    private def shareDataAndMutate(stg: StartToGoal[T], gts: GoalToStart[T]) : (StartToGoal[T], GoalToStart[T]) = {
+    private def shareDataAndTransform(stg: StartToGoal[T], gts: GoalToStart[T]) : (StartToGoal[T], GoalToStart[T]) = {
         
         val stgStepData = stg.status.stepData
         val gtsStepData = gts.status.stepData
