@@ -1,6 +1,6 @@
 package bidir_astar
 
-import actors.BiDirDirector
+import concurrency.BiDirDirector
 import pathingmap.pathingmapdata.PathingMapString
 import astar_base._
 import heuristic.{HeuristicBundle, HeuristicLib}
@@ -19,7 +19,6 @@ import java.security.InvalidParameterException
 
 // Basically, runs two AStar processes asychronously, and they pass each other their updated beenThere arrays and current locations.
 // If one reaches a location that the other has reached, or if the current locations are next to each other, it returns.
-
 object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDistance) {
 
     override def apply(mapString: PathingMapString) : ExecutionStatus[BiDirStepData] = {

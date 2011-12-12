@@ -1,4 +1,4 @@
-package bidir_astar.actors
+package bidir_astar.concurrency
 
 import actors.Actor
 import bidir_astar.BiDirStepData

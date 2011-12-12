@@ -9,6 +9,6 @@ package astar_base.heuristic
 
 object HeuristicLib {
     def manhattanDistance(h: HeuristicBundle) : Int = {
-        math.abs(h.start.x - h.end.x) + math.abs(h.start.y - h.end.y)
+        (h.start.x - h.end.x).abs + (h.start.y - h.end.y).abs
     }
 }

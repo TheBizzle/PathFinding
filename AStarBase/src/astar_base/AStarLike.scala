@@ -16,7 +16,7 @@ trait AStarLike[T <: StepData] {
     self:AStarBase[T] =>
 
     protected def calculateMaxIters(colCount: Int, rowCount: Int) : Int = {
-        math.floor(colCount * rowCount * scalingFactor).toInt
+        (colCount * rowCount * scalingFactor).floor.toInt
     }
 
     /**
