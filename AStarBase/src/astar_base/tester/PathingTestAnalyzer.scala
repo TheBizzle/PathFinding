@@ -37,7 +37,7 @@ object PathingTestAnalyzer {
         def breadcrumbsHelper(breadcrumbs: Array[Array[Coordinate]], current: Coordinate) : List[Coordinate] = {
             val next = breadcrumbs(current.x)(current.y)
             current :: {
-                if ((next.x > -1) && (next.y > -1))
+                if ((next.x > Coordinate.InvalidVal) && (next.y > Coordinate.InvalidVal))
                     breadcrumbsHelper(breadcrumbs, next)
                 else
                     Nil

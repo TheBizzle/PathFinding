@@ -36,10 +36,10 @@ object AStar extends AStarBase[StepData](1.0, HeuristicLib.manhattanDistance) {
         val beenThere = initialize2DArr(colCount, rowCount, false)
         val queue = new PriorityQueue[PriorityCoordinate](PriorityCoordinateOrdering.compare)
 
-        val costArr = initialize2DArr(colCount, rowCount, -1)
-        val heuristicArr = initialize2DArr(colCount, rowCount, -1)
-        val totalArr = initialize2DArr(colCount, rowCount, -1)
-        val breadcrumbArr = initialize2DArr(colCount, rowCount, new Coordinate(-1, -1))
+        val costArr = initialize2DArr(colCount, rowCount, Coordinate.InvalidVal)
+        val heuristicArr = initialize2DArr(colCount, rowCount, Coordinate.InvalidVal)
+        val totalArr = initialize2DArr(colCount, rowCount, Coordinate.InvalidVal)
+        val breadcrumbArr = initialize2DArr(colCount, rowCount, new Coordinate(Coordinate.InvalidVal, Coordinate.InvalidVal))
 
         costArr(start.x)(start.y) = 0
         heuristicArr(start.x)(start.y) = heuristic(new HeuristicBundle(start, goal))
@@ -87,7 +87,7 @@ object AStar extends AStarBase[StepData](1.0, HeuristicLib.manhattanDistance) {
 
         }
         else
-            Failure(StepData(new Coordinate(-1, -1), stepData))  // Exit point (failure)
+            Failure(StepData(new Coordinate(Coordinate.InvalidVal, Coordinate.InvalidVal), stepData))  // Exit point (failure)
 
     }
 

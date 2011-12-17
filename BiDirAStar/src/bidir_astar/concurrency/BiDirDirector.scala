@@ -46,10 +46,10 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
         gts.start()
         val gtsFuture = (gts !! "start")
 
-        val stgVal = stgFuture()
-        val gtsVal = gtsFuture()
+        val stgVal = stgFuture().asInstanceOf[StartToGoal[T]]
+        val gtsVal = gtsFuture().asInstanceOf[GoalToStart[T]]
 
-        (stgVal.asInstanceOf[StartToGoal[T]], gtsVal.asInstanceOf[GoalToStart[T]])
+        (stgVal, gtsVal)
 
     }
 
