@@ -137,12 +137,18 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
     }
 
     override def equals(that: Any) : Boolean = {
-        if (that.isInstanceOf[BiHashMap[A, B]]) {
-            val thatHash = that.asInstanceOf[BiHashMap[A, B]]
-            thatHash.abMap.equals(abMap) && thatHash.baMap.equals(baMap)
+        that match {
+            case thatHash: BiHashMap[A, B] => ((thatHash.abMap.equals(abMap) && thatHash.baMap.equals(baMap)) || (thatHash.abMap.equals(baMap) && thatHash.baMap.equals(abMap)))
+            case _ => false
         }
-        else
-            false
+    }
+
+    override def hashCode : Int = {
+        abMap.hashCode() ^ baMap.hashCode()  // XOR the hashcodes of the two maps
+    }
+
+    def canEqual(other: Any) : Boolean = {
+        other.isInstanceOf[BiHashMap[A, B]] || other.isInstanceOf[BiHashMap[B, A]]
     }
 
     def ASet : scala.collection.Set[A] = {

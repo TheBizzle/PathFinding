@@ -13,7 +13,7 @@ import coordinate.{Coordinate, PriorityCoordinate}
 
 trait AStarLike[T <: StepData] {
 
-    self:AStarBase[T] =>
+    self: AStarBase[T] =>
 
     protected def calculateMaxIters(colCount: Int, rowCount: Int) : Int = {
         (colCount * rowCount * scalingFactor).floor.toInt
@@ -44,7 +44,7 @@ trait AStarLike[T <: StepData] {
     }
 
     protected def queueDoesContain(coord: Coordinate, queue: PriorityQueue[PriorityCoordinate]) : Boolean = {
-        queue.foreach { case(x) => if (x == coord) true }
+        queue.foreach { case(x) => if (coord overlaps x) true }
         false
     }
 

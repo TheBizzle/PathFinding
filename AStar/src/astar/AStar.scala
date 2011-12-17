@@ -79,7 +79,7 @@ object AStar extends AStarBase[StepData](1.0, HeuristicLib.manhattanDistance) {
             //println("Goal: " + destination)
             //println(stepData.queue.toString() + "\n\n")
 
-            if (freshLoc == goal)
+            if (freshLoc overlaps goal)
                 return Success(StepData(freshLoc, stepData))  // Exit point (success)
 
             beenThereArr(freshLoc.x)(freshLoc.y) = true

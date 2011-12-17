@@ -73,7 +73,7 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
             //println("Goal: " + destination)
             //println(stepData.queue.toString() + "\n\n")
 
-            if (freshLoc == goal)
+            if (freshLoc overlaps goal)
                 return Success(BiDirStepData(freshLoc, stepData))     // Exit point (success)
 
             beenThereArr(freshLoc.x)(freshLoc.y) = true

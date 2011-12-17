@@ -24,12 +24,18 @@ class PriorityCoordinate(xLoc: Int, yLoc: Int, priorityVal: Int) extends Coordin
     }
 
     override def equals(that: Any) : Boolean = {
-        if (that.isInstanceOf[Coordinate]) {
-            val coord = that.asInstanceOf[Coordinate]
-            (x == coord.x) && (y == coord.y)
+        that match {
+            case thatCoord: PriorityCoordinate => super.equals(that) && (priority == thatCoord.priority)
+            case _ => false
         }
-        else
-            false
+    }
+
+    override def hashCode : Int = {
+        41 * super.hashCode + priority
+    }
+
+    override def canEqual(other: Any) : Boolean = {
+        other.isInstanceOf[PriorityCoordinate]
     }
 
 }
