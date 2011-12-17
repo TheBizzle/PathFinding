@@ -48,6 +48,11 @@ class BiDirStepData(currentLocation: Coordinate,
         othersBreadcrumbArr = oBreadcrumbs.clone()
     }
 
+    def hasInOthersBreadcrumbs(loc: Coordinate) : Boolean = {
+        val thatLoc = othersBreadcrumbArr(loc.x)(loc.y)
+        (thatLoc.x != Coordinate.InvalidVal) && (thatLoc.y != Coordinate.InvalidVal)
+    }
+
 }
 
 

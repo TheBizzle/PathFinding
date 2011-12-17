@@ -31,17 +31,17 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
         val beenThere = initialize2DArr(colCount, rowCount, false)
         val queue = new PriorityQueue[PriorityCoordinate](PriorityCoordinateOrdering.compare)
 
-        val costArr = initialize2DArr(colCount, rowCount, Coordinate.BadCoordVal)
-        val heuristicArr = initialize2DArr(colCount, rowCount, Coordinate.BadCoordVal)
-        val totalArr = initialize2DArr(colCount, rowCount, Coordinate.BadCoordVal)
-        val breadcrumbArr = initialize2DArr(colCount, rowCount, new Coordinate(Coordinate.BadCoordVal, Coordinate.BadCoordVal))
+        val costArr = initialize2DArr(colCount, rowCount, Coordinate.InvalidVal)
+        val heuristicArr = initialize2DArr(colCount, rowCount, Coordinate.InvalidVal)
+        val totalArr = initialize2DArr(colCount, rowCount, Coordinate.InvalidVal)
+        val breadcrumbArr = initialize2DArr(colCount, rowCount, new Coordinate(Coordinate.InvalidVal, Coordinate.InvalidVal))
 
         costArr(start.x)(start.y) = 0
         heuristicArr(start.x)(start.y) = heuristic(new HeuristicBundle(start, goal))
         totalArr(start.x)(start.y) = costArr(start.x)(start.y) + heuristicArr(start.x)(start.y)
 
         val otherLoc = goal
-        val otherBreadcrumbs = initialize2DArr(colCount, rowCount, new Coordinate(Coordinate.BadCoordVal, Coordinate.BadCoordVal))
+        val otherBreadcrumbs = initialize2DArr(colCount, rowCount, new Coordinate(Coordinate.InvalidVal, Coordinate.InvalidVal))
 
         queue.enqueue(new PriorityCoordinate(start, totalArr(start.x)(start.y)))
         execute(new BiDirStepData(start, goal, beenThere, queue, pathingMap,
@@ -73,12 +73,7 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
             //println("Goal: " + destination)
             //println(stepData.queue.toString() + "\n\n")
 
-            val isInBreadcrumbs = othersBreadcrumbs(freshLoc.x)(freshLoc.y) match {
-                case coord: Coordinate => (coord.x != Coordinate.BadCoordVal) && (coord.y != Coordinate.BadCoordVal)
-                case _ => false
-            }
-
-            if (freshLoc overlaps goal || (a @ ) )
+            if ((freshLoc overlaps goal) || (stepData hasInOthersBreadcrumbs freshLoc))
                 return Success(BiDirStepData(freshLoc, stepData))     // Exit point (success)
 
             beenThereArr(freshLoc.x)(freshLoc.y) = true
@@ -86,7 +81,7 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
 
         }
         else
-            Failure(BiDirStepData(new Coordinate(Coordinate.BadCoordVal, Coordinate.BadCoordVal), stepData))  // Exit point (failure)
+            Failure(BiDirStepData(new Coordinate(Coordinate.InvalidVal, Coordinate.InvalidVal), stepData))  // Exit point (failure)
 
     }
 
