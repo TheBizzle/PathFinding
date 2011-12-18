@@ -58,8 +58,15 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
         val stgStepData = stg.status.stepData
         val gtsStepData = gts.status.stepData
 
+        /**
+         * This can be fixed at some point to get rid of othersBreadcrumbsArr as a var in BiDirStepData
+         * This can be done with A going in B's breadcrumbs, finding the breadcrumb (C) of B.loc,
+         * and then updating A.othersBreadcrumbsArr for all neighbors of C
+         *
+         * At least... I THINK that will work.  I'd rather get this whole thing working before I try that and make things worse for myself, though.
+         */
         // I find this very displeasing
-        stgStepData.mergeShared( gtsStepData.breadcrumbArr)
+        stgStepData.mergeShared(gtsStepData.breadcrumbArr)
         gtsStepData.mergeShared(stgStepData.breadcrumbArr)
 
         // Actually, I find this whole function displeasing

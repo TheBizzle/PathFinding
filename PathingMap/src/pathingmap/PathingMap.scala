@@ -56,7 +56,7 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
     }
 
     override def clone() : PathingMap = {
-        new PathingMap(colCount, rowCount, pathingMap.clone())
+        new PathingMap(colCount, rowCount, pathingMap map ( _.clone() ))
     }
 
 }
@@ -103,7 +103,7 @@ object PathingMap {
     }
 
     def generateCloneWithPath(path: List[Coordinate], inMap: PathingMap) : PathingMap = {
-        val outMap = new PathingMap(inMap.colCount, inMap.rowCount, inMap.pathingMap.clone())
+        val outMap = inMap.clone()
         path.foreach { case(coord) => outMap.pathingMap(coord.x)(coord.y) = Path }
         outMap
     }

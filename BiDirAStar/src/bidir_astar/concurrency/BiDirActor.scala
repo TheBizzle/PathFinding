@@ -38,7 +38,6 @@ case class StartToGoal[T <: BiDirStepData](exeStatus: ExecutionStatus[T], itrs: 
                 reply(new StartToGoal(actStatus, actIters, decide, step))
             }
         }
-
     }
 }
 

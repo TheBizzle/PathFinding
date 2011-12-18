@@ -29,15 +29,15 @@ class BiDirStepData(currentLocation: Coordinate,
     private var othersBreadcrumbArr = othersBreadcrumbs
 
     override def clone() : BiDirStepData = {
-        new BiDirStepData(loc.clone(), goal.clone(), beenThereArr.clone(), queue.clone(),
-                          pathingMap.clone(), costArr.clone(), heuristicArr.clone(), totalArr.clone(),
-                          breadcrumbArr.clone(), othersBreadcrumbArr.clone())
+        new BiDirStepData(loc.clone(), goal.clone(), beenThereArr map (_.clone()), queue.clone(),
+                          pathingMap.clone(), costArr map (_.clone()), heuristicArr map (_.clone()),
+                          totalArr map (_.clone()), breadcrumbArr map (_.clone()), othersBreadcrumbArr map (_.clone()))
     }
 
     def cloneForBiBackwards() : BiDirStepData = {
-        new BiDirStepData(goal.clone(), loc.clone(), beenThereArr.clone(), queue.clone(),
-                          pathingMap.clone(), costArr.clone(), heuristicArr.clone(), totalArr.clone(),
-                          breadcrumbArr.clone(), othersBreadcrumbArr.clone())
+        new BiDirStepData(goal.clone(), loc.clone(), beenThereArr map (_.clone()), queue.clone(),
+                          pathingMap.clone(), costArr map (_.clone()), heuristicArr map (_.clone()),
+                          totalArr map (_.clone()), breadcrumbArr map (_.clone()), othersBreadcrumbArr map (_.clone()))
     }
 
     def mergeShared(oBreadcrumbs: Array[Array[Coordinate]]) {
