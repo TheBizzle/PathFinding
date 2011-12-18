@@ -15,9 +15,9 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
     val decide = decisionFunc
     val step = stepFunc
 
-    def direct(forwardStepData: T, backwardsStepData: T, iters: Int) : ExecutionStatus[T] = {
-        val stg = new StartToGoal[T](Continue(forwardStepData), iters, decide, step)
-        val gts = new GoalToStart[T](Continue(backwardsStepData), iters, decide, step)
+    def direct(forwardStepData: T, backwardsStepData: T) : ExecutionStatus[T] = {
+        val stg = new StartToGoal[T](Continue(forwardStepData), 0, decide, step)
+        val gts = new GoalToStart[T](Continue(backwardsStepData), 0, decide, step)
         evaluateActions(stg, gts)
     }
 
@@ -26,13 +26,13 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
         val (resultStg, resultGts) = runActionsForResult(stg, gts)
 
         resultStg.status match {
-            case Failure(x)  => Failure(x)
-            case Success(x)  => Success(x)
-            case Continue(x) =>
+            case (result @ Failure(_)) => result
+            case (result @ Success(_)) => result
+            case Continue(_) =>
                 resultGts.status match {
-                    case Failure(y)  => Failure(y)
-                    case Success(y)  => Success(y)
-                    case Continue(y) => { val (neoStg, neoGts) = shareDataAndTransform(resultStg, resultGts); evaluateActions(neoStg, neoGts) }
+                    case (result @ Failure(_)) => result
+                    case (result @ Success(_)) => result
+                    case Continue(_) => { val (neoStg, neoGts) = shareDataAndTransform(resultStg, resultGts); evaluateActions(neoStg, neoGts) }
                 }
         }
 
@@ -59,8 +59,8 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
         val gtsStepData = gts.status.stepData
 
         // I find this very displeasing
-        stgStepData.mergeShared(gtsStepData.loc, gtsStepData.breadcrumbArr)
-        gtsStepData.mergeShared(stgStepData.loc, stgStepData.breadcrumbArr)
+        stgStepData.mergeShared( gtsStepData.breadcrumbArr)
+        gtsStepData.mergeShared(stgStepData.breadcrumbArr)
 
         // Actually, I find this whole function displeasing
         val neoStg = new StartToGoal[T](Continue(stgStepData), stg.iters, stg.decide, stg.step)

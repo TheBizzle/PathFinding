@@ -35,30 +35,27 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
         val heuristicArr = initialize2DArr(colCount, rowCount, Coordinate.InvalidVal)
         val totalArr = initialize2DArr(colCount, rowCount, Coordinate.InvalidVal)
         val breadcrumbArr = initialize2DArr(colCount, rowCount, new Coordinate(Coordinate.InvalidVal, Coordinate.InvalidVal))
+        val otherBreadcrumbs = initialize2DArr(colCount, rowCount, new Coordinate(Coordinate.InvalidVal, Coordinate.InvalidVal))
 
         costArr(start.x)(start.y) = 0
         heuristicArr(start.x)(start.y) = heuristic(new HeuristicBundle(start, goal))
         totalArr(start.x)(start.y) = costArr(start.x)(start.y) + heuristicArr(start.x)(start.y)
 
-        val otherLoc = goal
-        val otherBreadcrumbs = initialize2DArr(colCount, rowCount, new Coordinate(Coordinate.InvalidVal, Coordinate.InvalidVal))
-
         queue.enqueue(new PriorityCoordinate(start, totalArr(start.x)(start.y)))
-        execute(new BiDirStepData(start, goal, beenThere, queue, pathingMap,
-                                  costArr, heuristicArr, totalArr, breadcrumbArr,
-                                  otherLoc, otherBreadcrumbs), maxIters = calculateMaxIters(colCount, rowCount))
+        execute(new BiDirStepData(start, goal, beenThere, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, otherBreadcrumbs),
+                maxIters = calculateMaxIters(colCount, rowCount))
 
     }
 
-    override protected def execute(stepData: BiDirStepData, iters: Int, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
+    override protected def execute(stepData: BiDirStepData, iters: Int = 0, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
         val director = new BiDirDirector(decide(_: BiDirStepData, _: Int, maxIters), step) // decide() gets partially applied
-        director.direct(stepData.clone(), stepData.cloneForBiBackwards(), iters) match {
+        director.direct(stepData.clone(), stepData.cloneForBiBackwards()) match {
             case status: ExecutionStatus[BiDirStepData] => status
             case _ => throw new InvalidParameterException
         }
     }
 
-    override protected def decide(stepData: BiDirStepData, iters: Int = 0, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
+    override protected def decide(stepData: BiDirStepData, iters: Int, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
 
         import stepData._
 

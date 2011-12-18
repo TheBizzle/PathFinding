@@ -22,29 +22,25 @@ class BiDirStepData(currentLocation: Coordinate,
                     heuristicArray: Array[Array[Int]],
                     totalArray: Array[Array[Int]],
                     breadcrumbs: Array[Array[Coordinate]],
-                    othersCurrentLocation: Coordinate,
                     othersBreadcrumbs: Array[Array[Coordinate]])
                     extends StepData(currentLocation, goalLocation, beenThere, pQueue, pMap, costArray, heuristicArray, totalArray, breadcrumbs) {
 
     // Shame on me!  Shaaaaame!
-    private var othersLoc = othersCurrentLocation
     private var othersBreadcrumbArr = othersBreadcrumbs
 
     override def clone() : BiDirStepData = {
         new BiDirStepData(loc.clone(), goal.clone(), beenThereArr.clone(), queue.clone(),
                           pathingMap.clone(), costArr.clone(), heuristicArr.clone(), totalArr.clone(),
-                          breadcrumbArr.clone(), othersLoc.clone(), othersBreadcrumbArr.clone())
+                          breadcrumbArr.clone(), othersBreadcrumbArr.clone())
     }
 
     def cloneForBiBackwards() : BiDirStepData = {
-        val neoStart = loc.clone()
-        new BiDirStepData(goal.clone(), neoStart, beenThereArr.clone(), queue.clone(),
+        new BiDirStepData(goal.clone(), loc.clone(), beenThereArr.clone(), queue.clone(),
                           pathingMap.clone(), costArr.clone(), heuristicArr.clone(), totalArr.clone(),
-                          breadcrumbArr.clone(), neoStart, othersBreadcrumbArr.clone())
+                          breadcrumbArr.clone(), othersBreadcrumbArr.clone())
     }
 
-    def mergeShared(oLoc: Coordinate, oBreadcrumbs: Array[Array[Coordinate]]) {
-        othersLoc = oLoc.clone()
+    def mergeShared(oBreadcrumbs: Array[Array[Coordinate]]) {
         othersBreadcrumbArr = oBreadcrumbs.clone()
     }
 
@@ -60,7 +56,6 @@ object BiDirStepData {
     def apply(freshLoc: Coordinate, stepData: BiDirStepData) : BiDirStepData = {
         import stepData._
         new BiDirStepData(freshLoc, goal, beenThereArr, queue, pathingMap,
-                          costArr, heuristicArr, totalArr, breadcrumbArr,
-                          othersLoc, othersBreadcrumbArr)
+                          costArr, heuristicArr, totalArr, breadcrumbArr, othersBreadcrumbArr)
     }
 }
