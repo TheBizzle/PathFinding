@@ -19,7 +19,8 @@ class StepData(currentLocation: Coordinate,
                costArray: Array[Array[Int]],
                heuristicArray: Array[Array[Int]],
                totalArray: Array[Array[Int]],
-               breadcrumbs: Array[Array[Coordinate]]) {
+               breadcrumbs: Array[Array[Coordinate]],
+               endGoalLocation: Coordinate = null) {
 
     val loc = currentLocation
     val goal = goalLocation
@@ -30,6 +31,9 @@ class StepData(currentLocation: Coordinate,
     val heuristicArr = heuristicArray
     val totalArr = totalArray
     val breadcrumbArr = breadcrumbs
+    val endGoal = if (null == endGoalLocation) goalLocation else endGoalLocation    // This is a variable that is useful for A* algorithms that\
+                                                                                    // might have multiple intermediary goals,
+                                                                                    // or for the backwards-moving track of bidirectional A*
 
 }
 

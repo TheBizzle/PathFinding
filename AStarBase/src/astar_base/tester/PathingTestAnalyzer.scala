@@ -16,7 +16,7 @@ object PathingTestAnalyzer {
 
     def apply(status: ExecutionStatus[StepData]) {
         status match {
-            case Success(x) => { println("Success!"); retracePath(x.breadcrumbArr, x.goal, x.pathingMap) }
+            case Success(x) => { println("Success!"); retracePath(x.breadcrumbArr, x.endGoal, x.pathingMap) }
             case _ => println("Failed to find a solution....\n\n")
         }
     }
@@ -37,7 +37,7 @@ object PathingTestAnalyzer {
         def breadcrumbsHelper(breadcrumbs: Array[Array[Coordinate]], current: Coordinate) : List[Coordinate] = {
             val next = breadcrumbs(current.x)(current.y)
             current :: {
-                if ((next.x > Coordinate.InvalidVal) && (next.y > Coordinate.InvalidVal))
+                if ((next.x != Coordinate.InvalidValue) && (next.y != Coordinate.InvalidValue))
                     breadcrumbsHelper(breadcrumbs, next)
                 else
                     Nil

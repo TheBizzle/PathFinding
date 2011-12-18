@@ -13,6 +13,9 @@ import statuses.ExecutionStatus
 
 abstract class AStarBase[T <: StepData](branchingFactor: Double, heuristicFunc: HeuristicBundle => Int) extends AStarLike[T] {
 
+    // A bad/initial numerical value for some things—NOT COUNTING x AND y MEMBERS OF COORDINATES; they have their own InvalidValue
+    protected val BadVal = -1
+
     protected val scalingFactor = branchingFactor        // How much of the map you're willing to query (from 0 to 1)
     protected val heuristic = heuristicFunc              // The heuristic function that A* will be using
 

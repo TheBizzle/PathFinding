@@ -2,6 +2,8 @@ package bidir_astar.concurrency
 
 import bidir_astar.BiDirStepData
 import astar_base.statuses._
+import coordinate.Coordinate
+import java.security.InvalidParameterException
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,14 +29,50 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
 
         resultStg.status match {
             case (result @ Failure(_)) => result
-            case (result @ Success(_)) => result
+            case Success(x) => mergeBreadcrumbsForForwardOnSuccess(x, resultGts.status.stepData)
             case Continue(_) =>
                 resultGts.status match {
                     case (result @ Failure(_)) => result
-                    case (result @ Success(_)) => result
+                    case Success(x) => mergeBreadcrumbsForBackwardsOnSuccess(x, resultStg.status.stepData)
                     case Continue(_) => { val (neoStg, neoGts) = shareDataAndTransform(resultStg, resultGts); evaluateActions(neoStg, neoGts) }
                 }
         }
+
+    }
+
+    def mergeBreadcrumbsForForwardOnSuccess(forwardData: T, backwardsData: T) : Success[T] = {
+        backwardsData.reverseBreadcrumbs()
+        Success(mergeBreadcrumbs(forwardData, backwardsData, forwardData.goal, forwardData.loc))
+    }
+
+    def mergeBreadcrumbsForBackwardsOnSuccess(backwardsData: T, forwardData : T) : Success[T] = {
+        backwardsData.reverseBreadcrumbs()
+        Success(mergeBreadcrumbs(backwardsData, forwardData, backwardsData.loc, backwardsData.goal))
+    }
+
+    def mergeBreadcrumbs(myData: T, thatData: T, startLoc: Coordinate, endLoc: Coordinate) : T = {
+
+        val myCrumbs = myData.breadcrumbArr
+        val thoseCrumbs = thatData.breadcrumbArr
+
+        // DEBUGGING STATEMENTS
+        //myCrumbs foreach ( x => print( x(0).toString + "||") ); print('\n')
+        //thoseCrumbs foreach ( x => print( x(0).toString + "||") ); print("\n\n")
+
+        var holder = startLoc
+
+        do {
+            if ((holder.x == Coordinate.InvalidValue) || (holder.y == Coordinate.InvalidValue)) throw new InvalidParameterException
+            val crumb = thoseCrumbs(holder.x)(holder.y)
+            myCrumbs(holder.x)(holder.y) = crumb
+            holder = crumb
+        } while (!(holder overlaps endLoc))
+
+        // DEBUGGING STATEMENTS
+        //myCrumbs foreach ( x => print( x(0).toString + "||") ); print('\n')
+        //thoseCrumbs foreach ( x => print( x(0).toString + "||") ); print('\n')
+
+        myData
 
     }
 
@@ -66,8 +104,8 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
          * At least... I THINK that will work.  I'd rather get this whole thing working before I try that and make things worse for myself, though.
          */
         // I find this very displeasing
-        stgStepData.mergeShared(gtsStepData.breadcrumbArr)
-        gtsStepData.mergeShared(stgStepData.breadcrumbArr)
+        stgStepData.assimilateBreadcrumbs(gtsStepData.breadcrumbArr)
+        gtsStepData.assimilateBreadcrumbs(stgStepData.breadcrumbArr)
 
         // Actually, I find this whole function displeasing
         val neoStg = new StartToGoal[T](Continue(stgStepData), stg.iters, stg.decide, stg.step)

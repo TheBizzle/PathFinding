@@ -51,5 +51,5 @@ class Coordinate(xLoc: Int, yLoc: Int) {
 }
 
 object Coordinate {
-    val InvalidVal = -1    // Invalid (initial) X/Y values for Coordinates
+    val InvalidValue = -1    // Invalid (initial) X/Y values for Coordinates
 }
