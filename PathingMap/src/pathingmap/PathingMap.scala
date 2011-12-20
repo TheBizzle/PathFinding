@@ -39,6 +39,10 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
         pathingMap(end.x)(end.y) = Self
     }
 
+    def markAsGoal(coordinate: Coordinate) {
+        pathingMap(coordinate.x)(coordinate.y) = Goal
+    }
+
     override def toString : String = {
 
         var acc = List[String]()

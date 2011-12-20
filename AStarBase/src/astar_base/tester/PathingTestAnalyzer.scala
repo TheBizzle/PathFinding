@@ -26,6 +26,7 @@ object PathingTestAnalyzer {
         val pathTaken = eatBreadcrumbsForPath(breadcrumbs, goal)
         println("The path taken was: " + pathTaken + "\nHere, let me draw that for you on the map!\n")
 
+        pathingMap.markAsGoal(goal)
         println(PathingMap.generateCloneWithPath(pathTaken, pathingMap).toString)
 
         val suggestedLoc = pathTaken.tail.head

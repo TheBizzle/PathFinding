@@ -71,10 +71,10 @@ class BiDirStepData(currentLocation: Coordinate,
             }
         }
         // DEBUGGING STATEMENTS
-        //breadcrumbArr foreach ( x => print( x(0).toString + "||") ); print('\n')
+        //breadcrumbArr foreach ( x => print( x(0).toString + "||" ) ); print('\n')
         reversalHelper(loc, breadcrumbArr)
         breadcrumbArr(loc.x)(loc.y) = new Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue)
-        //breadcrumbArr foreach ( x => print( x(0).toString + "||") ); print('\n')
+        //breadcrumbArr foreach ( x => print( x(0).toString + "||" ) ); print('\n')
     }
 
 }
