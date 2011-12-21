@@ -7,10 +7,15 @@ package coordinate
  * Time: 12:25 AM
  */
 
-class Coordinate(xLoc: Int, yLoc: Int) {
+case class Coordinate(xLoc: Int, yLoc: Int) {
 
     val x = xLoc
     val y = yLoc
+
+    // The constructor for an invalid coordinate
+    def this() {
+        this(Coordinate.InvalidValue, Coordinate.InvalidValue)
+    }
 
     override def toString : String = {
         "(" + x + "," + y + ")"
@@ -51,5 +56,5 @@ class Coordinate(xLoc: Int, yLoc: Int) {
 }
 
 object Coordinate {
-    val InvalidValue = -1    // Invalid (initial) X/Y values for Coordinates
+    private val InvalidValue = -1    // Invalid (initial) X/Y values for Coordinates
 }
