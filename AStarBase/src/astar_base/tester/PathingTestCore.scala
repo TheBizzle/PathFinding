@@ -1,8 +1,8 @@
 package astar_base.tester
 
 import criteria._
-import java.security.InvalidParameterException
 import collection.immutable.{TreeMap, HashMap, Map}
+import java.security.InvalidParameterException
 
 /**
  * Created by IntelliJ IDEA.
@@ -132,25 +132,111 @@ object PathingTestCore {
         }
     }
 
-    def findUnionOfIntervals(ranges: List[PathingTestCriteriaRangeTuple]) : List[PathingTestCriteriaRangeTuple] = {
-        // Make it!
-        // -Error on interval consumption
-        // -Error on useless removal range
+    private def findUnionOfIntervals(ranges: List[PathingTestCriteriaRangeTuple]) : List[PathingTestCriteriaRangeTuple] = {
+        val (testList, skipList) = siftTestAndSkip(ranges)
+        coalesceLists(condenseCriteriaTupleList(testList), condenseCriteriaTupleList(skipList))
+    }
+    
+    private def siftTestAndSkip(list: List[PathingTestCriteriaRangeTuple]) : (List[PathingTestCriteriaRangeTuple], List[PathingTestCriteriaRangeTuple]) = {
+        def siftHelper(inList: List[PathingTestCriteriaRangeTuple], testList: List[PathingTestCriteriaRangeTuple], skipList: List[PathingTestCriteriaRangeTuple]) : (List[PathingTestCriteriaRangeTuple], List[PathingTestCriteriaRangeTuple]) = {
+            inList match {
+                case Nil                  => (testList, skipList)
+                case h::t                 => {
+                    val flag = h.criteria.flag
+                    if (flag.isInstanceOf[TestRunFlag])
+                        siftHelper(t, h :: testList, skipList)
+                    else if (flag.isInstanceOf[TestSkipFlag])
+                        siftHelper(t, testList, h :: skipList)
+                    else
+                        throw new InvalidParameterException("Unexpected type of CriteriaRangeTuple!")   // EXPLODE!
+                }
+            }
+        }
+        siftHelper(list, List[PathingTestCriteriaRangeTuple](), List[PathingTestCriteriaRangeTuple]())
+    }
+
+    private def condenseCriteriaTupleList(ranges: List[PathingTestCriteriaRangeTuple]) : List[PathingTestCriteriaRangeTuple] = {
+        def condensationHelper(ranges: List[PathingTestCriteriaRangeTuple], r: PathingTestCriteriaRangeTuple) : List[PathingTestCriteriaRangeTuple] = {
+            ranges match {
+                case Nil  => Nil
+                case h::t => {
+                    if (doIntersect(r, h))
+                        condensationHelper(t, mergeCriteriaRangeTuples(r, h))   // If the first two intersect, merge and recurse
+                    else
+                        r :: condensationHelper(t, h)                           // If they don't, r is fully condensed
+                }
+            }
+        }
+        condensationHelper(ranges.tail, ranges.head)
+    }
+
+    private def coalesceLists(a: List[PathingTestCriteriaRangeTuple], b: List[PathingTestCriteriaRangeTuple]) : List[PathingTestCriteriaRangeTuple] = {
+        // Compare a.head and b.head
+        // If they intersect...
+        // If they don't intersect...
+        // Crazy, tricky, "watch the order!"-style logic!
         null
+    }
+
+    private def doIntersect(a: PathingTestCriteriaRangeTuple, b: PathingTestCriteriaRangeTuple) : Boolean = {
+        val ra = Range(a.criteria.guide._1, a.criteria.guide._2)
+        val rb = Range(b.criteria.guide._1, b.criteria.guide._2)
+        ra.intersect(rb).size > 0
+    }
+
+    // Coming into things, it's assumed that a starts at (or before) b
+    private def mergeCriteriaRangeTuples(a: PathingTestCriteriaRangeTuple, b: PathingTestCriteriaRangeTuple) : PathingTestCriteriaRangeTuple = {
+
+        val aCrit = a.criteria
+        val bCrit = b.criteria
+
+        if (aCrit.flag != bCrit.flag)
+            throw new InvalidParameterException("Flag mismatch on merging tuple " + a + " and tuple " + b)
+
+        if (bCrit.guide._2 < aCrit.guide._2)
+            throw new InvalidParameterException("Erroneous fully-encapsulated interval (" + bCrit.guide._1 + ", " + bCrit.guide._2 + ") supplied!")
+
+        PathingTestCriteriaRangeTuple(aCrit.guide._1, bCrit.guide._2, aCrit.flag)
+
     }
 
     // Calls an implicit conversion of RangeTuples into List[ValueTuple]s
-    def createTreeFromRangeCriteriaList(ranges: List[PathingTestCriteriaRangeTuple]) : TreeMap[Int, Boolean] = {
-        ranges.flatten foldLeft(TreeMap[Int, Boolean]())( (tree, x) => tree + (x.criteria.guide -> true) )
+    private def createTreeFromRangeCriteriaList(ranges: List[PathingTestCriteriaRangeTuple]) : TreeMap[Int, Boolean] = {
+        ranges.flatten.foldLeft (TreeMap[Int, Boolean]()) ( (tree, x) => tree + (x.criteria.guide -> true) )
     }
 
-    def mergeTreeWithValues(rangesMap: TreeMap[Int, Boolean], values: List[PathingTestCriteriaValueTuple]) : TreeMap[Int, Boolean] = {
-        // Make it!
-        // -   Add   (Success) : Add it...
-        // -   Add   (Failure) : "Error!  Duplicate!"
-        // - Removal (Success) : Remove it...
-        // - Removal (Failure) : "Error!  Nothing to remove!"
-        null
+    private def mergeTreeWithValues(rangesTree: TreeMap[Int, Boolean], values: List[PathingTestCriteriaValueTuple]) : TreeMap[Int, Boolean] = {
+
+        def addToTree(rangesTree: TreeMap[Int, Boolean], value: Int) : TreeMap[Int, Boolean] = {
+            rangesTree.get(value) match {
+                case Some(_) => throw new InvalidParameterException("Redundant inclusion of test #" + value)
+                case None    => rangesTree + (value -> true)
+            }
+        }
+
+        def removeFromTree(rangesTree: TreeMap[Int, Boolean], value: Int) : TreeMap[Int, Boolean] = {
+            rangesTree.get(value) match {
+                case Some(_) => rangesTree - value
+                case None    => throw new InvalidParameterException("Redundant exclusion of test #" + value)
+            }
+        }
+
+        values match {
+            case Nil  => rangesTree
+            case h::t => {
+                val flag = h.criteria.flag
+                val neoTree = {
+                    if (flag.isInstanceOf[TestRunFlag])
+                        addToTree(rangesTree, h.criteria.guide)
+                    else if (flag.isInstanceOf[TestSkipFlag])
+                        removeFromTree(rangesTree, h.criteria.guide)
+                    else
+                        throw new InvalidParameterException("Unexpected type of CriteriaRangeTuple!")   // EXPLODE!
+                }
+                mergeTreeWithValues(neoTree, t)
+            }
+        }
+        
     }
 
     private def initializeTestArray : Array[Function] = {
