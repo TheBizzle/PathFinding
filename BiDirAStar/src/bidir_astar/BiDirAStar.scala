@@ -34,8 +34,8 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
         val costArr = initialize2DArr(colCount, rowCount, BadVal)
         val heuristicArr = initialize2DArr(colCount, rowCount, BadVal)
         val totalArr = initialize2DArr(colCount, rowCount, BadVal)
-        val breadcrumbArr = initialize2DArr(colCount, rowCount, new Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue))
-        val otherBreadcrumbs = initialize2DArr(colCount, rowCount, new Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue))
+        val breadcrumbArr = initialize2DArr(colCount, rowCount, new Coordinate())
+        val otherBreadcrumbs = initialize2DArr(colCount, rowCount, new Coordinate())
 
         costArr(start.x)(start.y) = 0
         heuristicArr(start.x)(start.y) = heuristic(new HeuristicBundle(start, goal))
@@ -78,7 +78,7 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
 
         }
         else
-            Failure(BiDirStepData(new Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue), stepData))  // Exit point (failure)
+            Failure(BiDirStepData(new Coordinate(), stepData))  // Exit point (failure)
 
     }
 

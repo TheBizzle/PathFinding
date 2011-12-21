@@ -39,7 +39,7 @@ object AStar extends AStarBase[StepData](1.0, HeuristicLib.manhattanDistance) {
         val costArr = initialize2DArr(colCount, rowCount, BadVal)
         val heuristicArr = initialize2DArr(colCount, rowCount, BadVal)
         val totalArr = initialize2DArr(colCount, rowCount, BadVal)
-        val breadcrumbArr = initialize2DArr(colCount, rowCount, new Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue))
+        val breadcrumbArr = initialize2DArr(colCount, rowCount, new Coordinate())
 
         costArr(start.x)(start.y) = 0
         heuristicArr(start.x)(start.y) = heuristic(new HeuristicBundle(start, goal))
@@ -87,7 +87,7 @@ object AStar extends AStarBase[StepData](1.0, HeuristicLib.manhattanDistance) {
 
         }
         else
-            Failure(StepData(new Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue), stepData))  // Exit point (failure)
+            Failure(StepData(new Coordinate(), stepData))  // Exit point (failure)
 
     }
 

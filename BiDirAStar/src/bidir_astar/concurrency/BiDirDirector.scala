@@ -62,10 +62,14 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
         var holder = startLoc
 
         do {
-            if ((holder.x == Coordinate.InvalidValue) || (holder.y == Coordinate.InvalidValue)) throw new InvalidParameterException
-            val crumb = thoseCrumbs(holder.x)(holder.y)
-            myCrumbs(holder.x)(holder.y) = crumb
-            holder = crumb
+            holder match {
+                case Coordinate() => throw new InvalidParameterException
+                case _            => {
+                    val crumb = thoseCrumbs(holder.x)(holder.y)
+                    myCrumbs(holder.x)(holder.y) = crumb
+                    holder = crumb
+                }
+            }
         } while (!(holder overlaps endLoc))
 
         // DEBUGGING STATEMENTS

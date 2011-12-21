@@ -58,22 +58,27 @@ class BiDirStepData(currentLocation: Coordinate,
     }
 
     def hasInOthersBreadcrumbs(loc: Coordinate) : Boolean = {
-        val thatLoc = othersBreadcrumbArr(loc.x)(loc.y)
-        (thatLoc.x != Coordinate.InvalidValue) && (thatLoc.y != Coordinate.InvalidValue)
+        othersBreadcrumbArr(loc.x)(loc.y) match {
+            case Coordinate() => false
+            case _            => true
+        }
     }
 
     def reverseBreadcrumbs() {
         def reversalHelper(loc: Coordinate, crumbArr: Array[Array[Coordinate]]) {
             val crumb = crumbArr(loc.x)(loc.y)
-            if (crumb.x != Coordinate.InvalidValue && crumb.y != Coordinate.InvalidValue) {
-                reversalHelper(crumb, crumbArr)
-                crumbArr(crumb.x)(crumb.y) = loc
+            crumb match {
+                case Coordinate() => // Let the recursion die on invalid Coordinates
+                case _            => {
+                    reversalHelper(crumb, crumbArr)
+                    crumbArr(crumb.x)(crumb.y) = loc
+                }
             }
         }
         // DEBUGGING STATEMENTS
         //breadcrumbArr foreach ( x => print( x(0).toString + "||" ) ); print('\n')
         reversalHelper(loc, breadcrumbArr)
-        breadcrumbArr(loc.x)(loc.y) = new Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue)
+        breadcrumbArr(loc.x)(loc.y) = new Coordinate()
         //breadcrumbArr foreach ( x => print( x(0).toString + "||" ) ); print('\n')
     }
 
