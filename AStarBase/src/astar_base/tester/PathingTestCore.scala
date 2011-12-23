@@ -1,7 +1,7 @@
 package astar_base.tester
 
+import collection.immutable.{HashMap, Map}
 import criteria._
-import collection.immutable.{TreeMap, HashMap, Map}
 import java.security.InvalidParameterException
 import scala.Array
 
@@ -52,24 +52,21 @@ object PathingTestCore {
     private def handleTestIntervals(valuesOption: Option[List[PathingTestCriteriaValueTuple]], rangesOption: Option[List[PathingTestCriteriaRangeTuple]]) : List[Int] = {
 
         val (values, ranges) = List(valuesOption, rangesOption) foreach ( _ match { case None => Nil; case Some(_) => sortCriteria(_) } )
-        val maxNumFound = {
-            values.last.criteria match {
-                case x: PathingTestCriteriaRangeTuple => x.guide._1
-                case x: PathingTestCriteriaValueTuple => x.guide
-                case _                                => throw new InvalidParameterException("Invalid criteria type!  What the heck did you pass into the testing suite...?")
-            }
-        }
 
         if (values.last.criteria.guide > getMaxTestNum)
             throw new InvalidParameterException("There is no test #" + values.last.criteria.guide)
 
-        val unionOfRanges = findUnionOfIntervals(ranges)
+        val unionOfRanges = findUnionOfIntervals(ranges).foldLeft (List[PathingTestCriteriaRangeTuple]()) ( (acc, x) => if (x.isValid) x :: acc else acc )
 
         if (unionOfRanges.last.criteria.guide._2 > getMaxTestNum)
             throw new InvalidParameterException("Test range (" + unionOfRanges.last.criteria.guide._1 + ", " + unionOfRanges.last.criteria.guide._2 +
                                                 " extends to a number for which there is no corresponding test")
 
-        val resultArr = mergeValuesIntoArr(createArrayFromRangeCriteriaList(unionOfRanges, maxNumFound), values)
+        val maxVal = values.last.criteria.guide
+        val maxRange = unionOfRanges.last.criteria.guide._2
+        val overallMax = if (maxVal > maxRange) maxVal else maxRange
+
+        val resultArr = mergeValuesIntoArr(createArrayFromRangeCriteriaList(unionOfRanges, overallMax), values)
         val outList = { for ( i <- 0 until resultArr.size;
                               if (resultArr(i)) ) yield i }.toList
 
@@ -170,7 +167,7 @@ object PathingTestCore {
             ranges match {
                 case Nil  => Nil
                 case h::t => {
-                    if (doIntersect(r, h))
+                    if (r intersects h)
                         condensationHelper(t, mergeCriteriaRangeTuples(r, h))   // If the first two intersect, merge and recurse
                     else
                         r :: condensationHelper(t, h)                           // If they don't, r is fully condensed
@@ -181,18 +178,53 @@ object PathingTestCore {
     }
 
     private def coalesceLists(a: List[PathingTestCriteriaRangeTuple], b: List[PathingTestCriteriaRangeTuple]) : List[PathingTestCriteriaRangeTuple] = {
-        // Compare a.head and b.head
-        // If they intersect...
-        // If they don't intersect...
-        // Crazy, tricky, "watch the order!"-style logic!
-        null
+
+        def trimOffEncapsulateds(a: List[PathingTestCriteriaRangeTuple], bh: PathingTestCriteriaRangeTuple) : (PathingTestCriteriaRangeTuple, List[PathingTestCriteriaRangeTuple]) = {
+            a match {
+                case Nil    => throw new InvalidParameterException("Exclusion of range (" + bh.criteria.guide._1 + ", " + bh.criteria.guide._2 + ") is unnecessary")
+                case ah::at => {
+                    if(ah intersects bh) {
+                        if (bh encapsulates ah)
+                            trimOffEncapsulateds(at, bh)
+                        else {
+                            import ah.criteria._
+                            val ahr = PathingTestCriteriaRangeTuple(bh.criteria.guide._1 + 1, guide._2, flag)
+                            (ahr, a)
+                        }
+                    }
+                    else
+                        (ah, at)
+                }
+            }
+        }
+
+        b match {
+            case Nil    => Nil
+            case bh::bt => {
+                a match {
+                    case Nil    => throw new InvalidParameterException("Exclusion of range (" + bh.criteria.guide._1 + ", " + bh.criteria.guide._2 + ") is unnecessary")
+                    case ah::at => {
+                        if (ah intersects bh) {
+                            val ahl = PathingTestCriteriaRangeTuple(ah.criteria.guide._1, bh.criteria.guide._2 - 1, ah.criteria.flag)
+                            if (ah encapsulates bh) {
+                                val ahr = PathingTestCriteriaRangeTuple(bh.criteria.guide._1 + 1, ah.criteria.guide._2, ah.criteria.flag)
+                                ahl :: coalesceLists(ahr :: at, bt)
+                            }
+                            else {
+                                val (neoHead, aTailRemaining) = trimOffEncapsulateds(at, bh)
+                                ahl :: coalesceLists (neoHead :: aTailRemaining, bt)
+                            }
+                        }
+                        else
+                            throw new InvalidParameterException("Exclusion of range (" + bh.criteria.guide._1 + ", " + bh.criteria.guide._2 + ") is unnecessary")
+                    }
+                }
+            }
+        }
+
     }
 
-    private def doIntersect(a: PathingTestCriteriaRangeTuple, b: PathingTestCriteriaRangeTuple) : Boolean = {
-        val ra = Range(a.criteria.guide._1, a.criteria.guide._2)
-        val rb = Range(b.criteria.guide._1, b.criteria.guide._2)
-        ra.intersect(rb).size > 0
-    }
+
 
     // Coming into things, it's assumed that a starts at (or before) b
     private def mergeCriteriaRangeTuples(a: PathingTestCriteriaRangeTuple, b: PathingTestCriteriaRangeTuple) : PathingTestCriteriaRangeTuple = {
