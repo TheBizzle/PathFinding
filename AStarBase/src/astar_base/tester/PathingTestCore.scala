@@ -179,21 +179,21 @@ object PathingTestCore {
 
     private def coalesceLists(a: List[PathingTestCriteriaRangeTuple], b: List[PathingTestCriteriaRangeTuple]) : List[PathingTestCriteriaRangeTuple] = {
 
-        def trimOffEncapsulateds(a: List[PathingTestCriteriaRangeTuple], bh: PathingTestCriteriaRangeTuple) : (PathingTestCriteriaRangeTuple, List[PathingTestCriteriaRangeTuple]) = {
+        def trimOffEncapsulations(a: List[PathingTestCriteriaRangeTuple], bh: PathingTestCriteriaRangeTuple) : List[PathingTestCriteriaRangeTuple] = {
             a match {
                 case Nil    => throw new InvalidParameterException("Exclusion of range (" + bh.criteria.guide._1 + ", " + bh.criteria.guide._2 + ") is unnecessary")
                 case ah::at => {
                     if(ah intersects bh) {
                         if (bh encapsulates ah)
-                            trimOffEncapsulateds(at, bh)
+                            trimOffEncapsulations(at, bh)
                         else {
                             import ah.criteria._
                             val ahr = PathingTestCriteriaRangeTuple(bh.criteria.guide._1 + 1, guide._2, flag)
-                            (ahr, a)
+                            ahr :: at
                         }
                     }
                     else
-                        (ah, at)
+                        a
                 }
             }
         }
@@ -211,8 +211,8 @@ object PathingTestCore {
                                 ahl :: coalesceLists(ahr :: at, bt)
                             }
                             else {
-                                val (neoHead, aTailRemaining) = trimOffEncapsulateds(at, bh)
-                                ahl :: coalesceLists (neoHead :: aTailRemaining, bt)
+                                val neoA = trimOffEncapsulations(at, bh)
+                                ahl :: coalesceLists (neoA, bt)
                             }
                         }
                         else
