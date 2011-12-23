@@ -3,6 +3,7 @@ package astar_base.tester
 import criteria._
 import collection.immutable.{TreeMap, HashMap, Map}
 import java.security.InvalidParameterException
+import scala.Array
 
 /**
  * Created by IntelliJ IDEA.
@@ -51,6 +52,13 @@ object PathingTestCore {
     private def handleTestIntervals(valuesOption: Option[List[PathingTestCriteriaValueTuple]], rangesOption: Option[List[PathingTestCriteriaRangeTuple]]) : List[Int] = {
 
         val (values, ranges) = List(valuesOption, rangesOption) foreach ( _ match { case None => Nil; case Some(_) => sortCriteria(_) } )
+        val maxNumFound = {
+            values.last.criteria match {
+                case x: PathingTestCriteriaRangeTuple => x.guide._1
+                case x: PathingTestCriteriaValueTuple => x.guide
+                case _                                => throw new InvalidParameterException("Invalid criteria type!  What the heck did you pass into the testing suite...?")
+            }
+        }
 
         if (values.last.criteria.guide > getMaxTestNum)
             throw new InvalidParameterException("There is no test #" + values.last.criteria.guide)
@@ -61,10 +69,12 @@ object PathingTestCore {
             throw new InvalidParameterException("Test range (" + unionOfRanges.last.criteria.guide._1 + ", " + unionOfRanges.last.criteria.guide._2 +
                                                 " extends to a number for which there is no corresponding test")
 
-        val outList = mergeTreeWithValues(createTreeFromRangeCriteriaList(unionOfRanges), values).toList
+        val resultArr = mergeValuesIntoArr(createArrayFromRangeCriteriaList(unionOfRanges, maxNumFound), values)
+        val outList = { for ( i <- 0 until resultArr.size;
+                              if (resultArr(i)) ) yield i }.toList
 
         if (!outList.isEmpty)
-            outList map ( _._1 )
+            outList
         else
             throw new InvalidParameterException("No tests to run!")
 
@@ -133,11 +143,11 @@ object PathingTestCore {
     }
 
     private def findUnionOfIntervals(ranges: List[PathingTestCriteriaRangeTuple]) : List[PathingTestCriteriaRangeTuple] = {
-        val (testList, skipList) = siftTestAndSkip(ranges)
+        val (testList, skipList) = siftOutTestsAndSkips(ranges)
         coalesceLists(condenseCriteriaTupleList(testList), condenseCriteriaTupleList(skipList))
     }
     
-    private def siftTestAndSkip(list: List[PathingTestCriteriaRangeTuple]) : (List[PathingTestCriteriaRangeTuple], List[PathingTestCriteriaRangeTuple]) = {
+    private def siftOutTestsAndSkips(list: List[PathingTestCriteriaRangeTuple]) : (List[PathingTestCriteriaRangeTuple], List[PathingTestCriteriaRangeTuple]) = {
         def siftHelper(inList: List[PathingTestCriteriaRangeTuple], testList: List[PathingTestCriteriaRangeTuple], skipList: List[PathingTestCriteriaRangeTuple]) : (List[PathingTestCriteriaRangeTuple], List[PathingTestCriteriaRangeTuple]) = {
             inList match {
                 case Nil                  => (testList, skipList)
@@ -200,40 +210,40 @@ object PathingTestCore {
 
     }
 
+    // Basically, takes advantage of bucketing to quickly 
     // Calls an implicit conversion of RangeTuples into List[ValueTuple]s
-    private def createTreeFromRangeCriteriaList(ranges: List[PathingTestCriteriaRangeTuple]) : TreeMap[Int, Boolean] = {
-        ranges.flatten.foldLeft (TreeMap[Int, Boolean]()) ( (tree, x) => tree + (x.criteria.guide -> true) )
+    private def createArrayFromRangeCriteriaList(ranges: List[PathingTestCriteriaRangeTuple], maxNum: Int) : Array[Boolean] = {
+        val arr = new Array[Boolean](maxNum)
+        ranges.flatten.foreach { arr(_.criteria.guide) = true }
     }
 
-    private def mergeTreeWithValues(rangesTree: TreeMap[Int, Boolean], values: List[PathingTestCriteriaValueTuple]) : TreeMap[Int, Boolean] = {
+    private def mergeValuesIntoArr(rangesArr: Array[Boolean], values: List[PathingTestCriteriaValueTuple]) : Array[Boolean] = {
 
-        def addToTree(rangesTree: TreeMap[Int, Boolean], value: Int) : TreeMap[Int, Boolean] = {
-            rangesTree.get(value) match {
-                case Some(_) => throw new InvalidParameterException("Redundant inclusion of test #" + value)
-                case None    => rangesTree + (value -> true)
-            }
+        def addToArr(rangesArr: Array[Boolean], value: Int) : Array[Boolean] = {
+            if (rangesArr(value))
+                throw new InvalidParameterException("Redundant inclusion of test #" + value)
+            else
+                { rangesArr(value) = true; rangesArr }
         }
 
-        def removeFromTree(rangesTree: TreeMap[Int, Boolean], value: Int) : TreeMap[Int, Boolean] = {
-            rangesTree.get(value) match {
-                case Some(_) => rangesTree - value
-                case None    => throw new InvalidParameterException("Redundant exclusion of test #" + value)
-            }
+        def removeFromArr(rangesArr: Array[Boolean], value: Int) : Array[Boolean] = {
+            if (rangesArr(value))
+                { rangesArr(value) = false; rangesArr }
+            else
+                throw new InvalidParameterException("Redundant exclusion of test #" + value)
         }
 
         values match {
-            case Nil  => rangesTree
+            case Nil  => rangesArr
             case h::t => {
                 val flag = h.criteria.flag
-                val neoTree = {
-                    if (flag.isInstanceOf[TestRunFlag])
-                        addToTree(rangesTree, h.criteria.guide)
-                    else if (flag.isInstanceOf[TestSkipFlag])
-                        removeFromTree(rangesTree, h.criteria.guide)
-                    else
-                        throw new InvalidParameterException("Unexpected type of CriteriaRangeTuple!")   // EXPLODE!
-                }
-                mergeTreeWithValues(neoTree, t)
+                if (flag.isInstanceOf[TestRunFlag])
+                    addToArr(rangesArr, h.criteria.guide)
+                else if (flag.isInstanceOf[TestSkipFlag])
+                    removeFromArr(rangesArr, h.criteria.guide)
+                else
+                    throw new InvalidParameterException("Unexpected type of CriteriaRangeTuple!")   // EXPLODE!
+                mergeValuesIntoArr(rangesArr, t)
             }
         }
         
