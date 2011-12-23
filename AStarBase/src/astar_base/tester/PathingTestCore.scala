@@ -210,7 +210,7 @@ object PathingTestCore {
 
     }
 
-    // Basically, takes advantage of bucketing to quickly 
+    // Basically, takes advantage of bucketing to quickly deal with test numbers and their test-ness/skip-ness
     // Calls an implicit conversion of RangeTuples into List[ValueTuple]s
     private def createArrayFromRangeCriteriaList(ranges: List[PathingTestCriteriaRangeTuple], maxNum: Int) : Array[Boolean] = {
         val arr = new Array[Boolean](maxNum)
