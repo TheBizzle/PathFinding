@@ -17,23 +17,24 @@ object TestingCore {
     private val ArgKeyValue = "value"
     private val ArgKeyRange = "range"
     private val ArgKeyToggle = "toggle"
-    private val ArgKeyList = List(ArgKeyToggle, ArgKeyRange, ArgKeyValue)   // The ordering here is important.  Don't mess with it!
 
     // These existential types displease me...
     def apply[T <: StepData](args: List[TestCriteria[_]], thingToTest: PathFinder[T]) {
         val argMap = sortArgLists(args)
-        val relevantKeys = findRelevantKeys(argMap)
-        makeTestRunningDecisions(argMap, relevantKeys, thingToTest)
+        makeTestRunningDecisions(argMap, thingToTest)
     }
 
-    private def makeTestRunningDecisions[T <: StepData](argMap: Map[String, List[TestCriteria[_]]], keyList: List[String], thingToTest: PathFinder[T]) {
+    private def makeTestRunningDecisions[T <: StepData](argMap: Map[String, List[TestCriteria[_]]], thingToTest: PathFinder[T]) {
 
         val toggles = new TestToggleFlagWrapper(argMap.get(ArgKeyToggle).asInstanceOf[Option[List[TestCriteriaToggleFlag]]])
         val wantsToRunPathing = assessPathingDesire(argMap)
         val (isTalkative, isRunningBaseTests, isSkippingPathingTests) = (toggles.get(Talkative), toggles.get(RunBaseTests), toggles.get(SkipPathingTests))
 
-        if ((isSkippingPathingTests && (wantsToRunPathing || !isRunningBaseTests)))
-            throw new InvalidParameterException
+        if (isSkippingPathingTests)
+            if(wantsToRunPathing)
+                throw new InvalidParameterException("If you don't want skip running pathing tests, you should not specify pathing tests to run.")
+            else if (!isRunningBaseTests)
+                throw new InvalidParameterException("You can run the test suite if you're going to skip the pathing tests AND the base tests")
 
         val testsToRun = {
             if (!isSkippingPathingTests)
@@ -56,13 +57,13 @@ object TestingCore {
         // val (values, ranges) = List(valuesOption, rangesOption) foreach ( _ match { case None => Nil; case Some(x) => sortCriteria(x) } )
         
         val values = valuesOption match {
-            case None    => Nil
-            case Some(x) => sortCriteriaValues(x)
+            case Some(x @ (h::t)) => sortCriteriaValues(x)
+            case _                  => Nil
         }
 
         val ranges = rangesOption match {
-            case None    => Nil
-            case Some(x) => sortCriteriaRanges(x)
+            case Some(x @ (h::t)) => sortCriteriaRanges(x)
+            case _    => Nil
         }
 
         if (!values.isEmpty && (values.last.criteria.guide > PathingTestCluster.getSize))
@@ -103,13 +104,14 @@ object TestingCore {
     }
 
     private def assessPathingDesire(argMap:  Map[String, List[TestCriteria[_]]]) : Boolean = {
-        def assessmentHelper(argListOption: Option[List[TestCriteria[_]]]) : Boolean = {
-            argListOption match {
-                case None    => false
-                case Some(x) => x foreach { x => if (x.isInstanceOf[TestRunFlag]) true }; false
+        def assessmentHelper(tuples: List[TestCriteria[TestTuple[_,_]]]) : Boolean = {
+            tuples match {
+                case Nil  => false
+                case h::t => if (h.criteria.flag.isInstanceOf[TestRunFlag]) true else assessmentHelper(t)
             }
         }
-        assessmentHelper(argMap.get(ArgKeyValue)) || assessmentHelper(argMap.get(ArgKeyRange))
+        assessmentHelper(argMap(ArgKeyValue).asInstanceOf[List[TestCriteria[TestTuple[_,_]]]]) ||
+            assessmentHelper(argMap(ArgKeyRange).asInstanceOf[List[TestCriteria[TestTuple[_,_]]]])
     }
 
     private def sortArgLists(args: List[TestCriteria[_]]) : Map[String, List[TestCriteria[_]]] = {
@@ -131,20 +133,6 @@ object TestingCore {
         sortHelper(args, HashMap[String, List[TestCriteria[_]]](ArgKeyValue -> List[TestCriteriaValueTuple](),
                                                                 ArgKeyRange -> List[TestCriteriaRangeTuple](),
                                                                 ArgKeyToggle -> List[TestCriteriaToggleFlag]()))
-    }
-
-    private def findRelevantKeys(argMap: Map[String, List[TestCriteria[_]]]) : List[String] = {
-        def relevantKeyHelper(argMap: Map[String, List[TestCriteria[_]]], keyList: List[String]) : List[String] = {
-            keyList match {
-                case Nil  => Nil
-                case h::t =>
-                    argMap.get(h) match {
-                        case Some(x: List[TestCriteria[_]]) => if (!x.isEmpty) h :: relevantKeyHelper(argMap, t) else Nil
-                        case None    => Nil
-                    }
-            }
-        }
-        relevantKeyHelper(argMap, ArgKeyList)
     }
 
     // There's a better way to do this—think implicit conversions!
@@ -183,7 +171,7 @@ object TestingCore {
 
         def condensationHelper(ranges: List[TestCriteriaRangeTuple], r: TestCriteriaRangeTuple) : List[TestCriteriaRangeTuple] = {
             ranges match {
-                case Nil  => Nil
+                case Nil  => List(r)
                 case h::t => {
                     if (r intersects h)
                         condensationHelper(t, mergeCriteriaRangeTuples(r, h))   // If the first two intersect, merge and recurse
@@ -222,7 +210,7 @@ object TestingCore {
         }
 
         b match {
-            case Nil    => Nil
+            case Nil    => a
             case bh::bt => {
                 a match {
                     case Nil    => throw new InvalidParameterException("Exclusion of range (" + bh.criteria.guide._1 + ", " + bh.criteria.guide._2 + ") is unnecessary")
@@ -268,7 +256,7 @@ object TestingCore {
     // Basically, takes advantage of bucketing to quickly deal with test numbers and their test-ness/skip-ness
     // Generally, calls an implicit conversion of List[RangeTuples] into List[List[ValueTuple]]s where it is called
     private def createArrayFromRangeCriteriaList(ranges: List[List[TestCriteriaValueTuple]], maxNum: Int) : Array[Boolean] = {
-        val arr = new Array[Boolean](maxNum)
+        val arr = new Array[Boolean](maxNum + 1)
         ranges.flatten.foreach { x => arr(x.criteria.guide) = true }
         arr
     }

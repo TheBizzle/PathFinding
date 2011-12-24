@@ -69,7 +69,7 @@ object TestCriteriaRangeTuple {
         that map ( rangeTupleToValueTupleList(_) )
     }
     implicit def rangeTupleToValueTupleList(that: TestCriteriaRangeTuple) : List[TestCriteriaValueTuple] = {
-        Range(that.criteria.guide._1, that.criteria.guide._2).foldLeft (List[TestCriteriaValueTuple]()) ( (acc, x) => TestCriteriaValueTuple(x, TestingFlag.flipArity(that.criteria.flag)) :: acc)
+        Range(that.criteria.guide._1, that.criteria.guide._2).inclusive.foldLeft (List[TestCriteriaValueTuple]()) ( (acc, x) => TestCriteriaValueTuple(x, TestingFlag.flipArity(that.criteria.flag)) :: acc)
     }
 }
 

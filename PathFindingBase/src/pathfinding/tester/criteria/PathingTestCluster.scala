@@ -24,7 +24,7 @@ sealed abstract class TestFunction extends Function2[PathFinder[StepData], Boole
 object PathingTestCluster {
 
     // I hope that calling (object Array).apply(args) will only make an array that has args.length elements...
-    private val tests = Array[TestFunction](Test1, Test2, Test3, Test4, Test5, Test6)
+    private val tests = Array[TestFunction](null, Test1, Test2, Test3, Test4, Test5, Test6)
 
     // I hate it!  I HATE IT!
     def runTests[T <: StepData](testNums: List[Int], thingToTest: PathFinder[T], isTalkative: Boolean) {
@@ -32,7 +32,7 @@ object PathingTestCluster {
     }
 
     def getSize : Int = {
-        tests.length
+        tests.length - 1
     }
 
     private def analyze[T <: StepData](status: ExecutionStatus[T], isTalkative: Boolean) {
