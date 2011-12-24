@@ -1,8 +1,9 @@
 package astar_base
 
-import heuristic.HeuristicBundle
-import pathingmap.pathingmapdata.PathingMapString
-import statuses.ExecutionStatus
+import heuristics.HeuristicBundle
+import pathfinding.pathingmap.pathingmapdata.PathingMapString
+import pathfinding.statuses.ExecutionStatus
+import pathfinding.PathFinder
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,7 +12,7 @@ import statuses.ExecutionStatus
  * Time: 11:15 PM
  */
 
-abstract class AStarBase[T <: StepData](branchingFactor: Double, heuristicFunc: HeuristicBundle => Int) extends AStarLike[T] {
+abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicFunc: HeuristicBundle => Int) extends AStarLike[T] with PathFinder {
 
     // A bad/initial numerical value for some things—NOT COUNTING THE "X" AND "Y" MEMBERS OF COORDINATE OBJECTS; they have their own InvalidValue
     protected val BadVal = -1

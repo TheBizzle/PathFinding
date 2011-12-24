@@ -2,7 +2,7 @@ package astar_base
 
 import datastructure.priorityqueue.PriorityQueue
 import java.security.InvalidParameterException
-import coordinate.{Coordinate, PriorityCoordinate}
+import pathfinding.coordinate.{Coordinate, PriorityCoordinate}
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,7 +11,7 @@ import coordinate.{Coordinate, PriorityCoordinate}
  * Time: 11:04 PM
  */
 
-trait AStarLike[T <: StepData] {
+trait AStarLike[T <: AStarStepData] {
 
     self: AStarBase[T] =>
 
