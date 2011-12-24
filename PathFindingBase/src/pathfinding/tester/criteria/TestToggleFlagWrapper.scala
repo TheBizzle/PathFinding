@@ -17,6 +17,7 @@ class TestToggleFlagWrapper(toggles: Option[List[TestCriteriaToggleFlag]]) {
     private val flagMap = initializeFlagMap(FlagList)
 
     toggles match {
+        case None    => throw new InvalidParameterException("OMG, what did you do?!")
         case Some(x) => x map (verifyAndInsert(_))
     } 
 

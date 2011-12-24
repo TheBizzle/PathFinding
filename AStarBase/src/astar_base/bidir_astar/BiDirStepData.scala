@@ -59,8 +59,8 @@ class BiDirStepData(currentLocation: Coordinate,
 
     def hasInOthersBreadcrumbs(loc: Coordinate) : Boolean = {
         othersBreadcrumbArr(loc.x)(loc.y) match {
-            case Coordinate() => false
-            case _            => true
+            case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => false
+            case _                                                            => true
         }
     }
 
@@ -68,8 +68,8 @@ class BiDirStepData(currentLocation: Coordinate,
         def reversalHelper(loc: Coordinate, crumbArr: Array[Array[Coordinate]]) {
             val crumb = crumbArr(loc.x)(loc.y)
             crumb match {
-                case Coordinate() => // Let the recursion die on invalid Coordinates
-                case _            => {
+                case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => // Let the recursion die on invalid Coordinates
+                case _ => {
                     reversalHelper(crumb, crumbArr)
                     crumbArr(crumb.x)(crumb.y) = loc
                 }

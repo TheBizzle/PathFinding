@@ -12,7 +12,7 @@ import pathfinding.PathFinder
  * Time: 11:15 PM
  */
 
-abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicFunc: HeuristicBundle => Int) extends AStarLike[T] with PathFinder {
+abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicFunc: HeuristicBundle => Int) extends AStarLike[T] with PathFinder[T] {
 
     // A bad/initial numerical value for some things—NOT COUNTING THE "X" AND "Y" MEMBERS OF COORDINATE OBJECTS; they have their own InvalidValue
     protected val BadVal = -1

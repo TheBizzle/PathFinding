@@ -1,13 +1,13 @@
-package astar
+package astar_base.astar
 
 //import collection.mutable.PriorityQueue
-import pathingmap.pathingmapdata.PathingMapString
-import pathingmap.PathingMap
 import datastructure.priorityqueue.PriorityQueue
-import coordinate._
 import astar_base._
 import heuristics.{HeuristicBundle, HeuristicLib}
-import statuses._
+import pathfinding.pathingmap.pathingmapdata.PathingMapString
+import pathfinding.statuses._
+import pathfinding.pathingmap.PathingMap
+import pathfinding.coordinate._
 
 /**
  * Created by IntelliJ IDEA.

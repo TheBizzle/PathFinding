@@ -3,7 +3,7 @@ package pathfinding.tester
 import criteria._
 import collection.immutable.{HashMap, Map}
 import java.security.InvalidParameterException
-import pathfinding.PathFinder
+import pathfinding.{StepData, PathFinder}
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,13 +19,14 @@ object TestingCore {
     private val ArgKeyToggle = "toggle"
     private val ArgKeyList = List(ArgKeyToggle, ArgKeyRange, ArgKeyValue)   // The ordering here is important.  Don't mess with it!
 
-    def apply(args: List[TestCriteria], thingToTest: PathFinder) {
+    // These existential types displease me...
+    def apply[T <: StepData](args: List[TestCriteria[_]], thingToTest: PathFinder[T]) {
         val argMap = sortArgLists(args)
         val relevantKeys = findRelevantKeys(argMap)
         makeTestRunningDecisions(argMap, relevantKeys, thingToTest)
     }
 
-    private def makeTestRunningDecisions(argMap: Map[String, List[TestCriteria]], keyList: List[String], thingToTest: PathFinder) {
+    private def makeTestRunningDecisions[T <: StepData](argMap: Map[String, List[TestCriteria[_]]], keyList: List[String], thingToTest: PathFinder[T]) {
 
         val toggles = new TestToggleFlagWrapper(argMap.get(ArgKeyToggle).asInstanceOf[Option[List[TestCriteriaToggleFlag]]])
         val wantsToRunPathing = assessPathingDesire(argMap)
@@ -52,7 +53,7 @@ object TestingCore {
     private def handleTestIntervals(valuesOption: Option[List[TestCriteriaValueTuple]], rangesOption: Option[List[TestCriteriaRangeTuple]]) : List[Int] = {
 
         // Will need some work
-        //val (values, ranges) = List(valuesOption, rangesOption) foreach ( _ match { case None => Nil; case Some(x) => sortCriteria(x) } )
+        // val (values, ranges) = List(valuesOption, rangesOption) foreach ( _ match { case None => Nil; case Some(x) => sortCriteria(x) } )
         
         val values = valuesOption match {
             case None    => Nil
@@ -64,18 +65,27 @@ object TestingCore {
             case Some(x) => sortCriteriaRanges(x)
         }
 
-        if (values.last.criteria.guide > PathingTestCluster.getSize)
+        if (!values.isEmpty && (values.last.criteria.guide > PathingTestCluster.getSize))
             throw new InvalidParameterException("There is no test #" + values.last.criteria.guide)
 
-        val unionOfRanges = findUnionOfIntervals(ranges).foldLeft (List[TestCriteriaRangeTuple]()) ( (acc, x) => if (x.isValid) x :: acc else acc )
+        val unionOfRanges = {
+            if (!ranges.isEmpty) {
+                val union = findUnionOfIntervals(ranges).foldLeft (List[TestCriteriaRangeTuple]()) ( (acc, x) => if (x.isValid) x :: acc else acc )
+                if (!union.isEmpty && (union.last.criteria.guide._2 > PathingTestCluster.getSize))
+                    throw new InvalidParameterException("Test range (" + union.last.criteria.guide._1 + ", " + union.last.criteria.guide._2 +
+                                                        " extends to a number for which there is no corresponding test")
+                union
+            }
+            else
+                Nil
+        }
 
-        if (unionOfRanges.last.criteria.guide._2 > PathingTestCluster.getSize)
-            throw new InvalidParameterException("Test range (" + unionOfRanges.last.criteria.guide._1 + ", " + unionOfRanges.last.criteria.guide._2 +
-                                                " extends to a number for which there is no corresponding test")
-
-        val maxVal = values.last.criteria.guide
-        val maxRange = unionOfRanges.last.criteria.guide._2
+        val maxVal = if (!values.isEmpty) values.last.criteria.guide else 0
+        val maxRange = if (!unionOfRanges.isEmpty) unionOfRanges.last.criteria.guide._2 else 0
         val overallMax = if (maxVal > maxRange) maxVal else maxRange
+
+        if (overallMax < 1)
+            throw new InvalidParameterException("All runnable tests were excluded!  Use the SkipPathingTests flag, instead!")
 
         val resultArr = mergeValuesIntoArr(createArrayFromRangeCriteriaList(unionOfRanges, overallMax), values)
         val outList = { for ( i <- 0 until resultArr.size;
@@ -84,7 +94,7 @@ object TestingCore {
         if (!outList.isEmpty)
             outList
         else
-            throw new InvalidParameterException("No tests to run!")
+            throw new InvalidParameterException("All runnable tests were excluded!  Use the SkipPathingTests flag, instead!")
 
     }
 
@@ -92,8 +102,8 @@ object TestingCore {
         // Probably just call execute() on a ScalaTest class or something
     }
 
-    private def assessPathingDesire(argMap:  Map[String, List[TestCriteria]]) : Boolean = {
-        def assessmentHelper(argListOption: Option[List[TestCriteria]]) : Boolean = {
+    private def assessPathingDesire(argMap:  Map[String, List[TestCriteria[_]]]) : Boolean = {
+        def assessmentHelper(argListOption: Option[List[TestCriteria[_]]]) : Boolean = {
             argListOption match {
                 case None    => false
                 case Some(x) => x foreach { x => if (x.isInstanceOf[TestRunFlag]) true }; false
@@ -102,8 +112,8 @@ object TestingCore {
         assessmentHelper(argMap.get(ArgKeyValue)) || assessmentHelper(argMap.get(ArgKeyRange))
     }
 
-    private def sortArgLists(args: List[TestCriteria]) : Map[String, List[TestCriteria]] = {
-        def sortHelper(args: List[TestCriteria], argMap: Map[String, List[TestCriteria]]) : Map[String, List[TestCriteria]] = {
+    private def sortArgLists(args: List[TestCriteria[_]]) : Map[String, List[TestCriteria[_]]] = {
+        def sortHelper(args: List[TestCriteria[_]], argMap: Map[String, List[TestCriteria[_]]]) : Map[String, List[TestCriteria[_]]] = {
             args match {
                 case Nil  => argMap
                 case h::t => {
@@ -118,18 +128,18 @@ object TestingCore {
                 }
             }
         }
-        sortHelper(args, HashMap[String, List[TestCriteria]](ArgKeyValue -> List[TestCriteriaValueTuple](),
-                                                                    ArgKeyRange -> List[TestCriteriaRangeTuple](),
-                                                                    ArgKeyToggle -> List[TestCriteriaToggleFlag]()))
+        sortHelper(args, HashMap[String, List[TestCriteria[_]]](ArgKeyValue -> List[TestCriteriaValueTuple](),
+                                                                ArgKeyRange -> List[TestCriteriaRangeTuple](),
+                                                                ArgKeyToggle -> List[TestCriteriaToggleFlag]()))
     }
 
-    private def findRelevantKeys(argMap: Map[String, List[TestCriteria]]) : List[String] = {
-        def relevantKeyHelper(argMap: Map[String, List[TestCriteria]], keyList: List[String]) : List[String] = {
+    private def findRelevantKeys(argMap: Map[String, List[TestCriteria[_]]]) : List[String] = {
+        def relevantKeyHelper(argMap: Map[String, List[TestCriteria[_]]], keyList: List[String]) : List[String] = {
             keyList match {
                 case Nil  => Nil
                 case h::t =>
                     argMap.get(h) match {
-                        case Some(_) => h :: relevantKeyHelper(argMap, t)
+                        case Some(x: List[TestCriteria[_]]) => if (!x.isEmpty) h :: relevantKeyHelper(argMap, t) else Nil
                         case None    => Nil
                     }
             }
@@ -170,6 +180,7 @@ object TestingCore {
     }
 
     private def condenseCriteriaTupleList(ranges: List[TestCriteriaRangeTuple]) : List[TestCriteriaRangeTuple] = {
+
         def condensationHelper(ranges: List[TestCriteriaRangeTuple], r: TestCriteriaRangeTuple) : List[TestCriteriaRangeTuple] = {
             ranges match {
                 case Nil  => Nil
@@ -181,7 +192,12 @@ object TestingCore {
                 }
             }
         }
-        condensationHelper(ranges.tail, ranges.head)
+
+        ranges match {
+            case Nil  => Nil
+            case h::t => condensationHelper(t, h)
+        }
+
     }
 
     private def coalesceLists(a: List[TestCriteriaRangeTuple], b: List[TestCriteriaRangeTuple]) : List[TestCriteriaRangeTuple] = {

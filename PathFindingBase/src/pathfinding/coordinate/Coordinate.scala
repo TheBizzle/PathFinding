@@ -51,5 +51,6 @@ case class Coordinate(xLoc: Int = Coordinate.InvalidValue, yLoc: Int = Coordinat
 }
 
 object Coordinate {
-    private val InvalidValue = -1    // Invalid (initial) X/Y values for Coordinates
+    val InvalidValue = -1    // Invalid (initial) X/Y values for Coordinates
 }
+

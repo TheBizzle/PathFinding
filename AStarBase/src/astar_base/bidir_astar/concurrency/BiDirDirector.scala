@@ -63,8 +63,8 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
 
         do {
             holder match {
-                case Coordinate() => throw new InvalidParameterException
-                case _            => {
+                case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => throw new InvalidParameterException
+                case _ => {
                     val crumb = thoseCrumbs(holder.x)(holder.y)
                     myCrumbs(holder.x)(holder.y) = crumb
                     holder = crumb

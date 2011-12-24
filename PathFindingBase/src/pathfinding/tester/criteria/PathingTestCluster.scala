@@ -1,10 +1,10 @@
 package pathfinding.tester.criteria
 
 import pathfinding.pathingmap.pathingmapdata.PathingMapString
-import pathfinding.{StepData, PathFinder}
 import pathfinding.statuses.{Success, ExecutionStatus}
 import pathfinding.coordinate.Coordinate
 import pathfinding.pathingmap.PathingMap
+import pathfinding.{StepData, PathFinder}
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,11 +13,12 @@ import pathfinding.pathingmap.PathingMap
  * Time: 4:28 PM
  */
 
-sealed abstract class TestFunction extends Function2[PathFinder, Boolean, Unit] {
+// Is there a way to do this subtyping of StepData correctly...?
+sealed abstract class TestFunction extends Function2[PathFinder[StepData], Boolean, Unit] {
     // Consider not passing the toggle flags to apply() and just batch-processing toggles into function object local variables.
     // That way, the signatures of the functions wouldn't need to change if ever more toggles were added.
     // However... maybe they should HAVE TO change (to be sure of compliance).... :food for thought:
-    def apply(pathFinder: PathFinder, isTalkative: Boolean)
+    def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean)
 }
 
 object PathingTestCluster {
@@ -25,15 +26,16 @@ object PathingTestCluster {
     // I hope that calling (object Array).apply(args) will only make an array that has args.length elements...
     private val tests = Array[TestFunction](Test1, Test2, Test3, Test4, Test5, Test6)
 
-    def runTests(testNums: List[Int], thingToTest: PathFinder, isTalkative: Boolean) {
-        testNums foreach ( tests(_)(thingToTest, isTalkative) )
+    // I hate it!  I HATE IT!
+    def runTests[T <: StepData](testNums: List[Int], thingToTest: PathFinder[T], isTalkative: Boolean) {
+        testNums foreach ( tests(_)(thingToTest.asInstanceOf[PathFinder[StepData]], isTalkative) )
     }
 
     def getSize : Int = {
         tests.length
     }
 
-    private def analyze(status: ExecutionStatus[StepData], isTalkative: Boolean) {
+    private def analyze[T <: StepData](status: ExecutionStatus[T], isTalkative: Boolean) {
         status match {
             case Success(x) => { if (isTalkative) println("Success!"); retracePath(x.breadcrumbArr, x.endGoal, x.pathingMap, isTalkative) }
             case _ => if (isTalkative) println("Failed to find a solution....\n\n")
@@ -64,8 +66,8 @@ object PathingTestCluster {
             current :: {
                 val next = breadcrumbs(current.x)(current.y)
                 next match {
-                    case Coordinate() => Nil
-                    case _            => breadcrumbsHelper(breadcrumbs, next)
+                    case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => Nil
+                    case _                                                            => breadcrumbsHelper(breadcrumbs, next)
                 }
             }
         }
@@ -77,37 +79,37 @@ object PathingTestCluster {
     // =====================================+---------------------------------+======================================
 
     private object Test1 extends TestFunction {
-        def apply(pathFinder: PathFinder, isTalkative: Boolean) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
             analyze(pathFinder(TestMapString1), isTalkative)
         }
     }
 
     private object Test2 extends TestFunction {
-        def apply(pathFinder: PathFinder, isTalkative: Boolean) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
             analyze(pathFinder(TestMapString2), isTalkative)
         }
     }
 
     private object Test3 extends TestFunction {
-        def apply(pathFinder: PathFinder, isTalkative: Boolean) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
             analyze(pathFinder(TestMapString3), isTalkative)
         }
     }
 
     private object Test4 extends TestFunction {
-        def apply(pathFinder: PathFinder, isTalkative: Boolean) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
             analyze(pathFinder(TestMapString4), isTalkative)
         }
     }
 
     private object Test5 extends TestFunction {
-        def apply(pathFinder: PathFinder, isTalkative: Boolean) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
             analyze(pathFinder(TestMapString5), isTalkative)
         }
     }
 
     private object Test6 extends TestFunction {
-        def apply(pathFinder: PathFinder, isTalkative: Boolean) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
             analyze(pathFinder(TestMapString6), isTalkative)
         }
     }

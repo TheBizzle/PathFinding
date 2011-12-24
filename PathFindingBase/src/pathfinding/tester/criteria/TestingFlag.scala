@@ -21,6 +21,7 @@ sealed trait TestValueFlag extends ArityTestingFlag
 
 sealed trait TestToggleFlag extends TestingFlag      // Everytime something is made to inherit from this, it MUST be added to TestToggleFlagWrapper's FlagList
 
+// I wish that I could do this in a less hacky way...
 object RunRange extends TestRangeFlag with TestRunFlag
 object SkipRange extends TestRangeFlag with TestSkipFlag
 
@@ -34,7 +35,7 @@ case object SkipPathingTests extends TestToggleFlag      // Skips the running of
 object TestingFlag {
 
     // The things that I do to appease you, Scala...
-    def flipRunningness(flag: TestRunFlag) : TestSkipFlag = {
+    def flipRunningness(flag: TestRunFlag with ArityTestingFlag) : TestSkipFlag with ArityTestingFlag = {
         flag match {
             case x: TestValueFlag => SkipTest
             case x: TestRangeFlag => SkipRange
@@ -42,7 +43,7 @@ object TestingFlag {
         }
     }
 
-    def flipRunningness(flag: TestSkipFlag) : TestRunFlag = {
+    def flipRunningness(flag: TestSkipFlag with ArityTestingFlag) : TestRunFlag with ArityTestingFlag = {
         flag match {
             case x: TestValueFlag => RunTest
             case x: TestRangeFlag => RunRange
@@ -50,7 +51,7 @@ object TestingFlag {
         }
     }
 
-    def flipArity(flag: TestRangeFlag) : TestValueFlag = {
+    def flipArity(flag: TestRangeFlag with RunningnessTestingFlag) : TestValueFlag with RunningnessTestingFlag = {
         flag match {
             case x: TestRunFlag  => RunTest
             case x: TestSkipFlag => SkipTest
@@ -58,7 +59,7 @@ object TestingFlag {
         }
     }
 
-    def flipArity(flag: TestValueFlag) : TestRangeFlag = {
+    def flipArity(flag: TestValueFlag with RunningnessTestingFlag) : TestRangeFlag with RunningnessTestingFlag = {
         flag match {
             case x: TestRunFlag  => RunRange
             case x: TestSkipFlag => SkipRange
