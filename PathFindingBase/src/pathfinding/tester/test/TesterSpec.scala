@@ -4,7 +4,7 @@ import dummies.DummyPathFinder
 import org.scalatest.{FlatSpec, GivenWhenThen}
 import pathfinding.tester.TestingCore
 import pathfinding.tester.criteria._
-import java.security.InvalidParameterException
+import pathfinding.tester.exceptions._
 
 
 /**
@@ -24,8 +24,8 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         val inList: List[TestCriteria[_]] = Nil
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("NotRunningTestsException should be thrown")
+        intercept[NotRunningTestsException] {
             TestingCore(inList, DummyPathFinder)
         }
 
@@ -37,8 +37,8 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         val inList = List[TestCriteria[_]](TestCriteriaValueTuple(1, SkipTest), TestCriteriaValueTuple(1, RunTest))
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("NotRunningTestsException should be thrown")
+        intercept[NotRunningTestsException] {
             TestingCore(inList, DummyPathFinder)
         }
 
@@ -50,8 +50,8 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, RunRange), TestCriteriaToggleFlag(SkipPathingTests))
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("ContradictoryArgsException should be thrown")
+        intercept[ContradictoryArgsException] {
             TestingCore(inList, DummyPathFinder)
         }
 
@@ -63,8 +63,8 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         val inList = List[TestCriteria[_]](TestCriteriaValueTuple(100000, RunTest))
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("InvalidTestNumberException should be thrown")
+        intercept[InvalidTestNumberException] {
             TestingCore(inList, DummyPathFinder)
         }
 
@@ -76,8 +76,8 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 600000, RunRange))
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("InvalidTestNumberException should be thrown")
+        intercept[InvalidTestNumberException] {
             TestingCore(inList, DummyPathFinder)
         }
 
@@ -89,8 +89,8 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         val inList = List[TestCriteria[_]](TestCriteriaValueTuple(2, SkipTest), TestCriteriaValueTuple(1, RunTest))
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("UnnecessaryExclusionException should be thrown")
+        intercept[UnnecessaryExclusionException] {
             TestingCore(inList, DummyPathFinder)
         }
 
@@ -102,8 +102,8 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 2, RunRange), TestCriteriaRangeTuple(3, 4, SkipRange))
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("UnnecessaryExclusionException should be thrown")
+        intercept[UnnecessaryExclusionException] {
             TestingCore(inList, DummyPathFinder)
         }
 
@@ -115,8 +115,8 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 4, RunRange), TestCriteriaRangeTuple(2, 3, RunRange))
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("FullEncapsulationException should be thrown")
+        intercept[FullEncapsulationException] {
             TestingCore(inList, DummyPathFinder)
         }
 
@@ -128,21 +128,21 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, RunRange), TestCriteriaRangeTuple(2, 5, SkipRange), TestCriteriaRangeTuple(3, 4, SkipRange))
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("FullEncapsulationException should be thrown")
+        intercept[FullEncapsulationException] {
             TestingCore(inList, DummyPathFinder)
         }
 
     }
 
-    it should "be mad when passed a fully-encapsulated range for single exclusion" in {
+    it should "be mad when passed a range for running that is fully encapsulated by a range for skipping" in {
 
         given("one valid range of inclusion and one valid range for exclusion, where the exclusion range fully encapsulates the inclusion range")
         val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, SkipRange), TestCriteriaRangeTuple(2, 5, RunRange))
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("FullEncapsulationException should be thrown")
+        intercept[FullEncapsulationException] {
             TestingCore(inList, DummyPathFinder)
         }
 
@@ -154,21 +154,21 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         val inList = List[TestCriteria[_]](TestCriteriaValueTuple(1, RunTest), TestCriteriaValueTuple(1, RunTest))
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("RedundantInclusionException should be thrown")
+        intercept[RedundantInclusionException] {
             TestingCore(inList, DummyPathFinder)
         }
 
     }
 
-    it should "be mad when a single test is redudantly included in a range" in {
+    it should "be mad when a single test is redundantly included in a range" in {
 
         given("a valid range, and a valid single test (which was already included by the range")
         val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 2, RunRange), TestCriteriaValueTuple(1, RunTest))
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("RedundantInclusionException should be thrown")
+        intercept[RedundantInclusionException] {
             TestingCore(inList, DummyPathFinder)
         }
 
@@ -180,8 +180,8 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 4, RunRange), TestCriteriaValueTuple(1, SkipTest), TestCriteriaValueTuple(1, SkipTest))
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("UnnecessaryExclusionException should be thrown")
+        intercept[UnnecessaryExclusionException] {
             TestingCore(inList, DummyPathFinder)
         }
 
@@ -193,8 +193,8 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 5, RunRange), TestCriteriaRangeTuple(2, 4, SkipRange), TestCriteriaValueTuple(2, SkipTest))
 
         when("the tester is invoked")
-        then("InvalidParameterException should be thrown")
-        intercept[InvalidParameterException] {
+        then("UnnecessaryExclusionException should be thrown")
+        intercept[UnnecessaryExclusionException] {
             TestingCore(inList, DummyPathFinder)
         }
 
