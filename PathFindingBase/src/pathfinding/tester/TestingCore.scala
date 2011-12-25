@@ -32,9 +32,9 @@ object TestingCore {
 
         if (isSkippingPathingTests)
             if(wantsToRunPathing)
-                throw new InvalidParameterException("If you don't want skip running pathing tests, you should not specify pathing tests to run.")
+                throw new InvalidParameterException("If you want skip the pathing tests, you should not specify pathing tests to run.")
             else if (!isRunningBaseTests)
-                throw new InvalidParameterException("You can run the test suite if you're going to skip the pathing tests AND the base tests")
+                throw new InvalidParameterException("You can't run the test suite if you're going to skip the pathing tests AND the base tests")
 
         val testsToRun = {
             if (!isSkippingPathingTests)
@@ -71,7 +71,7 @@ object TestingCore {
 
         val unionOfRanges = {
             if (!ranges.isEmpty) {
-                val union = findUnionOfIntervals(ranges).foldLeft (List[TestCriteriaRangeTuple]()) ( (acc, x) => if (x.isValid) x :: acc else acc )
+                val union = findUnionOfIntervals(ranges).foldLeft (List[TestCriteriaRangeTuple]()) ( (acc, x) => if (x.isValid) x :: acc else acc ).reverse
                 if (!union.isEmpty && (union.last.criteria.guide._2 > PathingTestCluster.getSize))
                     throw new InvalidParameterException("Test range (" + union.last.criteria.guide._1 + ", " + union.last.criteria.guide._2 +
                                                         " extends to a number for which there is no corresponding test")
@@ -173,7 +173,10 @@ object TestingCore {
             ranges match {
                 case Nil  => List(r)
                 case h::t => {
-                    if (r intersects h)
+                    if ((r encapsulates h) || (h encapsulates r))
+                        throw new InvalidParameterException("Range (" + r.criteria.guide._1 + ", " + r.criteria.guide._2 + ") and " +
+                                                            "range (" + h.criteria.guide._1 + ", " + h.criteria.guide._2 + ") form a full encapsulation")
+                    else if (r intersects h)
                         condensationHelper(t, mergeCriteriaRangeTuples(r, h))   // If the first two intersect, merge and recurse
                     else
                         r :: condensationHelper(t, h)                           // If they don't, r is fully condensed
@@ -190,17 +193,20 @@ object TestingCore {
 
     private def coalesceLists(a: List[TestCriteriaRangeTuple], b: List[TestCriteriaRangeTuple]) : List[TestCriteriaRangeTuple] = {
 
-        def trimOffEncapsulateds(a: List[TestCriteriaRangeTuple], bh: TestCriteriaRangeTuple) : List[TestCriteriaRangeTuple] = {
+        def trimOffEncapsulateds(a: List[TestCriteriaRangeTuple], bh: TestCriteriaRangeTuple, isFirst: Boolean = true) : List[TestCriteriaRangeTuple] = {
             a match {
                 case Nil    => throw new InvalidParameterException("Exclusion of range (" + bh.criteria.guide._1 + ", " + bh.criteria.guide._2 + ") is unnecessary")
                 case ah::at => {
                     if(ah intersects bh) {
-                        if (bh encapsulates ah)
-                            trimOffEncapsulateds(at, bh)
+                        if (isFirst)
+                            throw new InvalidParameterException("Full encapsulation of range (" + ah.criteria.guide._1 + ", " + ah.criteria.guide._2 + ") detected")
                         else {
-                            import ah.criteria._
-                            val ahr = TestCriteriaRangeTuple(bh.criteria.guide._1 + 1, guide._2, flag)
-                            ahr :: at
+                            if (bh encapsulates ah)
+                                trimOffEncapsulateds(at, bh, false)
+                            else {
+                                val ahr = TestCriteriaRangeTuple(bh.criteria.guide._2 + 1, ah.criteria.guide._2, ah.criteria.flag)
+                                ahr :: at
+                            }
                         }
                     }
                     else
@@ -216,9 +222,9 @@ object TestingCore {
                     case Nil    => throw new InvalidParameterException("Exclusion of range (" + bh.criteria.guide._1 + ", " + bh.criteria.guide._2 + ") is unnecessary")
                     case ah::at => {
                         if (ah intersects bh) {
-                            val ahl = TestCriteriaRangeTuple(ah.criteria.guide._1, bh.criteria.guide._2 - 1, ah.criteria.flag)
+                            val ahl = TestCriteriaRangeTuple(ah.criteria.guide._1, bh.criteria.guide._1 - 1, ah.criteria.flag)
                             if (ah encapsulates bh) {
-                                val ahr = TestCriteriaRangeTuple(bh.criteria.guide._1 + 1, ah.criteria.guide._2, ah.criteria.flag)
+                                val ahr = TestCriteriaRangeTuple(bh.criteria.guide._2 + 1, ah.criteria.guide._2, ah.criteria.flag)
                                 ahl :: coalesceLists(ahr :: at, bt)
                             }
                             else {
@@ -234,8 +240,6 @@ object TestingCore {
         }
 
     }
-
-
 
     // Coming into things, it's assumed that a starts at (or before) b
     private def mergeCriteriaRangeTuples(a: TestCriteriaRangeTuple, b: TestCriteriaRangeTuple) : TestCriteriaRangeTuple = {
