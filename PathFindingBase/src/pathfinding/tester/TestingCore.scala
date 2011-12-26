@@ -14,9 +14,9 @@ import pathfinding.{StepData, PathFinder}
 
 object TestingCore {
 
-    private val ArgKeyValue = "value"
-    private val ArgKeyRange = "range"
-    private val ArgKeyToggle = "toggle"
+    private[tester] val ArgKeyValue = "value"
+    private[tester] val ArgKeyRange = "range"
+    private[tester] val ArgKeyToggle = "toggle"
 
     // These existential types displease me...
     def apply[T <: StepData](args: List[TestCriteria[_]], thingToTest: PathFinder[T]) {
@@ -37,9 +37,27 @@ object TestingCore {
                 throw new NotRunningTestsException("You can't run the test suite if you're going to skip the pathing tests AND the base tests")
 
         val testsToRun = {
-            if (!isSkippingPathingTests)
-                handleTestIntervals(argMap.get(ArgKeyValue).asInstanceOf[Option[List[TestCriteriaValueTuple]]],
-                                    argMap.get(ArgKeyRange).asInstanceOf[Option[List[TestCriteriaRangeTuple]]])
+            if (!isSkippingPathingTests) {
+
+                val valuesOption = argMap.get(ArgKeyValue).asInstanceOf[Option[List[TestCriteriaValueTuple]]]
+                val rangesOption = argMap.get(ArgKeyRange).asInstanceOf[Option[List[TestCriteriaRangeTuple]]]
+
+                // Will need some work
+                // val (values, ranges) = List(valuesOption, rangesOption) foreach ( _ match { case None => Nil; case Some(x) => sortCriteria(x) } )
+
+                val values = valuesOption  match {
+                    case Some(x @ (h::t)) => sortCriteriaValues(x)
+                    case _                => Nil
+                }
+
+                val ranges = rangesOption match {
+                    case Some(x @ (h::t)) => sortCriteriaRanges(x)
+                    case _                => Nil
+                }
+
+                handleTestIntervals(values, ranges)
+                
+            }
             else
                 Nil
         }
@@ -51,20 +69,7 @@ object TestingCore {
 
     }
 
-    private def handleTestIntervals(valuesOption: Option[List[TestCriteriaValueTuple]], rangesOption: Option[List[TestCriteriaRangeTuple]]) : List[Int] = {
-
-        // Will need some work
-        // val (values, ranges) = List(valuesOption, rangesOption) foreach ( _ match { case None => Nil; case Some(x) => sortCriteria(x) } )
-        
-        val values = valuesOption match {
-            case Some(x @ (h::t)) => sortCriteriaValues(x)
-            case _                => Nil
-        }
-
-        val ranges = rangesOption match {
-            case Some(x @ (h::t)) => sortCriteriaRanges(x)
-            case _                => Nil
-        }
+    private[tester] def handleTestIntervals(values: List[TestCriteriaValueTuple], ranges: List[TestCriteriaRangeTuple]) : List[Int] = {
 
         if (!values.isEmpty && (values.last.criteria.guide > PathingTestCluster.getSize))
             throw new InvalidTestNumberException("There is no test #" + values.last.criteria.guide)
@@ -104,18 +109,14 @@ object TestingCore {
         // Probably just call execute() on a ScalaTest class or something
     }
 
-    private def assessPathingDesire(argMap:  Map[String, List[TestCriteria[_]]]) : Boolean = {
-        def assessmentHelper(tuples: List[TestCriteria[TestTuple[_,_]]]) : Boolean = {
-            tuples match {
-                case Nil  => false
-                case h::t => if (h.criteria.flag.isInstanceOf[TestRunFlag]) true else assessmentHelper(t)
-            }
+    private[tester] def assessPathingDesire(argMap:  Map[String, List[TestCriteria[_]]]) : Boolean = {
+        def hasPathingDesire(h: TestCriteria[_]) : Boolean = {
+            h.asInstanceOf[TestCriteria[TestTuple[_,_]]].criteria.flag.isInstanceOf[TestRunFlag]
         }
-        assessmentHelper(argMap(ArgKeyValue).asInstanceOf[List[TestCriteria[TestTuple[_,_]]]]) ||
-            assessmentHelper(argMap(ArgKeyRange).asInstanceOf[List[TestCriteria[TestTuple[_,_]]]])
+        argMap(ArgKeyValue).exists(hasPathingDesire) || argMap(ArgKeyRange).exists(hasPathingDesire)
     }
 
-    private def sortArgLists(args: List[TestCriteria[_]]) : Map[String, List[TestCriteria[_]]] = {
+    private[tester] def sortArgLists(args: List[TestCriteria[_]]) : Map[String, List[TestCriteria[_]]] = {
         def sortHelper(args: List[TestCriteria[_]], argMap: Map[String, List[TestCriteria[_]]]) : Map[String, List[TestCriteria[_]]] = {
             args match {
                 case Nil  => argMap
@@ -131,26 +132,26 @@ object TestingCore {
                 }
             }
         }
-        sortHelper(args, HashMap[String, List[TestCriteria[_]]](ArgKeyValue -> List[TestCriteriaValueTuple](),
-                                                                ArgKeyRange -> List[TestCriteriaRangeTuple](),
+        sortHelper(args, HashMap[String, List[TestCriteria[_]]](ArgKeyValue  -> List[TestCriteriaValueTuple](),
+                                                                ArgKeyRange  -> List[TestCriteriaRangeTuple](),
                                                                 ArgKeyToggle -> List[TestCriteriaToggleFlag]()))
     }
 
-    // There's a better way to do this—think implicit conversions!
-    private def sortCriteriaValues(criteriaList: List[TestCriteriaValueTuple]) : List[TestCriteriaValueTuple] = {
+    // There's a way to avoid needing two functions that do the same thing with different parameters—think implicit conversions!
+    private[tester] def sortCriteriaValues(criteriaList: List[TestCriteriaValueTuple]) : List[TestCriteriaValueTuple] = {
         criteriaList.sortWith((a, b) => a.criteria.guide < b.criteria.guide)
     }
 
-    private def sortCriteriaRanges(criteriaList: List[TestCriteriaRangeTuple]) : List[TestCriteriaRangeTuple] = {
+    private[tester] def sortCriteriaRanges(criteriaList: List[TestCriteriaRangeTuple]) : List[TestCriteriaRangeTuple] = {
         criteriaList.sortWith((a, b) => a.criteria.guide._1 < b.criteria.guide._1)
     }
 
-    private def findUnionOfIntervals(ranges: List[TestCriteriaRangeTuple]) : List[TestCriteriaRangeTuple] = {
+    private[tester] def findUnionOfIntervals(ranges: List[TestCriteriaRangeTuple]) : List[TestCriteriaRangeTuple] = {
         val (testList, skipList) = siftOutTestsAndSkips(ranges)
         coalesceLists(condenseCriteriaTupleList(testList), condenseCriteriaTupleList(skipList))
     }
     
-    private def siftOutTestsAndSkips(list: List[TestCriteriaRangeTuple]) : (List[TestCriteriaRangeTuple], List[TestCriteriaRangeTuple]) = {
+    private[tester] def siftOutTestsAndSkips(list: List[TestCriteriaRangeTuple]) : (List[TestCriteriaRangeTuple], List[TestCriteriaRangeTuple]) = {
         def siftHelper(inList: List[TestCriteriaRangeTuple], testList: List[TestCriteriaRangeTuple], skipList: List[TestCriteriaRangeTuple]) : (List[TestCriteriaRangeTuple], List[TestCriteriaRangeTuple]) = {
             inList match {
                 case Nil                  => (testList, skipList)
@@ -168,7 +169,7 @@ object TestingCore {
         siftHelper(list, List[TestCriteriaRangeTuple](), List[TestCriteriaRangeTuple]())
     }
 
-    private def condenseCriteriaTupleList(ranges: List[TestCriteriaRangeTuple]) : List[TestCriteriaRangeTuple] = {
+    private[tester] def condenseCriteriaTupleList(ranges: List[TestCriteriaRangeTuple]) : List[TestCriteriaRangeTuple] = {
 
         def condensationHelper(ranges: List[TestCriteriaRangeTuple], r: TestCriteriaRangeTuple) : List[TestCriteriaRangeTuple] = {
             ranges match {
@@ -192,7 +193,7 @@ object TestingCore {
 
     }
 
-    private def coalesceLists(a: List[TestCriteriaRangeTuple], b: List[TestCriteriaRangeTuple]) : List[TestCriteriaRangeTuple] = {
+    private[tester] def coalesceLists(a: List[TestCriteriaRangeTuple], b: List[TestCriteriaRangeTuple]) : List[TestCriteriaRangeTuple] = {
 
         def trimLists(a: List[TestCriteriaRangeTuple], bh: TestCriteriaRangeTuple) : List[TestCriteriaRangeTuple] = {
             a match {
@@ -238,31 +239,34 @@ object TestingCore {
 
     }
 
-    // Coming into things, it's assumed that a starts at (or before) b
-    private def mergeCriteriaRangeTuples(a: TestCriteriaRangeTuple, b: TestCriteriaRangeTuple) : TestCriteriaRangeTuple = {
+    private[tester] def mergeCriteriaRangeTuples(a: TestCriteriaRangeTuple, b: TestCriteriaRangeTuple) : TestCriteriaRangeTuple = {
 
-        val aCrit = a.criteria
-        val bCrit = b.criteria
+        val (firstCrit, secondCrit) = {
+            if (b.criteria.guide._1 < a.criteria.guide._1)
+                (a.criteria, b.criteria)
+            else
+                (b.criteria, a.criteria)
+        }
 
-        if (aCrit.flag != bCrit.flag)
+        if (firstCrit.flag != secondCrit.flag)
             throw new RedundantInclusionException("Flag mismatch on merging tuple " + a + " and tuple " + b)
 
-        if (bCrit.guide._2 < aCrit.guide._2)
-            throw new FullEncapsulationException("Erroneous fully-encapsulated interval (" + bCrit.guide._1 + ", " + bCrit.guide._2 + ") supplied!")
+        if (secondCrit.guide._2 < firstCrit.guide._2)
+            throw new FullEncapsulationException("Erroneous fully-encapsulated interval (" + secondCrit.guide._1 + ", " + secondCrit.guide._2 + ") supplied!")
 
-        TestCriteriaRangeTuple(aCrit.guide._1, bCrit.guide._2, aCrit.flag)
+        TestCriteriaRangeTuple(firstCrit.guide._1, secondCrit.guide._2, firstCrit.flag)
 
     }
 
     // Basically, takes advantage of bucketing to quickly deal with test numbers and their test-ness/skip-ness
     // Generally, calls an implicit conversion of List[RangeTuples] into List[List[ValueTuple]]s where it is called
-    private def createArrayFromRangeCriteriaList(ranges: List[List[TestCriteriaValueTuple]], maxNum: Int) : Array[Boolean] = {
+    private[tester] def createArrayFromRangeCriteriaList(ranges: List[List[TestCriteriaValueTuple]], maxNum: Int) : Array[Boolean] = {
         val arr = new Array[Boolean](maxNum + 1)
         ranges.flatten.foreach { x => arr(x.criteria.guide) = true }
         arr
     }
 
-    private def mergeValuesIntoArr(rangesArr: Array[Boolean], values: List[TestCriteriaValueTuple]) : Array[Boolean] = {
+    private[tester] def mergeValuesIntoArr(rangesArr: Array[Boolean], values: List[TestCriteriaValueTuple]) : Array[Boolean] = {
 
         def addToArr(rangesArr: Array[Boolean], value: Int) : Array[Boolean] = {
             if (rangesArr(value))

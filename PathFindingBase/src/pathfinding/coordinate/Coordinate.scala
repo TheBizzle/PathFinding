@@ -44,8 +44,8 @@ case class Coordinate(xLoc: Int = Coordinate.InvalidValue, yLoc: Int = Coordinat
         41 * (4111 + x) + y
     }
 
-    def canEqual(other: Any) : Boolean = {
-        other.isInstanceOf[Coordinate]
+    def canEqual(that: Any) : Boolean = {
+        that.isInstanceOf[Coordinate]
     }
 
 }
