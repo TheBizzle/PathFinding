@@ -20,13 +20,23 @@ sealed class TestTuple[T, U <: ArityTestingFlag with RunningnessTestingFlag](tes
     val flag = testFlag
 }
 
-sealed abstract class TestCriteriaTuple[T, U <: ArityTestingFlag with RunningnessTestingFlag](criteriaTuple: TestTuple[T, U]) extends TestCriteria(criteriaTuple)
+sealed abstract class TestCriteriaTuple[T, U <: ArityTestingFlag with RunningnessTestingFlag](criteriaTuple: TestTuple[T, U]) extends TestCriteria(criteriaTuple) {
+    def getKey : Int
+}
 
 // ==========================================+-----------------------+============================================
 //                                           |     Value tuple       |
 // ==========================================+-----------------------+============================================
 
 class TestCriteriaValueTuple(tuple: TestTuple[Int, TestValueFlag with RunningnessTestingFlag]) extends TestCriteriaTuple(tuple) {
+
+    def getKey : Int = {
+        criteria.guide
+    }
+
+    override def toString : String = {
+        "(" + criteria.guide + ")"
+    }
 
     override def equals(that: Any) : Boolean = {
         that match {
@@ -58,6 +68,10 @@ object TestCriteriaValueTuple {
 
 class TestCriteriaRangeTuple(tuple: TestTuple[(Int, Int), TestRangeFlag with RunningnessTestingFlag]) extends TestCriteriaTuple(tuple) {
 
+    def getKey : Int = {
+        criteria.guide._1
+    }
+
     def isValid : Boolean = {
         criteria.guide._1 <= criteria.guide._2
     }
@@ -72,6 +86,10 @@ class TestCriteriaRangeTuple(tuple: TestTuple[(Int, Int), TestRangeFlag with Run
         val thisRange = Range(criteria.guide._1, criteria.guide._2)
         val thatRange = Range(that.criteria.guide._1, that.criteria.guide._2)
         thisRange containsSlice thatRange
+    }
+
+    override def toString : String = {
+        "(" + criteria.guide._1 + ", " + criteria.guide._2 + ")"
     }
 
     override def equals(that: Any) : Boolean = {

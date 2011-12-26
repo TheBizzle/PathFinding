@@ -83,70 +83,10 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
 
     }
 
-    it should "be mad when a value is excluded unnecessarily" in {
-
-        given("a single valid inclusion and a single invalid exclusion")
-        val inList = List[TestCriteria[_]](TestCriteriaValueTuple(2, SkipTest), TestCriteriaValueTuple(1, RunTest))
-
-        when("the tester is invoked")
-        then("UnnecessaryExclusionException should be thrown")
-        intercept[UnnecessaryExclusionException] {
-            TestingCore(inList, DummyPathFinder)
-        }
-
-    }
-
-    it should "be mad when a range is excluded unnecessarily" in {
-
-        given("a valid range to include and an invalid range to exclude")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 2, RunRange), TestCriteriaRangeTuple(3, 4, SkipRange))
-
-        when("the tester is invoked")
-        then("UnnecessaryExclusionException should be thrown")
-        intercept[UnnecessaryExclusionException] {
-            TestingCore(inList, DummyPathFinder)
-        }
-
-    }
-
-    it should "be mad when passed a fully-encapsulated range for double inclusion" in {
-
-        given("two valid ranges of inclusions, where one fully encapsulates the other")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 4, RunRange), TestCriteriaRangeTuple(2, 3, RunRange))
-
-        when("the tester is invoked")
-        then("FullEncapsulationException should be thrown")
-        intercept[FullEncapsulationException] {
-            TestingCore(inList, DummyPathFinder)
-        }
-
-    }
-
-    it should "be mad when passed a fully-encapsulated range for double exclusion" in {
-
-        given("one valid range of inclusions and two valid ranges of exclusions, where one exclusion range fully encapsulates the other")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, RunRange), TestCriteriaRangeTuple(2, 5, SkipRange), TestCriteriaRangeTuple(3, 4, SkipRange))
-
-        when("the tester is invoked")
-        then("FullEncapsulationException should be thrown")
-        intercept[FullEncapsulationException] {
-            TestingCore(inList, DummyPathFinder)
-        }
-
-    }
-
-    it should "be mad when passed a range for running that is fully encapsulated by a range for skipping" in {
-
-        given("one valid range of inclusion and one valid range for exclusion, where the exclusion range fully encapsulates the inclusion range")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, SkipRange), TestCriteriaRangeTuple(2, 5, RunRange))
-
-        when("the tester is invoked")
-        then("FullEncapsulationException should be thrown")
-        intercept[FullEncapsulationException] {
-            TestingCore(inList, DummyPathFinder)
-        }
-
-    }
+    // @address Should be mad when an exclusion extends to a point that no inclusion goes to
+    //          Write tests for containsOverlaps() and its caller
+    //          Write tests for findMaxOfValues() and handleRanges()
+    //          Write tests for new generateResultArray() and bucketAListOn_2() functions
 
     it should "be mad when a two of the same test are included redundantly" in {
 
@@ -154,8 +94,8 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         val inList = List[TestCriteria[_]](TestCriteriaValueTuple(1, RunTest), TestCriteriaValueTuple(1, RunTest))
 
         when("the tester is invoked")
-        then("RedundantInclusionException should be thrown")
-        intercept[RedundantInclusionException] {
+        then("RedundancyException should be thrown")
+        intercept[RedundancyException] {
             TestingCore(inList, DummyPathFinder)
         }
 
@@ -163,38 +103,77 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
 
     it should "be mad when a single test is redundantly included in a range" in {
 
-        given("a valid range, and a valid single test (which was already included by the range")
+        given("a valid range, and a valid single test (which was already included by the range)")
         val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 2, RunRange), TestCriteriaValueTuple(1, RunTest))
 
         when("the tester is invoked")
-        then("RedundantInclusionException should be thrown")
-        intercept[RedundantInclusionException] {
+        then("RedundancyException should be thrown")
+        intercept[RedundancyException] {
             TestingCore(inList, DummyPathFinder)
         }
 
     }
 
-    it should "be mad when two of the same test are excluded redundantly" in {
+    it should "be mad when a test range encapsulates another test range" in {
 
-        given("a valid range of inclusions, and two of the same single, valid skip")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 4, RunRange), TestCriteriaValueTuple(1, SkipTest), TestCriteriaValueTuple(1, SkipTest))
+        given("two valid test ranges (where one encapsulates the other)")
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 4, RunRange), TestCriteriaRangeTuple(2, 3, RunRange))
 
         when("the tester is invoked")
-        then("UnnecessaryExclusionException should be thrown")
-        intercept[UnnecessaryExclusionException] {
+        then("RedundancyException should be thrown")
+        intercept[RedundancyException] {
             TestingCore(inList, DummyPathFinder)
         }
 
     }
 
-    it should "be mad when a single test is redudantly excluded in a range" in {
+    it should "be mad when a skip range encapsulates another skip range" in {
 
-        given("a valid range of tests, a valid range of skips, and a valid single test skip (which was already included by the range)")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 5, RunRange), TestCriteriaRangeTuple(2, 4, SkipRange), TestCriteriaValueTuple(2, SkipTest))
+        given("two valid test ranges (where one encapsulates the other)")
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, RunRange), TestCriteriaRangeTuple(2, 5, SkipRange), TestCriteriaRangeTuple(3, 4, SkipRange))
 
         when("the tester is invoked")
-        then("UnnecessaryExclusionException should be thrown")
-        intercept[UnnecessaryExclusionException] {
+        then("RedundancyException should be thrown")
+        intercept[RedundancyException] {
+            TestingCore(inList, DummyPathFinder)
+        }
+
+    }
+
+    it should "be mad when a test value is excluded unnecessarily" in {
+
+        given("a valid range, and a valid single skip")
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(2, 4, RunRange), TestCriteriaValueTuple(1, SkipTest))
+
+        when("the tester is invoked")
+        then("RedundancyException should be thrown")
+        intercept[RedundancyException] {
+            TestingCore(inList, DummyPathFinder)
+        }
+
+    }
+
+    it should "be mad when a test range is excluded unnecessarily" in {
+
+        given("a valid range, and a valid single test (which was already included by the range")
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(4, 6, RunRange), TestCriteriaRangeTuple(1, 3, SkipRange))
+
+        when("the tester is invoked")
+        then("RedundancyException should be thrown")
+        intercept[RedundancyException] {
+            TestingCore(inList, DummyPathFinder)
+        }
+
+    }
+
+    it should "be mad when a test range is extends to exclude unnecessarily" in {
+
+        given("a valid range, and a valid single test (which was already included by the range")
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 3, RunRange), TestCriteriaRangeTuple(5, 6, RunRange), TestCriteriaRangeTuple(2, 4, SkipRange))
+
+        when("the tester is invoked")
+        then("RedundancyException should be thrown")
+        intercept[RedundancyException] {
             TestingCore(inList, DummyPathFinder)
         }
 

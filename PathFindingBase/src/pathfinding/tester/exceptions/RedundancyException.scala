@@ -7,4 +7,4 @@ package pathfinding.tester.exceptions
  * Time: 4:54 PM
  */
 
-class RedundantInclusionException(s: String = "") extends Exception("Redundant inclusion: " + s)
+class RedundancyException(s: String = "") extends Exception("Redundant inclusion: " + s)
