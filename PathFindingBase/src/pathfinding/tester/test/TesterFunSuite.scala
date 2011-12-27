@@ -4,7 +4,6 @@ import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers
 import pathfinding.tester.TestingCore
 import pathfinding.tester.criteria._
-import pathfinding.tester.criteria.TestCriteriaRangeTuple._
 import collection.immutable.HashMap
 
 /**
@@ -88,6 +87,281 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
         result should equal (true)
     }
 
+    test("sortCriteria - Empty") {
+        val inList = Nil
+        val resultList = TestingCore.sortCriteria(inList)
+        val expected = Nil
+        resultList should equal (expected)
+    }
+
+    test("sortCriteria - One value") {
+        val inList = List(TestCriteriaValueTuple(1, RunTest))
+        val resultList = TestingCore.sortCriteria(inList)
+        val expected = inList
+        resultList should equal (expected)
+    }
+
+    test("sortCriteria - One range") {
+        val inList = List(TestCriteriaRangeTuple(1, 1, RunRange))
+        val resultList = TestingCore.sortCriteria(inList)
+        val expected = inList
+        resultList should equal (expected)
+    }
+
+    test("sortCriteria - Many values (presorted)") {
+        val inList = List(TestCriteriaValueTuple(1, RunTest), TestCriteriaValueTuple(3, RunTest), TestCriteriaValueTuple(17, RunTest))
+        val resultList = TestingCore.sortCriteria(inList)
+        val expected = inList
+        resultList should equal (expected)
+    }
+
+    test("sortCriteria - Many ranges (presorted)") {
+        val inList = List(TestCriteriaRangeTuple(1, 6, RunRange), TestCriteriaRangeTuple(7, 7, RunRange),
+                          TestCriteriaRangeTuple(8, 9, RunRange), TestCriteriaRangeTuple(12, 17, RunRange))
+        val resultList = TestingCore.sortCriteria(inList)
+        val expected = inList
+        resultList should equal (expected)
+    }
+
+    test("sortCriteria - Many values (unsorted)") {
+        val inList = List(TestCriteriaValueTuple(17, RunTest), TestCriteriaValueTuple(1, RunTest), TestCriteriaValueTuple(3, RunTest))
+        val resultList = TestingCore.sortCriteria(inList)
+        val expected = List(TestCriteriaValueTuple(1, RunTest), TestCriteriaValueTuple(3, RunTest), TestCriteriaValueTuple(17, RunTest))
+        resultList should equal (expected)
+    }
+
+    test("sortCriteria - Many ranges (reversed)") {
+        val inList = List(TestCriteriaRangeTuple(12, 17, RunRange), TestCriteriaRangeTuple(8, 9, RunRange),
+                          TestCriteriaRangeTuple(7, 7, RunRange), TestCriteriaRangeTuple(1, 6, RunRange))
+        val resultList = TestingCore.sortCriteria(inList)
+        val expected = inList.reverse
+        resultList should equal (expected)
+    }
+
+    test("bucketAListOn_2 - Empty") {
+        val inList = Nil
+        val resultList = TestingCore.bucketAListOn_2(inList)
+        val expected = Array()
+        resultList should equal (expected)
+    }
+
+    test("bucketAListOn_2 - One Char") {
+        val inList = List(('a', 0))
+        val resultList = TestingCore.bucketAListOn_2(inList)
+        val expected = Array('a')
+        resultList should equal (expected)
+    }
+
+    test("bucketAListOn_2 - Many chars") {
+        val inList = List(('a', 0), ('s', 3), ('e', 2), ('o', 4), ('e', 6), ('w', 1), ('m', 5))
+        val resultList = TestingCore.bucketAListOn_2(inList)
+        val expected = "awesome"
+        resultList.toList.mkString should equal (expected)
+    }
+
+    test("handleRanges - Empty") {
+        val inList = Nil
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList)
+        val expectedTests = Nil
+        val expectedSkips = Nil
+        val expectedMax = 0
+        resultTests should equal (expectedTests)
+        resultSkips should equal (expectedSkips)
+        resultMax   should equal (expectedMax)
+    }
+
+    test("handleRanges - One run") {
+        val inList = List(TestCriteriaRangeTuple(1, 3, RunRange))
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList)
+        val expectedTests = inList
+        val expectedSkips = Nil
+        val expectedMax = 3
+        resultTests should equal (expectedTests)
+        resultSkips should equal (expectedSkips)
+        resultMax   should equal (expectedMax)
+    }
+    
+    test("handleRanges - One skip") {
+        val inList = List(TestCriteriaRangeTuple(1, 3, SkipRange))
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList)
+        val expectedTests = Nil
+        val expectedSkips = inList
+        val expectedMax = 0
+        resultTests should equal (expectedTests)
+        resultSkips should equal (expectedSkips)
+        resultMax   should equal (expectedMax)
+    }
+
+    test("handleRanges - Many runs") {
+        val inList = List(TestCriteriaRangeTuple(1, 3, RunRange), TestCriteriaRangeTuple(4, 4, RunRange), TestCriteriaRangeTuple(5, 6, RunRange))
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList)
+        val expectedTests = inList
+        val expectedSkips = Nil
+        val expectedMax = 6
+        resultTests should equal (expectedTests)
+        resultSkips should equal (expectedSkips)
+        resultMax   should equal (expectedMax)
+    }
+
+    test("handleRanges - Many skips") {
+        val inList = List(TestCriteriaRangeTuple(1, 3, SkipRange), TestCriteriaRangeTuple(4, 4, SkipRange), TestCriteriaRangeTuple(5, 6, SkipRange))
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList)
+        val expectedTests = Nil
+        val expectedSkips = inList
+        val expectedMax = 0
+        resultTests should equal (expectedTests)
+        resultSkips should equal (expectedSkips)
+        resultMax   should equal (expectedMax)
+    }
+
+    test("handleRanges - Many (mixed)") {
+        val inList = List(TestCriteriaRangeTuple(1, 3, SkipRange), TestCriteriaRangeTuple(4, 4, RunRange), TestCriteriaRangeTuple(5, 6, SkipRange))
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList)
+        val expectedTests = List(TestCriteriaRangeTuple(4, 4, RunRange))
+        val expectedSkips = List(TestCriteriaRangeTuple(1, 3, SkipRange), TestCriteriaRangeTuple(5, 6, SkipRange))
+        val expectedMax = 4
+        resultTests should equal (expectedTests)
+        resultSkips should equal (expectedSkips)
+        resultMax   should equal (expectedMax)
+    }
+    
+    test("handleValues - Empty") {
+        val inList = Nil
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList)
+        val expectedTests = Nil
+        val expectedSkips = Nil
+        val expectedMax = 0
+        resultTests should equal (expectedTests)
+        resultSkips should equal (expectedSkips)
+        resultMax   should equal (expectedMax)
+    }
+
+    test("handleValues - One run") {
+        val inList = List(TestCriteriaValueTuple(1, RunTest))
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList)
+        val expectedTests = inList
+        val expectedSkips = Nil
+        val expectedMax = 1
+        resultTests should equal (expectedTests)
+        resultSkips should equal (expectedSkips)
+        resultMax   should equal (expectedMax)
+    }
+    
+    test("handleValues - One skip") {
+        val inList = List(TestCriteriaValueTuple(1, SkipTest))
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList)
+        val expectedTests = Nil
+        val expectedSkips = inList
+        val expectedMax = 0
+        resultTests should equal (expectedTests)
+        resultSkips should equal (expectedSkips)
+        resultMax   should equal (expectedMax)
+    }
+
+    test("handleValues - Many runs") {
+        val inList = List(TestCriteriaValueTuple(1, RunTest), TestCriteriaValueTuple(4, RunTest), TestCriteriaValueTuple(5, RunTest))
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList)
+        val expectedTests = inList
+        val expectedSkips = Nil
+        val expectedMax = 5
+        resultTests should equal (expectedTests)
+        resultSkips should equal (expectedSkips)
+        resultMax   should equal (expectedMax)
+    }
+
+    test("handleValues - Many skips") {
+        val inList = List(TestCriteriaValueTuple(1, SkipTest), TestCriteriaValueTuple(4, SkipTest),  TestCriteriaValueTuple(5, SkipTest))
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList)
+        val expectedTests = Nil
+        val expectedSkips = inList
+        val expectedMax = 0
+        resultTests should equal (expectedTests)
+        resultSkips should equal (expectedSkips)
+        resultMax   should equal (expectedMax)
+    }
+
+    test("handleValues - Many (mixed)") {
+        val inList = List(TestCriteriaValueTuple(1, SkipTest), TestCriteriaValueTuple(4, RunTest), TestCriteriaValueTuple(5, SkipTest))
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList)
+        val expectedTests = List(TestCriteriaValueTuple(4, RunTest))
+        val expectedSkips = List(TestCriteriaValueTuple(1, SkipTest), TestCriteriaValueTuple(5, SkipTest))
+        val expectedMax = 4
+        resultTests should equal (expectedTests)
+        resultSkips should equal (expectedSkips)
+        resultMax   should equal (expectedMax)
+    }
+
+    test("containsOverlaps - Empty") {
+        
+        val inList = Nil
+        val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(inList)
+
+        // The "should" notation is breaking again...
+        result === false
+        offenderPart1 === None
+        offenderPart2 === None
+        
+    }
+
+    test("containsOverlaps - One") {
+
+        val inList = List(TestCriteriaRangeTuple(1, 1, RunRange))
+        val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(inList)
+
+        result === false
+        offenderPart1 === None
+        offenderPart2 === None
+
+    }
+
+    test("containsOverlaps - Many (without overlap)") {
+
+        val inList = List(TestCriteriaRangeTuple(1, 1, RunRange), TestCriteriaRangeTuple(3, 7, RunRange), TestCriteriaRangeTuple(9, 9, RunRange))
+        val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(inList)
+
+        result === false
+        offenderPart1 === None
+        offenderPart2 === None
+
+    }
+
+    test("containsOverlaps - Many (with SOME overlap)") {
+
+        val inList = List(TestCriteriaRangeTuple(1, 1, RunRange), TestCriteriaRangeTuple(3, 7, RunRange), TestCriteriaRangeTuple(7, 9, RunRange))
+        val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(inList)
+
+        result === true
+        offenderPart1 === Some(TestCriteriaRangeTuple(3, 7, RunRange))
+        offenderPart2 === Some(TestCriteriaRangeTuple(7, 9, RunRange))
+
+    }
+
+    test("containsOverlaps - Many (with ALL overlaps)") {
+
+        val inList = List(TestCriteriaRangeTuple(1, 5, RunRange), TestCriteriaRangeTuple(3, 7, RunRange), TestCriteriaRangeTuple(7, 9, RunRange))
+        val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(inList)
+
+        result === true
+        offenderPart1 === Some(TestCriteriaRangeTuple(1, 5, RunRange))
+        offenderPart2 === Some(TestCriteriaRangeTuple(3, 7, RunRange))
+
+    }
+
+    test("generateResultArray - Empty, empty, empty, empty, 10") {
+        val resultArr = TestingCore.generateResultArray(Nil, Nil, Nil, Nil, 10)
+        val expected = Array(false, false, false, false, false,
+                             false, false, false, false, false, false)
+        resultArr should equal (expected)
+    }
+
+    test("generateResultArray - One, one, one, one, 10") {
+        val resultArr = TestingCore.generateResultArray(List(TestCriteriaRangeTuple(2, 8, RunRange)), List(TestCriteriaValueTuple(10, RunTest)),
+                                                        List(TestCriteriaRangeTuple(4, 5, SkipRange)), List(TestCriteriaValueTuple(7, SkipTest)), 10)
+        val expected = Array(false, false, true, true, false,
+                             false, true, false, true, false, true)
+        resultArr should equal (expected)
+    }
+
     test("sortArgLists - Empty list") {
         val resultMap = TestingCore.sortArgLists(Nil)
         val (resultValues, resultRanges, resultToggles) = (resultMap(TestingCore.ArgKeyValue), resultMap(TestingCore.ArgKeyRange), resultMap(TestingCore.ArgKeyToggle))
@@ -149,54 +423,6 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
         toggleList.contains(inToggle1) === true
         toggleList.contains(inToggle2) === true
 
-    }
-
-    test("sortCriteriaValues - Empty list") {
-        val inList = Nil
-        val result = TestingCore.sortCriteriaValues(inList)
-        result should equal (inList)
-    }
-
-    test("sortCriteriaValues - Single-item list") {
-        val inList = List(TestCriteriaValueTuple(1, RunTest))
-        val result = TestingCore.sortCriteriaValues(inList)
-        result should equal (inList)
-    }
-
-    test("sortCriteriaValues - Multi-item list (presorted)") {
-        val inList = List(TestCriteriaValueTuple(1, RunTest), TestCriteriaValueTuple(2, RunTest))
-        val result = TestingCore.sortCriteriaValues(inList)
-        result should equal (inList)
-    }
-
-    test("sortCriteriaValues - Multi-item list (backwards)") {
-        val inList = List(TestCriteriaValueTuple(2, RunTest), TestCriteriaValueTuple(1, RunTest))
-        val result = TestingCore.sortCriteriaValues(inList)
-        result should equal (inList.reverse)
-    }
-
-    test("sortCriteriaRanges - Empty list") {
-        val inList = Nil
-        val result = TestingCore.sortCriteriaRanges(inList)
-        result should equal (inList)
-    }
-
-    test("sortCriteriaRanges - Single-item list") {
-        val inList = List(TestCriteriaRangeTuple(1, 2, RunRange))
-        val result = TestingCore.sortCriteriaRanges(inList)
-        result should equal (inList)
-    }
-
-    test("sortCriteriaRanges - Multi-item list (presorted)") {
-        val inList = List(TestCriteriaRangeTuple(1, 2, RunRange), TestCriteriaRangeTuple(3, 4, RunRange))
-        val result = TestingCore.sortCriteriaRanges(inList)
-        result should equal (inList)
-    }
-
-    test("sortCriteriaRanges - Multi-item list (backwards)") {
-        val inList = List(TestCriteriaRangeTuple(3, 4, RunRange), TestCriteriaRangeTuple(1, 2, RunRange))
-        val result = TestingCore.sortCriteriaRanges(inList)
-        result should equal (inList.reverse)
     }
 
     test("siftOutTestsAndSkips - No runs, no skips") {

@@ -83,11 +83,6 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
 
     }
 
-    // @address Should be mad when an exclusion extends to a point that no inclusion goes to
-    //          Write tests for containsOverlaps() and its caller
-    //          Write tests for findMaxOfValues() and handleRanges()
-    //          Write tests for new generateResultArray() and bucketAListOn_2() functions
-
     it should "be mad when a two of the same test are included redundantly" in {
 
         given("two of the same single, valid test")

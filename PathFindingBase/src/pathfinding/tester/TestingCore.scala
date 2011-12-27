@@ -43,12 +43,12 @@ object TestingCore {
                 val rangesOption = argMap.get(ArgKeyRange).asInstanceOf[Option[List[TestCriteriaRangeTuple]]]
 
                 val values = valuesOption  match {
-                    case Some(x @ (h::t)) => sortCriteriaValues(x)
+                    case Some(x @ (h::t)) => sortCriteria(x)
                     case _                => Nil
                 }
 
                 val ranges = rangesOption match {
-                    case Some(x @ (h::t)) => sortCriteriaRanges(x)
+                    case Some(x @ (h::t)) => sortCriteria(x)
                     case _                => Nil
                 }
 
@@ -69,7 +69,8 @@ object TestingCore {
     // Basically, takes advantage of bucketing to quickly deal with test numbers and their test-ness/skip-ness
     // Calls an implicit conversion of List[RangeTuples] into List[List[ValueTuple]]s where it is called
     // To curry, or not to curry—that is the question
-    private[tester] def generateResultArray(runRanges: List[TestCriteriaRangeTuple], runValues: List[TestCriteriaValueTuple], skipRanges: List[TestCriteriaRangeTuple], skipValues: List[TestCriteriaValueTuple], maxNum: Int) : Array[Boolean] = {
+    private[tester] def generateResultArray(runRanges: List[TestCriteriaRangeTuple], runValues: List[TestCriteriaValueTuple],
+                                            skipRanges: List[TestCriteriaRangeTuple], skipValues: List[TestCriteriaValueTuple], maxNum: Int) : Array[Boolean] = {
         val protoArr  = new Array[Boolean](maxNum + 1)
         val hemiArr   = applyValuesToArr(runRanges.flatten, protoArr)
         val modernArr = applyValuesToArr(runValues, hemiArr)
@@ -90,6 +91,7 @@ object TestingCore {
         arr
     }
 
+    // Expects values and ranges to both be sorted
     private[tester] def handleTestIntervals(values: List[TestCriteriaValueTuple], ranges: List[TestCriteriaRangeTuple]) : List[Int] = {
 
         val (testRanges, skipRanges, maxRangeVal) = handleRanges(ranges)
@@ -110,6 +112,7 @@ object TestingCore {
 
     }
 
+    // Expects ranges to be sorted
     private[tester] def handleRanges(ranges: List[TestCriteriaRangeTuple]) : (List[TestCriteriaRangeTuple], List[TestCriteriaRangeTuple], Int) = {
 
         if (!ranges.isEmpty) {
@@ -120,7 +123,7 @@ object TestingCore {
             if (testsHaveOverlap) throw new RedundancyException("Test list has an overlap between " + firstTest.get.toString + " and " + secondTest.get.toString)
 
             val (skipsHaveOverlap, firstSkip, secondSkip) = containsOverlaps(skipList)
-            if (skipsHaveOverlap) throw new RedundancyException("Test list has an overlap between " + firstSkip.get.toString + " and " + secondSkip.get.toString)
+            if (skipsHaveOverlap) throw new RedundancyException("Skip list has an overlap between " + firstSkip.get.toString + " and " + secondSkip.get.toString)
 
             val maxOfRanges = {
                 if (!testList.isEmpty) {
@@ -142,10 +145,11 @@ object TestingCore {
 
     }
 
+    // Expects values to be sorted
     private[tester] def handleValues(values: List[TestCriteriaValueTuple]) : (List[TestCriteriaValueTuple], List[TestCriteriaValueTuple], Int) = {
         if (!values.isEmpty) {
             val (testList, skipList) = siftOutTestsAndSkips(values)
-            val value = testList.last.criteria.guide
+            val value = if (!testList.isEmpty) testList.last.criteria.guide else 0
             if (value <= PathingTestCluster.getSize)
                 (testList, skipList, value)
             else
@@ -187,7 +191,7 @@ object TestingCore {
                                                                 ArgKeyToggle -> List[TestCriteriaToggleFlag]()))
     }
 
-    private[tester] def sortCriteriaValues[T <: TestCriteriaTuple[_, _] : Manifest](inList: List[T]) : List[T] = {
+    private[tester] def sortCriteria[T <: TestCriteriaTuple[_, _] : Manifest](inList: List[T]) : List[T] = {
         inList match {
             case Nil    => Nil
             case h::t   => {
@@ -207,10 +211,6 @@ object TestingCore {
         val buckets = new Array[T](inList.size)
         inList.foreach ( x => buckets(x._2) = x._1 )
         buckets
-    }
-
-    private[tester] def sortCriteriaRanges(criteriaList: List[TestCriteriaRangeTuple]) : List[TestCriteriaRangeTuple] = {
-        criteriaList.sortWith((a, b) => a.criteria.guide._1 < b.criteria.guide._1)
     }
 
     // Assumes the passed-in list to be sorted
