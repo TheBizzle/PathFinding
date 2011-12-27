@@ -41,30 +41,25 @@ object TestingCore {
             else if (!isRunningBaseTests)
                 throw new NotRunningTestsException("You can't run the test suite if you're going to skip the pathing tests AND the base tests")
 
-        val testsToRun = {
-            if (!isSkippingPathingTests) {
+        if (!isSkippingPathingTests) {
 
-                val valuesOption = argMap.get(ArgKeyValue).asInstanceOf[Option[List[TestCriteriaValueTuple]]]
-                val rangesOption = argMap.get(ArgKeyRange).asInstanceOf[Option[List[TestCriteriaRangeTuple]]]
+            val valuesOption = argMap.get(ArgKeyValue).asInstanceOf[Option[List[TestCriteriaValueTuple]]]
+            val rangesOption = argMap.get(ArgKeyRange).asInstanceOf[Option[List[TestCriteriaRangeTuple]]]
 
-                val values = valuesOption  match {
-                    case Some(x @ (h::t)) => sortCriteria(x)
-                    case _                => Nil
-                }
-
-                val ranges = rangesOption match {
-                    case Some(x @ (h::t)) => sortCriteria(x)
-                    case _                => Nil
-                }
-
-                handleTestIntervals(values, ranges, cluster.getSize)
-
+            val values = valuesOption  match {
+                case Some(x @ (h::t)) => sortCriteria(x)
+                case _                => Nil
             }
-            else
-                Nil
-        }
 
-        cluster.runTests(testsToRun, isTalkative)
+            val ranges = rangesOption match {
+                case Some(x @ (h::t)) => sortCriteria(x)
+                case _                => Nil
+            }
+
+            val testsToRun = handleTestIntervals(values, ranges, cluster.getSize)
+            cluster.runTests(testsToRun, isTalkative)
+
+        }
 
         if (isRunningBaseTests)
             runBaseTests()

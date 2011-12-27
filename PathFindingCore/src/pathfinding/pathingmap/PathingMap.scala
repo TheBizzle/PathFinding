@@ -1,9 +1,9 @@
 package pathfinding.pathingmap
 
 import direction._
+import exceptions.{UnknownSubclassException, InvalidParameterException}
 import terrain._
 import pathingmapdata.{PathingMapStringInterpreter, PathingMapString}
-import java.security.InvalidParameterException
 import pathfinding.coordinate.Coordinate
 
 /**
@@ -27,11 +27,11 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
             pathingMap(x)(y)
         else
             Invalid
-        
+
     }
 
     def neighborsOf(loc: Coordinate) : List[Direction] = {
-        PathingMap.DirList.foldLeft(List[Direction]()) ((acc,dir) => if (PathingMap.isPassable(getTerrain(PathingMap.findNeighborCoord(loc, dir)))) dir::acc else acc)
+        PathingMap.DirList.foldLeft(List[Direction]()) ((acc,dir) => if ( PathingMap.isPassable(getTerrain(PathingMap.findNeighborCoord(loc, dir)))) dir::acc else acc )
     }
 
     def step(start: Coordinate, end: Coordinate) {
@@ -94,7 +94,7 @@ object PathingMap {
             case South => new Coordinate(loc.x, loc.y - 1)
             case East  => new Coordinate(loc.x + 1, loc.y)
             case West  => new Coordinate(loc.x - 1, loc.y)
-            case _ => throw new InvalidParameterException
+            case _     => throw new UnknownSubclassException("" + dir)
         }
     }
 
@@ -103,7 +103,7 @@ object PathingMap {
         else if (end.y == start.y - 1) South
         else if (end.x == start.x + 1) East
         else if (end.x == start.x - 1) West
-        else throw new InvalidParameterException
+        else throw new InvalidParameterException(start.toString + " or " + end.toString + " is/are invalid")
     }
 
     def generateCloneWithPath(path: List[Coordinate], inMap: PathingMap) : PathingMap = {
