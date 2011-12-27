@@ -13,7 +13,7 @@ import pathfinding.{StepData, PathFinder}
  * Time: 4:28 PM
  */
 
-// Is there a way to do this subtyping of StepData correctly...?
+// @address Is there a way to do this subtyping of StepData correctly...?
 sealed abstract class TestFunction extends Function2[PathFinder[StepData], Boolean, Unit] {
     // Consider not passing the toggle flags to apply() and just batch-processing toggles into function object local variables.
     // That way, the signatures of the functions wouldn't need to change if ever more toggles were added.
@@ -75,7 +75,7 @@ object PathingTestCluster {
     }
 
     // =====================================+---------------------------------+======================================
-    //                                      |   Code for tests starts here    |
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>|   Code for tests starts here    |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     // =====================================+---------------------------------+======================================
 
     private object Test1 extends TestFunction {
@@ -115,7 +115,7 @@ object PathingTestCluster {
     }
 
     // ==============================+--------------------------------------------+==================================
-    //                                |   Code for test map strings starts here    |
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>|   Code for test map strings starts here    |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     // ==============================+--------------------------------------------+==================================
 
     object TestMapString1 extends PathingMapString("*_____________G", "akjshdkjashldjaksdhljakds")

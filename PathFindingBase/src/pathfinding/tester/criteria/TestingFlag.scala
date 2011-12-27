@@ -21,8 +21,6 @@ case object RunBaseTests extends TestToggleFlag          // Enables running the 
 case object SkipPathingTests extends TestToggleFlag      // Skips the running of any of the actual pathfinding tests
 
 object TestingFlag {
-
-    // The things that I do to appease you, Scala...
     def flipRunningness(flag: TestRunningnessFlag) : TestRunningnessFlag = {
         flag match {
             case RunTest  => SkipTest
@@ -30,5 +28,4 @@ object TestingFlag {
             case _    => throw new InvalidParameterException("Unknown TestRunningnessFlag for runningness flip!")
         }
     }
-
 }
