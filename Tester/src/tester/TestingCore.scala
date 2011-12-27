@@ -1,9 +1,9 @@
-package pathfinding.tester
+package tester
 
 import criteria._
 import exceptions._
-import pathfinding.{StepData, PathFinder}
 import collection.immutable.{List, HashMap, Map}
+import testcluster.TestCluster
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,14 +19,19 @@ object TestingCore {
     private[tester] val ArgKeyToggle = "toggle"
 
     // @address These existential types displease me...
-    def apply[T <: StepData](args: List[TestCriteria[_]], thingToTest: PathFinder[T]) {
+    def apply(args: List[TestCriteria[_]], cluster: TestCluster[_]) {
         val argMap = sortArgLists(args)
-        makeTestRunningDecisions(argMap, thingToTest)
+        makeTestRunningDecisions(argMap, cluster)
     }
 
-    private def makeTestRunningDecisions[T <: StepData](argMap: Map[String, List[TestCriteria[_]]], thingToTest: PathFinder[T]) {
+    private def makeTestRunningDecisions(argMap: Map[String, List[TestCriteria[_]]], cluster: TestCluster[_]) {
 
-        val toggles = new TestToggleFlagWrapper(argMap.get(ArgKeyToggle).asInstanceOf[Option[List[TestCriteriaToggleFlag]]])
+        val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[List[TestCriteriaToggleFlag]]] match {
+            case None    => throw new MysteriousDataException("OMG, what did you do?!")
+            case Some(x) => x
+        }
+
+        val toggles = new TestToggleFlagWrapper(rawToggles)
         val wantsToRunPathing = assessPathingDesire(argMap)
         val (isTalkative, isRunningBaseTests, isSkippingPathingTests) = (toggles.get(Talkative), toggles.get(RunBaseTests), toggles.get(SkipPathingTests))
 
@@ -52,14 +57,14 @@ object TestingCore {
                     case _                => Nil
                 }
 
-                handleTestIntervals(values, ranges)
+                handleTestIntervals(values, ranges, cluster.getSize)
 
             }
             else
                 Nil
         }
 
-        PathingTestCluster.runTests(testsToRun, thingToTest, isTalkative)
+        cluster.runTests(testsToRun, isTalkative)
 
         if (isRunningBaseTests)
             runBaseTests()
@@ -92,10 +97,10 @@ object TestingCore {
     }
 
     // Expects values and ranges to both be sorted
-    private[tester] def handleTestIntervals(values: List[TestCriteriaValueTuple], ranges: List[TestCriteriaRangeTuple]) : List[Int] = {
+    private[tester] def handleTestIntervals(values: List[TestCriteriaValueTuple], ranges: List[TestCriteriaRangeTuple], testCount: Int) : List[Int] = {
 
-        val (testRanges, skipRanges, maxRangeVal) = handleRanges(ranges)
-        val (testValues, skipValues, maxValueVal) = handleValues(values)
+        val (testRanges, skipRanges, maxRangeVal) = handleRanges(ranges, testCount)
+        val (testValues, skipValues, maxValueVal) = handleValues(values, testCount)
         val overallMax = if (maxValueVal > maxRangeVal) maxValueVal else maxRangeVal
 
         if (overallMax < 1)
@@ -113,7 +118,7 @@ object TestingCore {
     }
 
     // Expects ranges to be sorted
-    private[tester] def handleRanges(ranges: List[TestCriteriaRangeTuple]) : (List[TestCriteriaRangeTuple], List[TestCriteriaRangeTuple], Int) = {
+    private[tester] def handleRanges(ranges: List[TestCriteriaRangeTuple], testCount: Int) : (List[TestCriteriaRangeTuple], List[TestCriteriaRangeTuple], Int) = {
 
         if (!ranges.isEmpty) {
 
@@ -128,7 +133,7 @@ object TestingCore {
             val maxOfRanges = {
                 if (!testList.isEmpty) {
                     val value = testList.last.criteria.guide._2
-                    if (value <= PathingTestCluster.getSize)
+                    if (value <= testCount)
                         value
                     else
                         throw new InvalidTestNumberException("Test range " + testList.last.toString + " extends to a number for which there is no corresponding test")
@@ -146,11 +151,11 @@ object TestingCore {
     }
 
     // Expects values to be sorted
-    private[tester] def handleValues(values: List[TestCriteriaValueTuple]) : (List[TestCriteriaValueTuple], List[TestCriteriaValueTuple], Int) = {
+    private[tester] def handleValues(values: List[TestCriteriaValueTuple], testCount: Int) : (List[TestCriteriaValueTuple], List[TestCriteriaValueTuple], Int) = {
         if (!values.isEmpty) {
             val (testList, skipList) = siftOutTestsAndSkips(values)
             val value = if (!testList.isEmpty) testList.last.criteria.guide else 0
-            if (value <= PathingTestCluster.getSize)
+            if (value <= testCount)
                 (testList, skipList, value)
             else
                 throw new InvalidTestNumberException("There is no test #" + values.last.criteria.guide)

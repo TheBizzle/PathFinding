@@ -1,4 +1,4 @@
-package pathfinding.tester.criteria
+package tester.criteria
 
 /**
  * Created by IntelliJ IDEA.

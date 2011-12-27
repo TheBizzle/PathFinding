@@ -1,6 +1,6 @@
-package pathfinding.tester.criteria
+package tester.criteria
 
-import java.security.InvalidParameterException
+import tester.exceptions.MysteriousDataException
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +25,7 @@ object TestingFlag {
         flag match {
             case RunTest  => SkipTest
             case SkipTest => RunTest
-            case _    => throw new InvalidParameterException("Unknown TestRunningnessFlag for runningness flip!")
+            case _        => throw new MysteriousDataException("Unknown TestRunningnessFlag for runningness flip!")
         }
     }
 }

@@ -1,7 +1,7 @@
-package pathfinding.tester.criteria
+package tester.criteria
 
 import collection.mutable.HashMap
-import java.security.InvalidParameterException
+import tester.exceptions.MysteriousDataException
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,16 +10,12 @@ import java.security.InvalidParameterException
  * Time: 6:51 PM
  */
 
-class TestToggleFlagWrapper(toggles: Option[List[TestCriteriaToggleFlag]]) {
+class TestToggleFlagWrapper(toggles: List[TestCriteriaToggleFlag]) {
 
     private val FlagList = List(Talkative, RunBaseTests, SkipPathingTests)
 
     private val flagMap = initializeFlagMap(FlagList)
-
-    toggles match {
-        case None    => throw new InvalidParameterException("OMG, what did you do?!")
-        case Some(x) => x map (verifyAndInsert(_))
-    } 
+    toggles map ( verifyAndInsert(_) )
 
     // No entries should be ADDED to the map after calling this once
     private def initializeFlagMap(flags: List[TestToggleFlag]) : HashMap[TestToggleFlag, Boolean] = {
@@ -37,8 +33,8 @@ class TestToggleFlagWrapper(toggles: Option[List[TestCriteriaToggleFlag]]) {
         val flag = crit.criteria
         flagMap.get(flag) match {
             case Some(x) => flagMap.update(flag, true)
-            case None => throw new InvalidParameterException("Unknown toggle: " + flag.toString +
-                                                             "\nDid you make a new flag and forget to add it to TestToggleFlagWrapper's FlagList?")
+            case None => throw new MysteriousDataException("Unknown toggle: " + flag.toString +
+                                                           "\nDid you make a new flag and forget to add it to TestToggleFlagWrapper's FlagList?")
         }
     }
 

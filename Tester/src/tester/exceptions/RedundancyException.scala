@@ -1,4 +1,4 @@
-package pathfinding.tester.exceptions
+package tester.exceptions
 
 /**
  * Created by IntelliJ IDEA.

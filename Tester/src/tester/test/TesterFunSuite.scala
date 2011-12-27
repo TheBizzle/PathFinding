@@ -1,10 +1,10 @@
-package pathfinding.tester.test
+package tester.test
 
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers
-import pathfinding.tester.TestingCore
-import pathfinding.tester.criteria._
+import tester.TestingCore
 import collection.immutable.HashMap
+import tester.criteria._
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,7 +18,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
     test("handleTestIntervals - Empty, one") {
         val inValues = Nil
         val inRanges = List(TestCriteriaRangeTuple(1, 2, RunTest))
-        val result = TestingCore.handleTestIntervals(inValues, inRanges)
+        val result = TestingCore.handleTestIntervals(inValues, inRanges, 6)
         val expectedList = List(1, 2)
         result should equal (expectedList)
     }
@@ -26,7 +26,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
     test("handleTestIntervals - One, empty") {
         val inValues = List(TestCriteriaValueTuple(2, RunTest))
         val inRanges = Nil
-        val result = TestingCore.handleTestIntervals(inValues, inRanges)
+        val result = TestingCore.handleTestIntervals(inValues, inRanges, 6)
         val expectedList = List(2)
         result should equal (expectedList)
     }
@@ -34,7 +34,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
     test("handleTestIntervals - One, one") {
         val inValues = List(TestCriteriaValueTuple(2, RunTest))
         val inRanges = List(TestCriteriaRangeTuple(4, 6, RunTest))
-        val result = TestingCore.handleTestIntervals(inValues, inRanges)
+        val result = TestingCore.handleTestIntervals(inValues, inRanges, 6)
         val expectedList = List(2, 4, 5, 6)
         result should equal (expectedList)
     }
@@ -42,7 +42,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
     test("handleTestIntervals - Many, many") {
         val inValues = List(TestCriteriaValueTuple(5, RunTest), TestCriteriaValueTuple(1, SkipTest))
         val inRanges = List(TestCriteriaRangeTuple(1, 4, RunTest), TestCriteriaRangeTuple(2, 3, SkipTest))
-        val result = TestingCore.handleTestIntervals(inValues, inRanges)
+        val result = TestingCore.handleTestIntervals(inValues, inRanges, 6)
         val expectedList = List(4, 5)
         result should equal (expectedList)
     }
@@ -161,7 +161,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
     test("handleRanges - Empty") {
         val inList = Nil
-        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList)
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList, 6)
         val expectedTests = Nil
         val expectedSkips = Nil
         val expectedMax = 0
@@ -172,7 +172,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
     test("handleRanges - One run") {
         val inList = List(TestCriteriaRangeTuple(1, 3, RunTest))
-        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList)
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList, 6)
         val expectedTests = inList
         val expectedSkips = Nil
         val expectedMax = 3
@@ -183,7 +183,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
     
     test("handleRanges - One skip") {
         val inList = List(TestCriteriaRangeTuple(1, 3, SkipTest))
-        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList)
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList, 6)
         val expectedTests = Nil
         val expectedSkips = inList
         val expectedMax = 0
@@ -194,7 +194,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
     test("handleRanges - Many runs") {
         val inList = List(TestCriteriaRangeTuple(1, 3, RunTest), TestCriteriaRangeTuple(4, 4, RunTest), TestCriteriaRangeTuple(5, 6, RunTest))
-        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList)
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList, 6)
         val expectedTests = inList
         val expectedSkips = Nil
         val expectedMax = 6
@@ -205,7 +205,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
     test("handleRanges - Many skips") {
         val inList = List(TestCriteriaRangeTuple(1, 3, SkipTest), TestCriteriaRangeTuple(4, 4, SkipTest), TestCriteriaRangeTuple(5, 6, SkipTest))
-        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList)
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList, 6)
         val expectedTests = Nil
         val expectedSkips = inList
         val expectedMax = 0
@@ -216,7 +216,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
     test("handleRanges - Many (mixed)") {
         val inList = List(TestCriteriaRangeTuple(1, 3, SkipTest), TestCriteriaRangeTuple(4, 4, RunTest), TestCriteriaRangeTuple(5, 6, SkipTest))
-        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList)
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList, 6)
         val expectedTests = List(TestCriteriaRangeTuple(4, 4, RunTest))
         val expectedSkips = List(TestCriteriaRangeTuple(1, 3, SkipTest), TestCriteriaRangeTuple(5, 6, SkipTest))
         val expectedMax = 4
@@ -227,7 +227,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
     
     test("handleValues - Empty") {
         val inList = Nil
-        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList)
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList, 6)
         val expectedTests = Nil
         val expectedSkips = Nil
         val expectedMax = 0
@@ -238,7 +238,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
     test("handleValues - One run") {
         val inList = List(TestCriteriaValueTuple(1, RunTest))
-        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList)
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList, 6)
         val expectedTests = inList
         val expectedSkips = Nil
         val expectedMax = 1
@@ -249,7 +249,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
     
     test("handleValues - One skip") {
         val inList = List(TestCriteriaValueTuple(1, SkipTest))
-        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList)
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList, 6)
         val expectedTests = Nil
         val expectedSkips = inList
         val expectedMax = 0
@@ -260,7 +260,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
     test("handleValues - Many runs") {
         val inList = List(TestCriteriaValueTuple(1, RunTest), TestCriteriaValueTuple(4, RunTest), TestCriteriaValueTuple(5, RunTest))
-        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList)
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList, 6)
         val expectedTests = inList
         val expectedSkips = Nil
         val expectedMax = 5
@@ -271,7 +271,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
     test("handleValues - Many skips") {
         val inList = List(TestCriteriaValueTuple(1, SkipTest), TestCriteriaValueTuple(4, SkipTest),  TestCriteriaValueTuple(5, SkipTest))
-        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList)
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList, 6)
         val expectedTests = Nil
         val expectedSkips = inList
         val expectedMax = 0
@@ -282,7 +282,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
     test("handleValues - Many (mixed)") {
         val inList = List(TestCriteriaValueTuple(1, SkipTest), TestCriteriaValueTuple(4, RunTest), TestCriteriaValueTuple(5, SkipTest))
-        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList)
+        val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList, 6)
         val expectedTests = List(TestCriteriaValueTuple(4, RunTest))
         val expectedSkips = List(TestCriteriaValueTuple(1, SkipTest), TestCriteriaValueTuple(5, SkipTest))
         val expectedMax = 4
