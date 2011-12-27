@@ -15,12 +15,12 @@ sealed abstract class TestCriteria[T](criteriaValue: T) {
     val criteria = criteriaValue
 }
 
-sealed class TestTuple[T, U <: ArityTestingFlag with RunningnessTestingFlag](testGuide: T, testFlag: U) {
+sealed class TestTuple[T, U <: TestRunningnessFlag](testGuide: T, testFlag: U) {
     val guide = testGuide
     val flag = testFlag
 }
 
-sealed abstract class TestCriteriaTuple[T, U <: ArityTestingFlag with RunningnessTestingFlag](criteriaTuple: TestTuple[T, U]) extends TestCriteria(criteriaTuple) {
+sealed abstract class TestCriteriaTuple[T, U <: TestRunningnessFlag](criteriaTuple: TestTuple[T, U]) extends TestCriteria(criteriaTuple) {
     def getKey : Int
 }
 
@@ -28,7 +28,7 @@ sealed abstract class TestCriteriaTuple[T, U <: ArityTestingFlag with Runningnes
 //                                           |     Value tuple       |
 // ==========================================+-----------------------+============================================
 
-class TestCriteriaValueTuple(tuple: TestTuple[Int, TestValueFlag with RunningnessTestingFlag]) extends TestCriteriaTuple(tuple) {
+class TestCriteriaValueTuple(tuple: TestTuple[Int, TestRunningnessFlag]) extends TestCriteriaTuple(tuple) {
 
     def getKey : Int = {
         criteria.guide
@@ -57,7 +57,7 @@ class TestCriteriaValueTuple(tuple: TestTuple[Int, TestValueFlag with Runningnes
 }
 
 object TestCriteriaValueTuple {
-    def apply(guide: Int,  flag: TestValueFlag with RunningnessTestingFlag) : TestCriteriaValueTuple = {
+    def apply(guide: Int,  flag: TestRunningnessFlag) : TestCriteriaValueTuple = {
         new TestCriteriaValueTuple(new TestTuple(guide, flag))
     }
 }
@@ -66,7 +66,7 @@ object TestCriteriaValueTuple {
 //                                           |     Range tuple       |
 // ==========================================+-----------------------+============================================
 
-class TestCriteriaRangeTuple(tuple: TestTuple[(Int, Int), TestRangeFlag with RunningnessTestingFlag]) extends TestCriteriaTuple(tuple) {
+class TestCriteriaRangeTuple(tuple: TestTuple[(Int, Int), TestRunningnessFlag]) extends TestCriteriaTuple(tuple) {
 
     def getKey : Int = {
         criteria.guide._1
@@ -112,17 +112,17 @@ class TestCriteriaRangeTuple(tuple: TestTuple[(Int, Int), TestRangeFlag with Run
 }
 
 object TestCriteriaRangeTuple {
-    def apply(guide: (Int, Int),  flag: TestRangeFlag with RunningnessTestingFlag) : TestCriteriaRangeTuple = {
+    def apply(guide: (Int, Int),  flag: TestRunningnessFlag) : TestCriteriaRangeTuple = {
         new TestCriteriaRangeTuple(new TestTuple(guide, flag))
     }
-    def apply(guideStart: Int, guideEnd: Int,  flag: TestRangeFlag with RunningnessTestingFlag) : TestCriteriaRangeTuple = {
+    def apply(guideStart: Int, guideEnd: Int,  flag: TestRunningnessFlag) : TestCriteriaRangeTuple = {
         new TestCriteriaRangeTuple(new TestTuple((guideStart, guideEnd), flag))
     }
     implicit def rangeTupleListToValueTupleListList(that: List[TestCriteriaRangeTuple]) : List[List[TestCriteriaValueTuple]] = {
         that map ( rangeTupleToValueTupleList(_) )
     }
     implicit def rangeTupleToValueTupleList(that: TestCriteriaRangeTuple) : List[TestCriteriaValueTuple] = {
-        Range(that.criteria.guide._1, that.criteria.guide._2).inclusive.foldLeft (List[TestCriteriaValueTuple]()) ( (acc, x) => TestCriteriaValueTuple(x, TestingFlag.flipArity(that.criteria.flag)) :: acc)
+        Range(that.criteria.guide._1, that.criteria.guide._2).inclusive.foldLeft (List[TestCriteriaValueTuple]()) ( (acc, x) => TestCriteriaValueTuple(x, that.criteria.flag) :: acc)
     }
 }
 

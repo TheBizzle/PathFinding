@@ -9,4 +9,4 @@ import pathfinding.tester.{TestingCore}
  * Time: 11:08 PM
  */
 
-TestingCore(List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, RunRange), TestCriteriaToggleFlag(Talkative)), AStar)
+TestingCore(List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, RunTest), TestCriteriaToggleFlag(Talkative)), AStar)

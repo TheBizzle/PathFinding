@@ -81,7 +81,7 @@ object TestingCore {
     private[tester] def applyValuesToArr(values: List[TestCriteriaValueTuple], arr: Array[Boolean]) : Array[Boolean] = {
         values.foreach {
             x => {
-                val isTesting = x.criteria.flag.isInstanceOf[TestRunFlag]
+                val isTesting = (x.criteria.flag == RunTest)
                 if (arr(x.criteria.guide) != isTesting)
                     arr(x.criteria.guide) = isTesting
                 else
@@ -165,7 +165,7 @@ object TestingCore {
 
     private[tester] def assessPathingDesire(argMap:  Map[String, List[TestCriteria[_]]]) : Boolean = {
         def hasPathingDesire(h: TestCriteria[_]) : Boolean = {
-            h.asInstanceOf[TestCriteria[TestTuple[_,_]]].criteria.flag.isInstanceOf[TestRunFlag]
+            h.asInstanceOf[TestCriteria[TestTuple[_,_]]].criteria.flag == RunTest
         }
         argMap(ArgKeyValue).exists(hasPathingDesire) || argMap(ArgKeyRange).exists(hasPathingDesire)
     }
@@ -232,12 +232,12 @@ object TestingCore {
                 case Nil                  => (testList.reverse, skipList.reverse)
                 case h::t                 => {
                     val flag = h.criteria.flag
-                    if (flag.isInstanceOf[TestRunFlag])
+                    if (flag == RunTest)
                         siftHelper(t, h :: testList, skipList)
-                    else if (flag.isInstanceOf[TestSkipFlag])
+                    else if (flag == SkipTest)
                         siftHelper(t, testList, h :: skipList)
                     else
-                        throw new UnexpectedTypeException("Unexpected type of CriteriaRangeTuple!")   // EXPLODE!
+                        throw new UnexpectedTypeException("Unexpected type of TestRunningnessFlag!")   // EXPLODE!
                 }
             }
         }

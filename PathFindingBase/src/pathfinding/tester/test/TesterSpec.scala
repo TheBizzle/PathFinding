@@ -47,7 +47,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
     it should "be mad when you say that you don't want to run tests and then pass it test numbers to run" in {
 
         given("a SkipPathingTests flag and a request to run a pathing test")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, RunRange), TestCriteriaToggleFlag(SkipPathingTests))
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, RunTest), TestCriteriaToggleFlag(SkipPathingTests))
 
         when("the tester is invoked")
         then("ContradictoryArgsException should be thrown")
@@ -73,7 +73,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
     it should "be mad when it's asked to run tests on a range that goes beyond the maximum test number" in {
 
         given("a range that goes beyond the maximum test number")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 600000, RunRange))
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 600000, RunTest))
 
         when("the tester is invoked")
         then("InvalidTestNumberException should be thrown")
@@ -99,7 +99,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
     it should "be mad when a single test is redundantly included in a range" in {
 
         given("a valid range, and a valid single test (which was already included by the range)")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 2, RunRange), TestCriteriaValueTuple(1, RunTest))
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 2, RunTest), TestCriteriaValueTuple(1, RunTest))
 
         when("the tester is invoked")
         then("RedundancyException should be thrown")
@@ -112,7 +112,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
     it should "be mad when a test range encapsulates another test range" in {
 
         given("two valid test ranges (where one encapsulates the other)")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 4, RunRange), TestCriteriaRangeTuple(2, 3, RunRange))
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 4, RunTest), TestCriteriaRangeTuple(2, 3, RunTest))
 
         when("the tester is invoked")
         then("RedundancyException should be thrown")
@@ -125,7 +125,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
     it should "be mad when a skip range encapsulates another skip range" in {
 
         given("two valid test ranges (where one encapsulates the other)")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, RunRange), TestCriteriaRangeTuple(2, 5, SkipRange), TestCriteriaRangeTuple(3, 4, SkipRange))
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, RunTest), TestCriteriaRangeTuple(2, 5, SkipTest), TestCriteriaRangeTuple(3, 4, SkipTest))
 
         when("the tester is invoked")
         then("RedundancyException should be thrown")
@@ -138,7 +138,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
     it should "be mad when a test value is excluded unnecessarily" in {
 
         given("a valid range, and a valid single skip")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(2, 4, RunRange), TestCriteriaValueTuple(1, SkipTest))
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(2, 4, RunTest), TestCriteriaValueTuple(1, SkipTest))
 
         when("the tester is invoked")
         then("RedundancyException should be thrown")
@@ -151,7 +151,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
     it should "be mad when a test range is excluded unnecessarily" in {
 
         given("a valid range, and a valid single test (which was already included by the range")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(4, 6, RunRange), TestCriteriaRangeTuple(1, 3, SkipRange))
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(4, 6, RunTest), TestCriteriaRangeTuple(1, 3, SkipTest))
 
         when("the tester is invoked")
         then("RedundancyException should be thrown")
@@ -164,7 +164,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
     it should "be mad when a test range is extends to exclude unnecessarily" in {
 
         given("a valid range, and a valid single test (which was already included by the range")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 3, RunRange), TestCriteriaRangeTuple(5, 6, RunRange), TestCriteriaRangeTuple(2, 4, SkipRange))
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 3, RunTest), TestCriteriaRangeTuple(5, 6, RunTest), TestCriteriaRangeTuple(2, 4, SkipTest))
 
         when("the tester is invoked")
         then("RedundancyException should be thrown")
