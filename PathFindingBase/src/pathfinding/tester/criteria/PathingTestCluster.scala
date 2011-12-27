@@ -23,7 +23,7 @@ sealed abstract class TestFunction extends Function2[PathFinder[StepData], Boole
 
 object PathingTestCluster {
 
-    // I hope that calling (object Array).apply(args) will only make an array that has args.length elements...
+    // There is no test #0—IS NOT AND NEVER WILL BE
     private val tests = Array[TestFunction](null, Test1, Test2, Test3, Test4, Test5, Test6)
 
     // I hate it!  I HATE IT!
