@@ -8,6 +8,7 @@ import pathfinding.pathingmap.pathingmapdata.PathingMapString
 import pathfinding.statuses._
 import pathfinding.pathingmap.PathingMap
 import pathfinding.coordinate._
+import annotation.tailrec
 
 /**
  * Created by IntelliJ IDEA.
@@ -52,6 +53,7 @@ object AStar extends AStarBase[AStarStepData](1.0, HeuristicLib.manhattanDistanc
 
     }
 
+    @tailrec
     override protected def execute(stepData: AStarStepData, iters: Int = 0, maxIters: Int) : ExecutionStatus[AStarStepData] = {
 
         val decision = decide(stepData, iters, maxIters)

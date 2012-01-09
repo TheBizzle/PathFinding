@@ -7,9 +7,8 @@ import tester.{TestingCore}
 /**
  * Created by IntelliJ IDEA.
  * User: Jason
- * Date: 11/3/11
- * Time: 11:08 PM
+ * Date: 1/8/12
+ * Time: 11:37 PM
  */
-
 PathingTestCluster.setThingToTest(AStar.asInstanceOf[PathFinder[StepData]])
-TestingCore(List[TestCriteria[_]](TestCriteriaRangeTuple(1, 39, RunTest), TestCriteriaToggleFlag(Talkative)), PathingTestCluster)
+TestingCore(List[TestCriteria[_]](TestCriteriaRangeTuple(1, 39, RunTest)), PathingTestCluster)

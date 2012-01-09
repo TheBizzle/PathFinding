@@ -13,6 +13,3 @@ import tester.TestingCore
 
 PathingTestCluster.setThingToTest(BiDirAStar.asInstanceOf[PathFinder[StepData]])
 TestingCore(List[TestCriteria[_]](TestCriteriaRangeTuple(1, 39, RunTest), TestCriteriaToggleFlag(Talkative)), PathingTestCluster)
-
-// Non-talkative variant
-//TestingCore(List[TestCriteria[_]](TestCriteriaRangeTuple(1, 39, RunTest)), PathingTestCluster)

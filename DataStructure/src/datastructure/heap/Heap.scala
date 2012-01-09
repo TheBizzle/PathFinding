@@ -1,5 +1,7 @@
 package datastructure.heap
 
+import annotation.tailrec
+
 /**
  * Created by IntelliJ IDEA.
  * User: Jason
@@ -34,7 +36,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     }
 
     private def arrTransfer(newArr: Array[Option[T]], originalArr: Array[Option[T]]) : Array[Option[T]] = {
-        def arrTransferHelper(newArr: Array[Option[T]], originalArr: Array[Option[T]], originalSize: Int, counter: Int) : Array[Option[T]] = {
+        @tailrec def arrTransferHelper(newArr: Array[Option[T]], originalArr: Array[Option[T]], originalSize: Int, counter: Int) : Array[Option[T]] = {
             if (counter < (originalSize - 1)) {
                 newArr(counter) = originalArr(counter)
                 arrTransferHelper(newArr, originalArr, originalSize, counter + 1)
@@ -45,13 +47,14 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
         arrTransferHelper(newArr, originalArr, originalArr.size, 0)
     }
 
+    @tailrec
     private def heapUp(elemIndex: Int) {
         val parentIndex = parentIndexOf(elemIndex)
         if ((elemIndex != 0) && isBetter(elemIndex, parentIndex)) { swap(elemIndex, parentIndex); heapUp(parentIndex) }
     }
 
     private def parentIndexOf(index: Int) : Int = {
-        math.floor((index-1)/2).toInt
+        ((index-1)/2).floor.toInt
     }
 
     private def swap(startIndex: Int,  endIndex: Int) {
@@ -70,6 +73,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
         retVal
     }
 
+    @tailrec
     private def heapDown(elemIndex: Int) {
         val myLast = size - 1
         if (elemIndex < myLast) {
@@ -98,7 +102,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     // Sadly, it's preferable to just run this every time we want the size, rather than
     // juggling 'size' vals on the Heap reconstruction that occurs after each array resize
     def size : Int = {
-        def sizeHelper(arr: Array[Option[T]], currentSize: Int) : Int = {
+        @tailrec def sizeHelper(arr: Array[Option[T]], currentSize: Int) : Int = {
             if ((arr.size > currentSize) && (!arr(currentSize).isEmpty))
                 sizeHelper(arr, currentSize + 1)
             else

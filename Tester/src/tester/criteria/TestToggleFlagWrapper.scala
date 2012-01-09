@@ -2,6 +2,7 @@ package tester.criteria
 
 import collection.mutable.HashMap
 import tester.exceptions.MysteriousDataException
+import annotation.tailrec
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,7 +20,7 @@ class TestToggleFlagWrapper(toggles: List[TestCriteriaToggleFlag]) {
 
     // No entries should be ADDED to the map after calling this once
     private def initializeFlagMap(flags: List[TestToggleFlag]) : HashMap[TestToggleFlag, Boolean] = {
-        def initializationHelper(flags: List[TestToggleFlag], flagMap: HashMap[TestToggleFlag, Boolean]) : HashMap[TestToggleFlag, Boolean] = {
+        @tailrec def initializationHelper(flags: List[TestToggleFlag], flagMap: HashMap[TestToggleFlag, Boolean]) : HashMap[TestToggleFlag, Boolean] = {
             flags match {
                 case Nil  => flagMap
                 case h::t => { flagMap.put(h, false); initializationHelper(t, flagMap)}

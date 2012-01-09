@@ -1,6 +1,7 @@
 package datastructure.bihashmap
 
 import collection.mutable.HashMap
+import annotation.tailrec
 
 /**
  * Created by IntelliJ IDEA.
@@ -183,7 +184,7 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
 
 object BiHashMap {
     def apply[A: Manifest, B: Manifest] (tupSeq: (A, B)*) : BiHashMap[A, B] = {
-        def applyHelper[A,B] (retMap: BiHashMap[A,B], tupList: List[(A, B)]) : BiHashMap[A, B] = {
+        @tailrec def applyHelper[A,B] (retMap: BiHashMap[A,B], tupList: List[(A, B)]) : BiHashMap[A, B] = {
             tupList match {
                 case (a, b)::t => { retMap.put(a, b); applyHelper(retMap, t) }
                 case Nil => retMap

@@ -4,6 +4,7 @@ import criteria._
 import exceptions._
 import collection.immutable.{List, HashMap, Map}
 import testcluster.TestCluster
+import annotation.tailrec
 
 /**
  * Created by IntelliJ IDEA.
@@ -171,7 +172,7 @@ object TestingCore {
     }
 
     private[tester] def sortArgLists(args: List[TestCriteria[_]]) : Map[String, List[TestCriteria[_]]] = {
-        def sortHelper(args: List[TestCriteria[_]], argMap: Map[String, List[TestCriteria[_]]]) : Map[String, List[TestCriteria[_]]] = {
+        @tailrec def sortHelper(args: List[TestCriteria[_]], argMap: Map[String, List[TestCriteria[_]]]) : Map[String, List[TestCriteria[_]]] = {
             args match {
                 case Nil  => argMap
                 case h::t => {
@@ -214,6 +215,7 @@ object TestingCore {
     }
 
     // Assumes the passed-in list to be sorted
+    @tailrec
     private[tester] def containsOverlaps(inList: List[TestCriteriaRangeTuple]) : (Boolean, Option[TestCriteriaRangeTuple], Option[TestCriteriaRangeTuple]) = {
         inList match {
             case h1::h2::t => {
@@ -227,7 +229,7 @@ object TestingCore {
     }
 
     private[tester] def siftOutTestsAndSkips[T <: TestCriteriaTuple[_, _] : Manifest](list: List[T]) : (List[T], List[T]) = {
-        def siftHelper(inList: List[T], testList: List[T], skipList: List[T]) : (List[T], List[T]) = {
+        @tailrec def siftHelper(inList: List[T], testList: List[T], skipList: List[T]) : (List[T], List[T]) = {
             inList match {
                 case Nil                  => (testList.reverse, skipList.reverse)
                 case h::t                 => {

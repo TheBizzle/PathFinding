@@ -4,6 +4,7 @@ import astar_base.bidir_astar.BiDirStepData
 import pathfinding.statuses._
 import pathfinding.coordinate.Coordinate
 import java.security.InvalidParameterException
+import annotation.tailrec
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,6 +24,7 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
         evaluateActions(stg, gts)
     }
 
+    @tailrec
     private def evaluateActions(stg: StartToGoal[T], gts: GoalToStart[T]) : ExecutionStatus[T] = {
 
         val (resultStg, resultGts) = runActionsForResult(stg, gts)
