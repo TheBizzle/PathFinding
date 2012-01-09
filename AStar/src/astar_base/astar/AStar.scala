@@ -70,7 +70,10 @@ object AStar extends AStarBase[AStarStepData](1.0, HeuristicLib.manhattanDistanc
 
         if (!queue.isEmpty && (iters < maxIters)) {
 
-            val freshLoc = getFreshLoc(queue, beenThereArr)
+            val freshOption = getFreshLoc(queue, beenThereArr)
+            if (freshOption == None) return Failure(stepData)      // Exit point (failure)
+
+            val freshLoc = freshOption.get
             pathingMap.step(loc, freshLoc)
 
             // DEBUGGING STATEMENTS

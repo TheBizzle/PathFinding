@@ -23,7 +23,7 @@ trait AStarLike[T <: AStarStepData] {
      * Some serious spaghetti!
      * Returns the first location in "queue" that hasn't already been examined (as determined by checking "beenThere").
      */
-    protected def getFreshLoc(queue: PriorityQueue[PriorityCoordinate], beenThere: Array[Array[Boolean]]): PriorityCoordinate = {
+    protected def getFreshLoc(queue: PriorityQueue[PriorityCoordinate], beenThere: Array[Array[Boolean]]) : Option[PriorityCoordinate] = {
         queue.dequeue() match {
             case None => throw new InvalidParameterException
             case Some(loc) => {
@@ -31,10 +31,10 @@ trait AStarLike[T <: AStarStepData] {
                     if (!queue.isEmpty)
                         getFreshLoc(queue, beenThere)
                     else
-                        throw new InvalidParameterException("Cannot pop!  Queue is empty!")
+                        None      // Exit point (failure)
                 }
                 else
-                    loc     // Exit point (success)
+                    Some(loc)     // Exit point (success)
             }
         }
     }

@@ -61,7 +61,10 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
 
         if (!queue.isEmpty && (iters < maxIters)) {
 
-            val freshLoc = getFreshLoc(queue, beenThereArr)
+            val freshOption = getFreshLoc(queue, beenThereArr)
+            if (freshOption == None) return Failure(stepData)         // Exit point (failure)
+
+            val freshLoc = freshOption.get
             pathingMap.step(loc, freshLoc)
 
             // DEBUGGING STATEMENTS
