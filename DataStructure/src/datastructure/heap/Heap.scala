@@ -62,6 +62,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
 
     def remove() : Option[T] = {
         val retVal = heapArr(0)
+        if (retVal == None) throw new NoSuchElementException
         val myLast = size - 1
         heapArr(0) = heapArr(myLast)
         heapArr(myLast) = None
@@ -110,8 +111,9 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
         size == 0
     }
 
-    def foreach[U](f: (Option[T]) => U) {
-        heapArr.foreach(f)
+    def foreach[U](f: (T => U)) {
+        val tempArr = heapArr.foldRight(List[T]())( (x, acc) => if (x != None) x.get :: acc else acc )
+        tempArr.foreach(f)
     }
 
     protected def initializeArr() {
