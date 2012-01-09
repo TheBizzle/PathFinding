@@ -7,6 +7,4 @@ package pathfinding.pathingmap.exceptions
  * Time: 12:55 PM
  */
 
-class InvalidParameterException(s: String = "") extends Exception("One or more passed-in parameters was invalid: " + s) {
-
-}
+class InvalidParameterException(s: String = "") extends Exception("One or more passed-in parameters was invalid: " + s)

@@ -1,7 +1,7 @@
 package astar_base
 
 import datastructure.priorityqueue.PriorityQueue
-import java.security.InvalidParameterException
+import exceptions.UnexpectedDataException
 import pathfinding.coordinate.{Coordinate, PriorityCoordinate}
 
 /**
@@ -25,7 +25,7 @@ trait AStarLike[T <: AStarStepData] {
      */
     protected def getFreshLoc(queue: PriorityQueue[PriorityCoordinate], beenThere: Array[Array[Boolean]]) : Option[PriorityCoordinate] = {
         queue.dequeue() match {
-            case None => throw new InvalidParameterException
+            case None => throw new UnexpectedDataException("Popped a None off the queue!")
             case Some(loc) => {
                 if (beenThere(loc.x)(loc.y)) {
                     if (!queue.isEmpty)

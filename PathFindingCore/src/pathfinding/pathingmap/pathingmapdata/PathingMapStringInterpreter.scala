@@ -2,7 +2,7 @@ package pathfinding.pathingmap.pathingmapdata
 
 import pathfinding.pathingmap.terrain._
 import pathfinding.coordinate.Coordinate
-import java.security.InvalidParameterException
+import pathfinding.pathingmap.exceptions.{InvalidMapStringException, InvalidParameterException}
 
 /**
  * Created by IntelliJ IDEA.
@@ -64,10 +64,10 @@ object PathingMapStringInterpreter {
         }
 
         if (selfList.size != 1)
-            throw new InvalidParameterException("Invalid number of starts!")
+            throw new InvalidMapStringException("Invalid number of starts!")
 
         if (goalList.size != 1)
-            throw new InvalidParameterException("Invalid number of goals!")
+            throw new InvalidMapStringException("Invalid number of goals!")
 
         (selfList.head, goalList.head)
 

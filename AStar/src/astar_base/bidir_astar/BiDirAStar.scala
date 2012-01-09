@@ -3,12 +3,12 @@ package astar_base.bidir_astar
 import concurrency.BiDirDirector
 import pathfinding.pathingmap.pathingmapdata.PathingMapString
 import astar_base._
+import exceptions.UnexpectedDataException
 import heuristics.{HeuristicBundle, HeuristicLib}
 import datastructure.priorityqueue.PriorityQueue
 import pathfinding.coordinate._
 import pathfinding.pathingmap.PathingMap
 import pathfinding.statuses._
-import java.security.InvalidParameterException
 
 /**
  * Created by IntelliJ IDEA.
@@ -51,7 +51,7 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
         val director = new BiDirDirector(decide(_: BiDirStepData, _: Int, maxIters), step) // decide() gets partially applied
         director.direct(stepData.clone(), stepData.cloneForBiBackwards()) match {
             case status: ExecutionStatus[BiDirStepData] => status
-            case _ => throw new InvalidParameterException
+            case _ => throw new UnexpectedDataException
         }
     }
 

@@ -3,8 +3,8 @@ package astar_base.bidir_astar.concurrency
 import astar_base.bidir_astar.BiDirStepData
 import pathfinding.statuses._
 import pathfinding.coordinate.Coordinate
-import java.security.InvalidParameterException
 import annotation.tailrec
+import astar_base.exceptions.UnexpectedDataException
 
 /**
  * Created by IntelliJ IDEA.
@@ -65,7 +65,7 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
 
         do {
             holder match {
-                case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => throw new InvalidParameterException
+                case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => throw new UnexpectedDataException(holder.toString)
                 case _ => {
                     val crumb = thoseCrumbs(holder.x)(holder.y)
                     myCrumbs(holder.x)(holder.y) = crumb

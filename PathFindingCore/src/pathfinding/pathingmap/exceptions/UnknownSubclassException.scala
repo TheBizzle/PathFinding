@@ -7,6 +7,4 @@ package pathfinding.pathingmap.exceptions
  * Time: 12:55 PM
  */
 
-class UnknownSubclassException(s: String = "") extends Exception("Unknown subclass found: " + s) {
-
-}
+class UnknownSubclassException(s: String = "") extends Exception("Unknown subclass found: " + s)
