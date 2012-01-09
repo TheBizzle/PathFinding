@@ -33,16 +33,27 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
 
     // The arrow in the parameter list is a dirty Scala trick for getting around the fact that
     // apply(A) and apply(B) have the same signatures to the JVM after type erasure
-    def apply(aKey: => A) : Option[B] = {
-        get(aKey)
+    def apply(aKey: => A) : B = {
+        val a = aKey
+        abMap(a)
     }
 
-    def apply(bKey: B) : Option[A] = {
-        get(bKey)
+    def apply(bKey: B) : A = {
+        baMap(bKey)
+    }
+
+    def default (aKey: => A) : B = {
+        val a = aKey
+        throw new NoSuchElementException("key not found: " + a)
+    }
+
+    def default (bKey: B) : A = {
+        throw new NoSuchElementException("key not found: " + bKey)
     }
 
     def get(aKey: => A) : Option[B] = {
-        abMap.get(aKey)
+        val a = aKey
+        abMap.get(a)
     }
 
     def get(bKey: B) : Option[A] = {
@@ -50,7 +61,8 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
     }
 
     def += (ab: => (A,  B)) : BiHashMap[A, B] = {
-        put(ab._1, ab._2)
+        val abTuple = ab; import abTuple._
+        put(_1, _2)
         this
     }
 
@@ -59,9 +71,10 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
         this
     }
 
-    def put(aKey: => A, bVal: => B) : Option[B] = {
-        baMap.put(bVal, aKey)
-        abMap.put(aKey, bVal)
+    def put(aKey: => A, bVal: B) : Option[B] = {
+        val a = aKey
+        baMap.put(bVal, a)
+        abMap.put(a, bVal)
     }
 
     def put(bKey: B, aVal: A) : Option[A] = {
@@ -70,11 +83,12 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
     }
 
     def remove(aKey: => A) : Option[B] = {
-        abMap.get(aKey) match {
+        val a = aKey
+        abMap.get(a) match {
             case Some(b) => baMap.remove(b)
             case None => // Doesn't matter
         }
-        abMap.remove(aKey)
+        abMap.remove(a)
     }
 
     def remove(bKey: B) : Option[A] = {
@@ -86,7 +100,8 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
     }
 
     def -= (aKey: => A) : BiHashMap[A, B] = {
-        remove(aKey)
+        val a = aKey
+        remove(a)
         this
     }
 
@@ -99,13 +114,14 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
         new BiHashMap(abMap.clone(), baMap.clone())
     }
 
-    def update(aKey: => A, bVal: => B) {
+    def update(aKey: => A, bVal: B) {
 
-        val hold = abMap.get(aKey)
-        abMap.update(aKey, bVal)
+        val a = aKey
+        val hold = abMap.get(a)
+        abMap.update(a, bVal)
 
         hold match {
-            case Some(b) => { baMap.remove(b); baMap.put(bVal, aKey) }
+            case Some(b) => { baMap.remove(b); baMap.put(bVal, a) }
             case None => // Doesn't matter
         }
 
