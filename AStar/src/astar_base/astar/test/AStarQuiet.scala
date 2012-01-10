@@ -1,5 +1,7 @@
+package astar_base.astar.test
+
 import astar_base.astar.AStar
-import pathfinding.test.PathingTestCluster
+import pathfinding.test.{TestScript, PathingTestCluster}
 import pathfinding.{StepData, PathFinder}
 import tester.criteria._
 import tester.{TestingCore}
@@ -10,5 +12,8 @@ import tester.{TestingCore}
  * Date: 1/8/12
  * Time: 11:37 PM
  */
-PathingTestCluster.setThingToTest(AStar.asInstanceOf[PathFinder[StepData]])
-TestingCore(List[TestCriteria[_]](TestCriteriaRangeTuple(1, 39, RunTest)), PathingTestCluster)
+
+object AStarQuiet extends TestScript {
+    PathingTestCluster.setThingToTest(AStar.asInstanceOf[PathFinder[StepData]])
+    TestingCore(List[TestCriteria[_]](TestCriteriaRangeTuple(1, 39, RunTest)), PathingTestCluster)
+}

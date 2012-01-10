@@ -153,7 +153,4 @@ object TestCriteriaToggleFlag {
     def apply(flag: TestToggleFlag) : TestCriteriaToggleFlag = {
         new TestCriteriaToggleFlag(flag)
     }
-    implicit def flagToCriteria(that: TestToggleFlag) : TestCriteriaToggleFlag = {
-        this.apply(that)
-    }
 }
