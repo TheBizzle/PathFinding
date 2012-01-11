@@ -31,7 +31,7 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
     }
 
     def neighborsOf(loc: Coordinate) : List[Direction] = {
-        PathingMap.DirList.foldLeft(List[Direction]()) ((acc,dir) => if ( PathingMap.isPassable(getTerrain(PathingMap.findNeighborCoord(loc, dir)))) dir::acc else acc )
+        PathingMap.DirList.foldLeft(List[Direction]()) ((acc,dir) => if ( getTerrain(PathingMap.findNeighborCoord(loc, dir)).isPassable ) dir::acc else acc )
     }
 
     def step(start: Coordinate, end: Coordinate) {
@@ -78,13 +78,6 @@ object PathingMap {
         TerrainCharConverter(terrain) match {
             case Some(x) => x
             case None => throw new InvalidParameterException("" + terrain)
-        }
-    }
-
-    def isPassable(terrain: Terrain) : Boolean = {
-        terrain match {
-            case Food | Mound | Empty | Goal => true
-            case _ => false
         }
     }
 

@@ -7,16 +7,16 @@ package pathfinding.pathingmap.terrain
  * Time: 12:22 AM
  */
 
-sealed abstract class Terrain
+sealed abstract class Terrain(val isPassable: Boolean)
 
-object Ant extends Terrain
-object Empty extends Terrain
-object Food extends Terrain
-object Goal extends Terrain
-object Invalid extends Terrain
-object Mound extends Terrain
-object Path extends Terrain
-object Query extends Terrain
-object Self extends Terrain
-object Wall extends Terrain
-object Water extends Terrain
+object Ant extends Terrain(true)
+object Empty extends Terrain(true)
+object Food extends Terrain(true)
+object Goal extends Terrain(true)
+object Invalid extends Terrain(false)
+object Mound extends Terrain(true)
+object Path extends Terrain(false)
+object Query extends Terrain(false)
+object Self extends Terrain(false)
+object Wall extends Terrain(false)
+object Water extends Terrain(false)
