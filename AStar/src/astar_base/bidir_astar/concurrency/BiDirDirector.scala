@@ -43,79 +43,36 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
     }
 
     def mergeBreadcrumbsForForwardOnSuccess(forwardData: T, backwardsData: T) : Success[T] = {
-        //backwardsData.reverseBreadcrumbs()
-        Success(mergeBreadcrumbsForward(forwardData, backwardsData, forwardData.loc, forwardData.goal))
+        Success(mergeBreadcrumbs(forwardData, backwardsData, forwardData.loc, forwardData.goal, true))
     }
 
     def mergeBreadcrumbsForBackwardsOnSuccess(backwardsData: T, forwardData : T) : Success[T] = {
         backwardsData.reverseBreadcrumbs()
-        Success(mergeBreadcrumbs(backwardsData, forwardData, backwardsData.loc, backwardsData.goal))
+        Success(mergeBreadcrumbs(backwardsData, forwardData, backwardsData.loc, backwardsData.goal, false))
     }
 
-    def mergeBreadcrumbsForward(myData: T, thatData: T, startLoc: Coordinate, endLoc: Coordinate) : T = {
-
-        val myCrumbs = myData.breadcrumbArr
-        val thoseCrumbs = thatData.breadcrumbArr
-
-        // DEBUGGING STATEMENTS
-        //myCrumbs foreach ( x => print( x(1).toString + "||") ); print("\n")
-        //myCrumbs foreach ( x => print( x(0).toString + "||") ); print("\n\n")
-        //thoseCrumbs foreach ( x => print( x(1).toString + "||") ); print("\n")
-        //thoseCrumbs foreach ( x => print( x(0).toString + "||") ); print("\n\n")
-
-        // @address RECURSION!
-        var holder = startLoc
-
-        do {
+    def mergeBreadcrumbs(myData: T, thatData: T, startLoc: Coordinate, endLoc: Coordinate, isForwards: Boolean) : T = {
+        @tailrec def mergeHelper(holder: Coordinate, myCrumbs: Array[Array[Coordinate]], thoseCrumbs: Array[Array[Coordinate]]) {
             holder match {
                 case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => throw new UnexpectedDataException(holder.toString)
                 case _ => {
                     val crumb = thoseCrumbs(holder.x)(holder.y)
-                    myCrumbs(crumb.x)(crumb.y) = holder
-                    holder = crumb
+                    val (indexer, updater) = if (isForwards) (crumb, holder) else (holder, crumb)
+                    myCrumbs(indexer.x)(indexer.y) = updater
+                    if (!(crumb overlaps endLoc)) mergeHelper(crumb, myCrumbs, thoseCrumbs)
                 }
             }
-        } while (!(holder overlaps endLoc))
-
-        // DEBUGGING STATEMENTS
-        //myCrumbs foreach ( x => print( x(0).toString + "||") ); print('\n')
-        //thoseCrumbs foreach ( x => print( x(0).toString + "||") ); print('\n')
-
+        }
+        // debugMerge(myCrumbs, thoseCrumbs)
+        mergeHelper(startLoc, myData.breadcrumbArr, thatData.breadcrumbArr)
         myData
-
     }
 
-    def mergeBreadcrumbs(myData: T, thatData: T, startLoc: Coordinate, endLoc: Coordinate) : T = {
-
-        val myCrumbs = myData.breadcrumbArr
-        val thoseCrumbs = thatData.breadcrumbArr
-
-        // DEBUGGING STATEMENTS
-        //myCrumbs foreach ( x => print( x(1).toString + "||") ); print("\n")
-        //myCrumbs foreach ( x => print( x(0).toString + "||") ); print("\n\n")
-        //thoseCrumbs foreach ( x => print( x(1).toString + "||") ); print("\n")
-        //thoseCrumbs foreach ( x => print( x(0).toString + "||") ); print("\n\n")
-
-        // @address RECURSION!
-        var holder = startLoc
-
-        do {
-            holder match {
-                case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => throw new UnexpectedDataException(holder.toString)
-                case _ => {
-                    val crumb = thoseCrumbs(holder.x)(holder.y)
-                    myCrumbs(holder.x)(holder.y) = crumb
-                    holder = crumb
-                }
-            }
-        } while (!(holder overlaps endLoc))
-
-        // DEBUGGING STATEMENTS
-        //myCrumbs foreach ( x => print( x(0).toString + "||") ); print('\n')
-        //thoseCrumbs foreach ( x => print( x(0).toString + "||") ); print('\n')
-
-        myData
-
+    private def debugMerge(myCrumbs: Array[Array[Coordinate]], thoseCrumbs: Array[Array[Coordinate]]) {
+        myCrumbs foreach ( x => print( x(1).toString + "||") ); print("\n")
+        myCrumbs foreach ( x => print( x(0).toString + "||") ); print("\n\n")
+        thoseCrumbs foreach ( x => print( x(1).toString + "||") ); print("\n")
+        thoseCrumbs foreach ( x => print( x(0).toString + "||") ); print("\n\n")
     }
 
     def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : (StartToGoal[T], GoalToStart[T]) = {
