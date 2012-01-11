@@ -72,7 +72,7 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
             pathingMap.step(loc, freshLoc)
 
             // DEBUGGING STATEMENTS
-            println(pathingMap.toString + "\n")
+            //println(pathingMap.toString + "\n")
             //println("Loc: " + loc)
             //println("Goal: " + destination)
             //println(stepData.queue.toString() + "\n\n")

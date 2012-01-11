@@ -43,13 +43,46 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
     }
 
     def mergeBreadcrumbsForForwardOnSuccess(forwardData: T, backwardsData: T) : Success[T] = {
-        backwardsData.reverseBreadcrumbs()
-        Success(mergeBreadcrumbs(forwardData, backwardsData, forwardData.goal, forwardData.loc))
+        //backwardsData.reverseBreadcrumbs()
+        Success(mergeBreadcrumbsForward(forwardData, backwardsData, forwardData.loc, forwardData.goal))
     }
 
     def mergeBreadcrumbsForBackwardsOnSuccess(backwardsData: T, forwardData : T) : Success[T] = {
         backwardsData.reverseBreadcrumbs()
         Success(mergeBreadcrumbs(backwardsData, forwardData, backwardsData.loc, backwardsData.goal))
+    }
+
+    def mergeBreadcrumbsForward(myData: T, thatData: T, startLoc: Coordinate, endLoc: Coordinate) : T = {
+
+        val myCrumbs = myData.breadcrumbArr
+        val thoseCrumbs = thatData.breadcrumbArr
+
+        // DEBUGGING STATEMENTS
+        //myCrumbs foreach ( x => print( x(1).toString + "||") ); print("\n")
+        //myCrumbs foreach ( x => print( x(0).toString + "||") ); print("\n\n")
+        //thoseCrumbs foreach ( x => print( x(1).toString + "||") ); print("\n")
+        //thoseCrumbs foreach ( x => print( x(0).toString + "||") ); print("\n\n")
+
+        // @address RECURSION!
+        var holder = startLoc
+
+        do {
+            holder match {
+                case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => throw new UnexpectedDataException(holder.toString)
+                case _ => {
+                    val crumb = thoseCrumbs(holder.x)(holder.y)
+                    myCrumbs(crumb.x)(crumb.y) = holder
+                    holder = crumb
+                }
+            }
+        } while (!(holder overlaps endLoc))
+
+        // DEBUGGING STATEMENTS
+        //myCrumbs foreach ( x => print( x(0).toString + "||") ); print('\n')
+        //thoseCrumbs foreach ( x => print( x(0).toString + "||") ); print('\n')
+
+        myData
+
     }
 
     def mergeBreadcrumbs(myData: T, thatData: T, startLoc: Coordinate, endLoc: Coordinate) : T = {
