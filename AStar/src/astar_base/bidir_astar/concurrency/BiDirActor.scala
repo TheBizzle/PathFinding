@@ -2,7 +2,7 @@ package astar_base.bidir_astar.concurrency
 
 import actors.Actor
 import astar_base.bidir_astar.BiDirStepData
-import pathfinding.statuses.ExecutionStatus
+import pathfinding.statuses.{Continue, ExecutionStatus}
 
 /**
  * Created by IntelliJ IDEA.

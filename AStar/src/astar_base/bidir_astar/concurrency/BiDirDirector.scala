@@ -101,16 +101,15 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
          * and then updating A.othersBreadcrumbsArr for all neighbors of C
          *
          * At least... I THINK that will work.  I'd rather get this whole thing working before I try that and make things worse for myself, though.
+         *
+         * The real question is... is it good for us to write code that makes assumptions of how stepping is done?
+         * Maybe we should just be returning a list of updated breadcrumbs.  (Yes, probably)
          */
         // I find this very displeasing
         stgStepData.assimilateBreadcrumbs(gtsStepData.breadcrumbArr)
         gtsStepData.assimilateBreadcrumbs(stgStepData.breadcrumbArr)
 
-        // Actually, I find this whole function displeasing
-        val neoStg = new StartToGoal[T](Continue(stgStepData), stg.iters, stg.decide, stg.step)
-        val neoGts = new GoalToStart[T](Continue(gtsStepData), gts.iters, gts.decide, gts.step)
-
-        (neoStg, neoGts)
+        (stg, gts)
         
     }
 
