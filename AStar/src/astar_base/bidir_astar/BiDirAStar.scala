@@ -41,18 +41,22 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
         heuristicArr(start.x)(start.y) = heuristic(new HeuristicBundle(start, goal))
         totalArr(start.x)(start.y) = costArr(start.x)(start.y) + heuristicArr(start.x)(start.y)
 
-        queue.enqueue(new PriorityCoordinate(start, totalArr(start.x)(start.y)))
         execute(new BiDirStepData(start, goal, beenThere, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, otherBreadcrumbs),
                 maxIters = calculateMaxIters(colCount, rowCount))
 
     }
 
     override protected def execute(stepData: BiDirStepData, iters: Int = 0, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
+
+        val stgStepData = step(stepData.clone())
+        val gtsStepData = step(stepData.cloneForBiBackwards())
         val director = new BiDirDirector(decide(_: BiDirStepData, _: Int, maxIters), step) // decide() gets partially applied
-        director.direct(stepData.clone(), stepData.cloneForBiBackwards()) match {
+
+        director.direct(stgStepData, gtsStepData) match {
             case status: ExecutionStatus[BiDirStepData] => status
             case _ => throw new UnexpectedDataException
         }
+        
     }
 
     override protected def decide(stepData: BiDirStepData, iters: Int, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
@@ -77,7 +81,7 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
                 return Success(BiDirStepData(freshLoc, stepData))     // Exit point (success)
 
             beenThereArr(freshLoc.x)(freshLoc.y) = true
-            Continue((BiDirStepData(freshLoc, stepData)))             // Exit point (only to return again soon)
+            Continue(BiDirStepData(freshLoc, stepData))             // Exit point (only to return again soon)
 
         }
         else

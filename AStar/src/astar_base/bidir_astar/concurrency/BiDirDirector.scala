@@ -44,15 +44,15 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
 
     def mergeBreadcrumbsForForwardOnSuccess(forwardData: T, backwardsData: T) : Success[T] = {
         backwardsData.reverseBreadcrumbs()
-        Success(mergeBreadcrumbs(forwardData, backwardsData, forwardData.loc, forwardData.goal, true))
+        Success(mergeBreadcrumbs(forwardData, backwardsData, forwardData.goal, forwardData.loc))
     }
 
     def mergeBreadcrumbsForBackwardsOnSuccess(backwardsData: T, forwardData : T) : Success[T] = {
         backwardsData.reverseBreadcrumbs()
-        Success(mergeBreadcrumbs(backwardsData, forwardData, backwardsData.loc, backwardsData.goal, false))
+        Success(mergeBreadcrumbs(backwardsData, forwardData, backwardsData.loc, backwardsData.goal))
     }
 
-    def mergeBreadcrumbs(myData: T, thatData: T, startLoc: Coordinate, endLoc: Coordinate, isForwards: Boolean) : T = {
+    def mergeBreadcrumbs(myData: T, thatData: T, startLoc: Coordinate, endLoc: Coordinate) : T = {
 
         val myCrumbs = myData.breadcrumbArr
         val thoseCrumbs = thatData.breadcrumbArr
@@ -71,8 +71,7 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
                 case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => throw new UnexpectedDataException(holder.toString)
                 case _ => {
                     val crumb = thoseCrumbs(holder.x)(holder.y)
-                    if (isForwards) myCrumbs(crumb.x)(crumb.y) = holder
-                    else            myCrumbs(holder.x)(holder.y) = crumb
+                    myCrumbs(holder.x)(holder.y) = crumb
                     holder = crumb
                 }
             }

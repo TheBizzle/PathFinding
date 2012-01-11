@@ -46,24 +46,21 @@ object AStar extends AStarBase[AStarStepData](1.0, HeuristicLib.manhattanDistanc
         heuristicArr(start.x)(start.y) = heuristic(new HeuristicBundle(start, goal))
         totalArr(start.x)(start.y) = costArr(start.x)(start.y) + heuristicArr(start.x)(start.y)
 
-        queue.enqueue(new PriorityCoordinate(start, totalArr(start.x)(start.y)))
-        execute(new AStarStepData(start, goal, beenThere, queue, pathingMap,
-                             costArr, heuristicArr, totalArr, breadcrumbArr),
+        execute(new AStarStepData(start, goal, beenThere, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr),
                 maxIters = calculateMaxIters(colCount, rowCount))
 
     }
 
-    @tailrec
     override protected def execute(stepData: AStarStepData, iters: Int = 0, maxIters: Int) : ExecutionStatus[AStarStepData] = {
-
-        val decision = decide(stepData, iters, maxIters)
-
-        decision match {
-            case Continue(x: AStarStepData) => execute(step(x), iters + 1, maxIters)
-            case Success(_)  => decision
-            case Failure(_)  => decision
+        @tailrec def executeHelper(stepData: AStarStepData, iters: Int = 0, maxIters: Int) : ExecutionStatus[AStarStepData] = {
+            val decision = decide(stepData, iters, maxIters)
+            decision match {
+                case Continue(x: AStarStepData) => executeHelper(step(x), iters + 1, maxIters)
+                case Success(_)  => decision
+                case Failure(_)  => decision
+            }
         }
-
+        executeHelper(step(stepData), iters, maxIters)
     }
 
     override protected def decide(stepData: AStarStepData, iters: Int, maxIters: Int) : ExecutionStatus[AStarStepData] = {
