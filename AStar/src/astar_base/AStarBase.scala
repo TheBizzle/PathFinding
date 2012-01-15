@@ -1,9 +1,10 @@
 package astar_base
 
 import heuristics.HeuristicBundle
-import pathfinding.pathingmap.pathingmapdata.PathingMapString
-import pathfinding.statuses.ExecutionStatus
 import pathfinding.PathFinder
+import pathfinding.pathingmap.PathingMap
+import pathfinding.coordinate.{PriorityCoordinate, Coordinate}
+import pathfinding.statuses._
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,17 +13,74 @@ import pathfinding.PathFinder
  * Time: 11:15 PM
  */
 
-abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicFunc: HeuristicBundle => Int) extends AStarLike[T] with PathFinder[T] {
-
-    // A bad/initial numerical value for some things—NOT COUNTING THE "X" AND "Y" MEMBERS OF COORDINATE OBJECTS; they have their own InvalidValue
-    protected val BadVal = -1
+abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicFunc: HeuristicBundle => Int) extends AStarLike[T] with AStarGruntwork[T] with PathFinder[T] {
 
     protected val scalingFactor = branchingFactor        // How much of the map you're willing to query (from 0 to 1)
     protected val heuristic = heuristicFunc              // The heuristic function that A* will be using
 
-    def apply(mapString: PathingMapString) : ExecutionStatus[T]
-    protected def execute(stepData: T,  iters: Int = 0, maxIters: Int) : ExecutionStatus[T]
-    protected def decide(stepData: T, iters: Int, maxIters: Int) : ExecutionStatus[T]
-    protected def step(stepData: T) : T
+    protected def decide(stepData: T, iters: Int, maxIters: Int) : ExecutionStatus[T] = {
+
+        import stepData._
+
+        if (!queue.isEmpty && (iters < maxIters)) {
+
+            val freshOption = getFreshLoc(queue, beenThereArr)
+            if (freshOption == None) return Failure(stepData)         // Exit point (failure)
+
+            val freshLoc = freshOption.get
+            pathingMap.step(loc, freshLoc)
+
+            if (goalIsFound(stepData, freshLoc))
+                return Success(makeNewStepData(freshLoc, stepData))     // Exit point (success)
+
+            beenThereArr(freshLoc.x)(freshLoc.y) = true
+            Continue(makeNewStepData(freshLoc, stepData))               // Exit point (only to return again soon)
+
+        }
+        else
+            Failure(makeNewStepData(new Coordinate(), stepData))  // Exit point (failure)
+
+    }
+
+    protected def step(stepData: T) : T = {
+
+        import stepData._
+
+        pathingMap.neighborsOf(loc).foreach { case(n) => {
+
+            val neighbor = PathingMap.findNeighborCoord(loc, n)
+            val x = neighbor.x
+            val y = neighbor.y
+
+            if (!beenThereArr(x)(y)) {
+
+                val newCost = costArr(loc.x)(loc.y) + 1
+                val doesContainNeighbor = queueDoesContain(neighbor, queue)
+
+                if (!doesContainNeighbor || (newCost < costArr(x)(y))) {
+                    costArr(x)(y) = newCost
+                    heuristicArr(x)(y) = heuristic(new HeuristicBundle(neighbor, goal))
+                    totalArr(x)(y) = costArr(x)(y) + heuristicArr(x)(y)
+                    breadcrumbArr(x)(y) = new Coordinate(loc.x, loc.y)
+                }
+
+                if (!doesContainNeighbor)
+                    queue.enqueue(new PriorityCoordinate(neighbor, totalArr(x)(y)))
+
+            }
+
+        }}
+
+        stepData
+
+    }
+
+    protected def primeStepData(stepData: T) : T = {
+        import stepData._
+        costArr(loc.x)(loc.y) = 0
+        heuristicArr(loc.x)(loc.y) = heuristic(new HeuristicBundle(loc, goal))
+        totalArr(loc.x)(loc.y) = costArr(loc.x)(loc.y) + heuristicArr(loc.x)(loc.y)
+        stepData
+    }
 
 }

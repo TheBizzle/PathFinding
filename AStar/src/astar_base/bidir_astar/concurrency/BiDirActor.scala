@@ -25,12 +25,13 @@ sealed abstract class BiDirActor[T <: BiDirStepData](es: ExecutionStatus[T], i: 
         val neoStatus = decide(step(status.stepData), neoIters)
         (neoStatus, neoIters)
     }
-    
+
 }
 
 case class StartToGoal[T <: BiDirStepData](exeStatus: ExecutionStatus[T], itrs: Int,
                                            decideFunc: (T, Int) => ExecutionStatus[T], stepFunc: T => T)
                                            extends BiDirActor[T](exeStatus, itrs, decideFunc, stepFunc) {
+
     def act() {
         react {
             case "start" => {
@@ -39,6 +40,7 @@ case class StartToGoal[T <: BiDirStepData](exeStatus: ExecutionStatus[T], itrs: 
             }
         }
     }
+
 }
 
 case class GoalToStart[T <: BiDirStepData](exeStatus: ExecutionStatus[T], itrs: Int,

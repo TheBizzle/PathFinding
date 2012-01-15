@@ -31,9 +31,15 @@ class AStarStepData(currentLocation: Coordinate,
 
 }
 
-object AStarStepData extends StepDataSingleton[AStarStepData] {
+object AStarStepData extends StepDataSingleton[AStarStepData] with FactoryThatTakesAStarStepData[AStarStepData] {
+
     def apply(freshLoc: Coordinate, stepData: AStarStepData) : AStarStepData = {
         import stepData._
         new AStarStepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr)
     }
+
+    override protected def mixinExtras(stepData: AStarStepData, extras: Seq[Any]) : AStarStepData = {
+        stepData
+    }
+
 }

@@ -1,8 +1,8 @@
 package astar_base
 
-import datastructure.priorityqueue.PriorityQueue
-import exceptions.UnexpectedDataException
-import pathfinding.coordinate.{Coordinate, PriorityCoordinate}
+import pathfinding.coordinate.Coordinate
+import pathfinding.pathingmap.pathingmapdata.PathingMapString
+import pathfinding.statuses.ExecutionStatus
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,39 +13,12 @@ import pathfinding.coordinate.{Coordinate, PriorityCoordinate}
 
 trait AStarLike[T <: AStarStepData] {
 
-    self: AStarBase[T] =>
-
-    protected def calculateMaxIters(colCount: Int, rowCount: Int) : Int = {
-        (colCount * rowCount * scalingFactor).floor.toInt
-    }
-
-    /**
-     * Some serious spaghetti!
-     * Returns the first location in "queue" that hasn't already been examined (as determined by checking "beenThere").
-     */
-    protected def getFreshLoc(queue: PriorityQueue[PriorityCoordinate], beenThere: Array[Array[Boolean]]) : Option[PriorityCoordinate] = {
-        queue.dequeue() match {
-            case None => throw new UnexpectedDataException("Popped a None off the queue!")
-            case Some(loc) => {
-                if (beenThere(loc.x)(loc.y)) {
-                    if (!queue.isEmpty)
-                        getFreshLoc(queue, beenThere)
-                    else
-                        None      // Exit point (failure)
-                }
-                else
-                    Some(loc)     // Exit point (success)
-            }
-        }
-    }
-
-    protected def initialize2DArr[T: Manifest](cols: Int, rows: Int, defaultVal: T) : Array[Array[T]] = {
-        new Array[Array[T]](cols) map ( x => new Array[T](rows) map (y => defaultVal) )
-    }
-
-    protected def queueDoesContain(coord: Coordinate, queue: PriorityQueue[PriorityCoordinate]) : Boolean = {
-        queue.foreach { case(x) => if (coord overlaps x) true }
-        false
-    }
+    def apply(mapString: PathingMapString) : ExecutionStatus[T]
+    protected def execute(stepData: T,  iters: Int = 0, maxIters: Int) : ExecutionStatus[T]
+    protected def goalIsFound(inSeq: Any*) : Boolean
+    protected def makeNewStepData(freshLoc: Coordinate, stepData: T) : T
+    protected def decide(stepData: T, iters: Int, maxIters: Int) : ExecutionStatus[T]
+    protected def step(stepData: T) : T
+    protected def primeStepData(stepData: T) : T
 
 }

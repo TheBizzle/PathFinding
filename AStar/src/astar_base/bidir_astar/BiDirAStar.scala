@@ -4,10 +4,8 @@ import concurrency.BiDirDirector
 import pathfinding.pathingmap.pathingmapdata.PathingMapString
 import astar_base._
 import exceptions.UnexpectedDataException
-import heuristics.{HeuristicBundle, HeuristicLib}
-import datastructure.priorityqueue.PriorityQueue
+import heuristics.HeuristicLib
 import pathfinding.coordinate._
-import pathfinding.pathingmap.PathingMap
 import pathfinding.statuses._
 
 /**
@@ -22,28 +20,8 @@ import pathfinding.statuses._
 object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDistance) {
 
     override def apply(mapString: PathingMapString) : ExecutionStatus[BiDirStepData] = {
-
-        val (start, goal, pathingMap) = PathingMap(mapString)
-
-        val colCount = pathingMap.colCount
-        val rowCount = pathingMap.rowCount
-
-        val beenThere = initialize2DArr(colCount, rowCount, false)
-        val queue = new PriorityQueue[PriorityCoordinate](PriorityCoordinateOrdering.compare)
-
-        val costArr = initialize2DArr(colCount, rowCount, BadVal)
-        val heuristicArr = initialize2DArr(colCount, rowCount, BadVal)
-        val totalArr = initialize2DArr(colCount, rowCount, BadVal)
-        val breadcrumbArr = initialize2DArr(colCount, rowCount, new Coordinate())
-        val otherBreadcrumbs = initialize2DArr(colCount, rowCount, new Coordinate())
-
-        costArr(start.x)(start.y) = 0
-        heuristicArr(start.x)(start.y) = heuristic(new HeuristicBundle(start, goal))
-        totalArr(start.x)(start.y) = costArr(start.x)(start.y) + heuristicArr(start.x)(start.y)
-
-        execute(new BiDirStepData(start, goal, beenThere, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, otherBreadcrumbs),
-                maxIters = calculateMaxIters(colCount, rowCount))
-
+        val stepData = BiDirStepData(mapString)
+        execute(primeStepData(stepData), maxIters = calculateMaxIters(stepData.pathingMap.colCount, stepData.pathingMap.rowCount))
     }
 
     override protected def execute(stepData: BiDirStepData, iters: Int = 0, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
@@ -59,67 +37,14 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
         
     }
 
-    override protected def decide(stepData: BiDirStepData, iters: Int, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
-
-        import stepData._
-
-        if (!queue.isEmpty && (iters < maxIters)) {
-
-            val freshOption = getFreshLoc(queue, beenThereArr)
-            if (freshOption == None) return Failure(stepData)         // Exit point (failure)
-
-            val freshLoc = freshOption.get
-            pathingMap.step(loc, freshLoc)
-
-            // DEBUGGING STATEMENTS
-            //println(pathingMap.toString + "\n")
-            //println("Loc: " + loc)
-            //println("Goal: " + destination)
-            //println(stepData.queue.toString() + "\n\n")
-
-            if ((freshLoc overlaps goal) || (stepData hasInOthersBreadcrumbs freshLoc))
-                return Success(BiDirStepData(freshLoc, stepData))     // Exit point (success)
-
-            beenThereArr(freshLoc.x)(freshLoc.y) = true
-            Continue(BiDirStepData(freshLoc, stepData))             // Exit point (only to return again soon)
-
-        }
-        else
-            Failure(BiDirStepData(new Coordinate(), stepData))  // Exit point (failure)
-
+    override protected def goalIsFound(inSeq: Any*) : Boolean = {
+        val stepData = inSeq(0).asInstanceOf[BiDirStepData]
+        val freshLoc = inSeq(1).asInstanceOf[Coordinate]
+        (freshLoc overlaps stepData.goal) || (stepData hasInOthersBreadcrumbs freshLoc)
     }
 
-    override protected def step(stepData: BiDirStepData) : BiDirStepData = {
-
-        import stepData._
-
-        pathingMap.neighborsOf(loc).foreach { case(n) => {
-
-            val neighbor = PathingMap.findNeighborCoord(loc, n)
-            val x = neighbor.x
-            val y = neighbor.y
-
-            if (!beenThereArr(x)(y)) {
-
-                val newCost = costArr(loc.x)(loc.y) + 1
-                val doesContainNeighbor = queueDoesContain(neighbor, queue)
-
-                if (!doesContainNeighbor || (newCost < costArr(x)(y))) {
-                    costArr(x)(y) = newCost
-                    heuristicArr(x)(y) = heuristic(new HeuristicBundle(neighbor, goal))
-                    totalArr(x)(y) = costArr(x)(y) + heuristicArr(x)(y)
-                    breadcrumbArr(x)(y) = new Coordinate(loc.x, loc.y)
-                }
-
-                if (!doesContainNeighbor)
-                    queue.enqueue(new PriorityCoordinate(neighbor, totalArr(x)(y)))
-
-            }
-
-        }}
-
-        stepData
-
+    override protected def makeNewStepData(freshLoc: Coordinate, stepData: BiDirStepData) : BiDirStepData = {
+        BiDirStepData(freshLoc, stepData)
     }
 
 }
