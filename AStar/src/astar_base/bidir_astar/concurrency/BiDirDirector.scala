@@ -69,10 +69,8 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
     }
 
     private def debugMerge(myCrumbs: Array[Array[Coordinate]], thoseCrumbs: Array[Array[Coordinate]]) {
-        myCrumbs foreach ( x => print( x(1).toString + "||") ); print("\n")
-        myCrumbs foreach ( x => print( x(0).toString + "||") ); print("\n\n")
-        thoseCrumbs foreach ( x => print( x(1).toString + "||") ); print("\n")
-        thoseCrumbs foreach ( x => print( x(0).toString + "||") ); print("\n\n")
+        List(myCrumbs, thoseCrumbs) foreach { x => x foreach ( y => print( y(1).toString + "||") ); print("\n")
+                                                   x foreach ( y => print( y(0).toString + "||") ); print("\n\n") }
     }
 
     def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : (StartToGoal[T], GoalToStart[T]) = {

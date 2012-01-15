@@ -18,7 +18,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
     protected val scalingFactor = branchingFactor        // How much of the map you're willing to query (from 0 to 1)
     protected val heuristic = heuristicFunc              // The heuristic function that A* will be using
 
-    protected def decide(stepData: T, iters: Int, maxIters: Int) : ExecutionStatus[T] = {
+    override protected def decide(stepData: T, iters: Int, maxIters: Int) : ExecutionStatus[T] = {
 
         import stepData._
 
@@ -42,7 +42,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
 
     }
 
-    protected def step(stepData: T) : T = {
+    override protected def step(stepData: T) : T = {
 
         import stepData._
 
@@ -75,7 +75,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
 
     }
 
-    protected def primeStepData(stepData: T) : T = {
+    override protected def primeStepData(stepData: T) : T = {
         import stepData._
         costArr(loc.x)(loc.y) = 0
         heuristicArr(loc.x)(loc.y) = heuristic(new HeuristicBundle(loc, goal))
