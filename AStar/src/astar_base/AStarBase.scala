@@ -5,6 +5,7 @@ import pathfinding.PathFinder
 import pathfinding.pathingmap.PathingMap
 import pathfinding.coordinate.{PriorityCoordinate, Coordinate}
 import pathfinding.statuses._
+import pathfinding.breadcrumb.Breadcrumb
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,7 +19,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
     protected val scalingFactor = branchingFactor        // How much of the map you're willing to query (from 0 to 1)
     protected val heuristic = heuristicFunc              // The heuristic function that A* will be using
 
-    override protected def decide(stepData: T, iters: Int, maxIters: Int) : ExecutionStatus[T] = {
+    override protected def decide(stepData: T, maxIters: Int) : ExecutionStatus[T] = {
 
         import stepData._
 
@@ -33,6 +34,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
             if (goalIsFound(stepData, freshLoc))
                 return Success(makeNewStepData(freshLoc, stepData))     // Exit point (success)
 
+            stepData.incIters()
             beenThereArr(freshLoc.x)(freshLoc.y) = true
             Continue(makeNewStepData(freshLoc, stepData))               // Exit point (only to return again soon)
 
@@ -42,9 +44,10 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
 
     }
 
-    override protected def step(stepData: T) : T = {
+    override protected def step(stepData: T) : (T, List[Breadcrumb]) = {
 
         import stepData._
+        var outList = List[Breadcrumb]()         // Ewwwwww
 
         pathingMap.neighborsOf(loc).foreach { case(n) => {
 
@@ -58,10 +61,15 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
                 val doesContainNeighbor = queueDoesContain(neighbor, queue)
 
                 if (!doesContainNeighbor || (newCost < costArr(x)(y))) {
+
                     costArr(x)(y) = newCost
                     heuristicArr(x)(y) = heuristic(new HeuristicBundle(neighbor, goal))
                     totalArr(x)(y) = costArr(x)(y) + heuristicArr(x)(y)
-                    breadcrumbArr(x)(y) = new Coordinate(loc.x, loc.y)
+
+                    val crumb = new Coordinate(loc.x, loc.y)
+                    breadcrumbArr(x)(y) = crumb
+                    outList = Breadcrumb(neighbor, crumb) :: outList
+                    
                 }
 
                 if (!doesContainNeighbor)
@@ -71,7 +79,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
 
         }}
 
-        stepData
+        (stepData, outList)
 
     }
 

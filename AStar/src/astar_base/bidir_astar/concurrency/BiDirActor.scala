@@ -2,7 +2,8 @@ package astar_base.bidir_astar.concurrency
 
 import actors.Actor
 import astar_base.bidir_astar.BiDirStepData
-import pathfinding.statuses.{Continue, ExecutionStatus}
+import pathfinding.statuses.ExecutionStatus
+import pathfinding.breadcrumb.Breadcrumb
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,45 +12,44 @@ import pathfinding.statuses.{Continue, ExecutionStatus}
  * Time: 4:26 PM
  */
 
-sealed abstract class BiDirActor[T <: BiDirStepData](es: ExecutionStatus[T], i: Int,
-                                                     dFunc: (T, Int) => ExecutionStatus[T],
-                                                     sFunc: T => T) extends Actor {
+sealed abstract class BiDirActor[T <: BiDirStepData](es: ExecutionStatus[T],
+                                                     dFunc: T => ExecutionStatus[T],
+                                                     sFunc: T => (T, List[Breadcrumb])) extends Actor {
 
-    val status = es
-    val iters = i
+    var status = es           // 6... 6, 6: The Number of the Bug
     val decide = dFunc
     val step = sFunc
 
-    protected def moveAndMutate() : (ExecutionStatus[T], Int) = {
-        val neoIters = iters + 1
-        val neoStatus = decide(step(status.stepData), neoIters)
-        (neoStatus, neoIters)
+    protected def moveAndMutate() : (ExecutionStatus[T], List[Breadcrumb]) = {
+        val (neoStepData, neoCrumbs) = step(status.stepData)
+        status = decide(neoStepData)
+        (status, neoCrumbs)
     }
 
-}
-
-case class StartToGoal[T <: BiDirStepData](exeStatus: ExecutionStatus[T], itrs: Int,
-                                           decideFunc: (T, Int) => ExecutionStatus[T], stepFunc: T => T)
-                                           extends BiDirActor[T](exeStatus, itrs, decideFunc, stepFunc) {
     def act() {
-        react {
-            case "start" => {
-                val (actStatus, actIters) = moveAndMutate()
-                reply(new StartToGoal(actStatus, actIters, decide, step))
+        loop {
+            react {
+                case (BiDirActor.assimilateMessageStr, crumbList: List[Breadcrumb]) => status.stepData.assimilateBreadcrumbs(crumbList)
+                case  BiDirActor.startMessageStr                                    => reply(moveAndMutate())
+                case  BiDirActor.stopMessageStr                                     => exit()
             }
         }
     }
+
 }
 
-case class GoalToStart[T <: BiDirStepData](exeStatus: ExecutionStatus[T], itrs: Int,
-                                           decideFunc: (T, Int) => ExecutionStatus[T], stepFunc: T => T)
-                                           extends BiDirActor[T](exeStatus, itrs, decideFunc, stepFunc) {
-    def act() {
-        react {
-            case "start" => {
-                val (actStatus, actIters) = moveAndMutate()
-                reply(new GoalToStart(actStatus, actIters, decide, step))
-            }
-        }
-    }
+private[concurrency] object BiDirActor {
+    val startMessageStr = "start"
+    val assimilateMessageStr = "assimilate"
+    val stopMessageStr = "stop"
 }
+
+case class StartToGoal[T <: BiDirStepData](exeStatus: ExecutionStatus[T],
+                                           decideFunc: T => ExecutionStatus[T],
+                                           stepFunc: T => (T, List[Breadcrumb]))
+                                           extends BiDirActor[T](exeStatus, decideFunc, stepFunc)
+
+case class GoalToStart[T <: BiDirStepData](exeStatus: ExecutionStatus[T],
+                                           decideFunc: T => ExecutionStatus[T],
+                                           stepFunc: T => (T, List[Breadcrumb]))
+                                           extends BiDirActor[T](exeStatus, decideFunc, stepFunc)

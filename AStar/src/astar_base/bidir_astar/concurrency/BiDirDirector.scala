@@ -5,6 +5,7 @@ import pathfinding.statuses._
 import pathfinding.coordinate.Coordinate
 import annotation.tailrec
 import astar_base.exceptions.UnexpectedDataException
+import pathfinding.breadcrumb.Breadcrumb
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,30 +14,36 @@ import astar_base.exceptions.UnexpectedDataException
  * Time: 4:19 PM
  */
 
-class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatus[T], stepFunc: T => T) {
+class BiDirDirector[T <: BiDirStepData](decisionFunc: T => ExecutionStatus[T], stepFunc: T => (T, List[Breadcrumb])) {
 
     val decide = decisionFunc
     val step = stepFunc
 
     def direct(forwardStepData: T, backwardsStepData: T) : ExecutionStatus[T] = {
-        val stg = new StartToGoal[T](Continue(forwardStepData), 0, decide, step)
-        val gts = new GoalToStart[T](Continue(backwardsStepData), 0, decide, step)
-        evaluateActions(stg, gts)
+        val stg = new StartToGoal[T](Continue(forwardStepData), decide, step)
+        val gts = new GoalToStart[T](Continue(backwardsStepData), decide, step)
+        val outVal = evaluateActions(stg, gts)
+        terminateActors(stg, gts)
+        outVal
     }
 
     @tailrec
     private def evaluateActions(stg: StartToGoal[T], gts: GoalToStart[T]) : ExecutionStatus[T] = {
 
-        val (resultStg, resultGts) = runActionsForResult(stg, gts)
+        val ((stgStatus, stgCrumbs), (gtsStatus, gtsCrumbs)) = runActionsForResult(stg, gts)
 
-        resultStg.status match {
+        stgStatus match {
             case (result @ Failure(_)) => result
-            case Success(x) => mergeBreadcrumbsForForwardOnSuccess(x, resultGts.status.stepData)
+            case Success(x) => mergeBreadcrumbsForForwardOnSuccess(x, gtsStatus.stepData)
             case Continue(_) =>
-                resultGts.status match {
+                gtsStatus match {
                     case (result @ Failure(_)) => result
-                    case Success(x) => mergeBreadcrumbsForBackwardsOnSuccess(x, resultStg.status.stepData)
-                    case Continue(_) => { val (neoStg, neoGts) = shareDataAndTransform(resultStg, resultGts); evaluateActions(neoStg, neoGts) }
+                    case Success(x) => mergeBreadcrumbsForBackwardsOnSuccess(x, stgStatus.stepData)
+                    case Continue(_) => {
+                        stg ! (BiDirActor.assimilateMessageStr, gtsCrumbs)
+                        gts ! (BiDirActor.assimilateMessageStr, stgCrumbs)
+                        evaluateActions(stg, gts)
+                    }
                 }
         }
 
@@ -73,43 +80,23 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: (T, Int) => ExecutionStatu
                                                    x foreach ( y => print( y(0).toString + "||") ); print("\n\n") }
     }
 
-    def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : (StartToGoal[T], GoalToStart[T]) = {
+    def terminateActors(actorArgs: BiDirActor[T]*) {
+        actorArgs.foreach(_ ! BiDirActor.stopMessageStr)
+    }
+
+    def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : ((ExecutionStatus[T], List[Breadcrumb]), (ExecutionStatus[T], List[Breadcrumb])) = {
 
         stg.start()
-        val stgFuture = (stg !! "start")
+        val stgFuture = (stg !! BiDirActor.startMessageStr)
 
         gts.start()
-        val gtsFuture = (gts !! "start")
+        val gtsFuture = (gts !! BiDirActor.startMessageStr)
 
-        val stgVal = stgFuture().asInstanceOf[StartToGoal[T]]
-        val gtsVal = gtsFuture().asInstanceOf[GoalToStart[T]]
+        val stgTuple = stgFuture().asInstanceOf[(ExecutionStatus[T], List[Breadcrumb])]
+        val gtsTuple = gtsFuture().asInstanceOf[(ExecutionStatus[T], List[Breadcrumb])]
 
-        (stgVal, gtsVal)
+        (stgTuple, gtsTuple)
 
     }
-
-    private def shareDataAndTransform(stg: StartToGoal[T], gts: GoalToStart[T]) : (StartToGoal[T], GoalToStart[T]) = {
-        
-        val stgStepData = stg.status.stepData
-        val gtsStepData = gts.status.stepData
-
-        /**
-         * This can be fixed at some point to get rid of othersBreadcrumbsArr as a var in BiDirStepData
-         * This can be done with A going in B's breadcrumbs, finding the breadcrumb (C) of B.loc,
-         * and then updating A.othersBreadcrumbsArr for all neighbors of C
-         *
-         * At least... I THINK that will work.  I'd rather get this whole thing working before I try that and make things worse for myself, though.
-         *
-         * The real question is... is it good for us to write code that makes assumptions of how stepping is done?
-         * Maybe we should just be returning a list of updated breadcrumbs.  (Yes, probably)
-         */
-        // I find this very displeasing
-        stgStepData.assimilateBreadcrumbs(gtsStepData.breadcrumbArr)
-        gtsStepData.assimilateBreadcrumbs(stgStepData.breadcrumbArr)
-
-        (stg, gts)
-        
-    }
-
 
 }

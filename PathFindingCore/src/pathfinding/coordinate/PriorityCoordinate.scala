@@ -15,6 +15,10 @@ class PriorityCoordinate(xLoc: Int, yLoc: Int, priorityVal: Int) extends Coordin
         this(coord.x, coord.y, priorityVal)
     }
 
+    def asCoordinate : Coordinate = {
+        new Coordinate(x, y)
+    }
+
     override def toString : String = {
          super.toString + ":" + priority
     }

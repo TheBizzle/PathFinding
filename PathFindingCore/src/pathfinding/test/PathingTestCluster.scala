@@ -1,11 +1,11 @@
 package pathfinding.test
 
 import pathfinding.pathingmap.pathingmapdata.PathingMapString
-import pathfinding.coordinate.Coordinate
 import pathfinding.pathingmap.PathingMap
 import tester.testcluster.{TestCluster, TestFunction}
 import pathfinding.statuses.{Failure, Success, ExecutionStatus}
 import pathfinding.{PathFinder, StepData}
+import pathfinding.coordinate.{PriorityCoordinate, Coordinate}
 
 /**
  * Created by IntelliJ IDEA.
@@ -75,7 +75,8 @@ object PathingTestCluster extends TestCluster[PathFinder[StepData]] {
 
     private def retracePath(breadcrumbs: Array[Array[Coordinate]], goal: Coordinate, pathingMap: PathingMap, isTalkative: Boolean) {
 
-        val pathTaken = eatBreadcrumbsForPath(breadcrumbs, goal)
+        val pathTaken = eatBreadcrumbsForPath(breadcrumbs, goal).map { case x: PriorityCoordinate => x.asCoordinate
+                                                                       case x                     => x }
 
         if (isTalkative)
             println("The path taken was: " + pathTaken + "\nHere, let me draw that for you on the map!\n")

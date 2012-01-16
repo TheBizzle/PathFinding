@@ -40,7 +40,7 @@ trait AStarGruntwork[T <: AStarStepData] {
     }
 
     protected def queueDoesContain(coord: Coordinate, queue: PriorityQueue[PriorityCoordinate]) : Boolean = {
-        queue.foreach { case(x) => if (coord overlaps x) true }
+        queue.foreach { case(x) => if (coord overlaps x) return true }
         false
     }
 

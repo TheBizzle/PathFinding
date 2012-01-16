@@ -30,16 +30,16 @@ object AStar extends AStarBase[AStarStepData](1.0, HeuristicLib.manhattanDistanc
         execute(primeStepData(stepData), maxIters = calculateMaxIters(stepData.pathingMap.colCount, stepData.pathingMap.rowCount))
     }
 
-    override protected def execute(stepData: AStarStepData, iters: Int = 0, maxIters: Int) : ExecutionStatus[AStarStepData] = {
-        @tailrec def executeHelper(stepData: AStarStepData, iters: Int = 0, maxIters: Int) : ExecutionStatus[AStarStepData] = {
-            val decision = decide(stepData, iters, maxIters)
+    override protected def execute(stepData: AStarStepData, maxIters: Int) : ExecutionStatus[AStarStepData] = {
+        @tailrec def executeHelper(stepData: AStarStepData, maxIters: Int) : ExecutionStatus[AStarStepData] = {
+            val decision = decide(stepData, maxIters)
             decision match {
-                case Continue(x: AStarStepData) => executeHelper(step(x), iters + 1, maxIters)
+                case Continue(x: AStarStepData) => executeHelper(step(x)._1, maxIters)
                 case Success(_)                 => decision
                 case Failure(_)                 => decision
             }
         }
-        executeHelper(step(stepData), iters, maxIters)
+        executeHelper(step(stepData)._1, maxIters)
     }
     protected def goalIsFound(inSeq: Any*) : Boolean = {
         val stepData = inSeq(0).asInstanceOf[AStarStepData]
