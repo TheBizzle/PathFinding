@@ -15,8 +15,7 @@ import tester.exceptions.MysteriousDataException
  * Time: 4:28 PM
  */
 
-// @address Consider making this a class—instead of being an object
-// If I see that fucking non-variant StepData one more time...
+// If I see that fucking non-variant StepData one more time...!
 object PathingTestCluster extends TestCluster[PathFinder[StepData]] {
 
     // There is no test #0—IS NOT AND NEVER WILL BE

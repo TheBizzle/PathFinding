@@ -24,7 +24,6 @@ object TestingCore {
         makeTestRunningDecisions(argMap, testable, cluster)
     }
 
-    // @address These existential types displease me...
     private def makeTestRunningDecisions[T <: Testable](argMap: Map[String, List[TestCriteria[_]]], testable: T, cluster: TestCluster[T]) {
 
         val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[List[TestCriteriaToggleFlag]]] match {
@@ -82,7 +81,7 @@ object TestingCore {
             catch {
                 case e: Exception => {
                     println("Test number " + test.testNum + " failed with an exception (" + e.getClass + ").")
-                    if (isStacktracing) print(e.getStackTrace)
+                    if (isStacktracing) println("\n" + e.getStackTraceString)
                 }
             }
         }
