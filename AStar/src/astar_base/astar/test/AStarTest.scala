@@ -14,6 +14,5 @@ import pathfinding.test.{TestScript, PathingTestCluster}
  */
 
 object AStarTest extends TestScript {
-    PathingTestCluster.setThingToTest(AStar.asInstanceOf[PathFinder[StepData]])
-    TestingCore(List[TestCriteria[_]](TestCriteriaRangeTuple(1, 39, RunTest), TestCriteriaToggleFlag(Talkative)), PathingTestCluster)
+    TestingCore(List[TestCriteria[_]](TestCriteriaRangeTuple(1, 39, RunTest), TestCriteriaToggleFlag(Talkative)), AStar.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
 }

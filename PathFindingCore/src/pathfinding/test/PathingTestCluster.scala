@@ -6,6 +6,7 @@ import tester.testcluster.{TestCluster, TestFunction}
 import pathfinding.statuses.{Failure, Success, ExecutionStatus}
 import pathfinding.{PathFinder, StepData}
 import pathfinding.coordinate.{PriorityCoordinate, Coordinate}
+import tester.exceptions.MysteriousDataException
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,52 +24,27 @@ object PathingTestCluster extends TestCluster[PathFinder[StepData]] {
                                                                         Test16, Test17, Test18, Test19, Test20, Test21, Test22, Test23, Test24, Test25, Test26, Test27, Test28, Test29, Test30,
                                                                         Test31, Test32, Test33, Test34, Test35, Test36, Test37, Test38, Test39)
 
-    // I hate it!  I HATE IT!  I hate the var!  I hate the lazy val!  I hate that it's statically typed as a StepData!
-    private var satanicThing: PathFinder[StepData] = null
-    private lazy val thingToTest = satanicThing
-
-    def setThingToTest(thing: PathFinder[StepData]) {
-        satanicThing = thing.asInstanceOf[PathFinder[StepData]]
-    }
-
-    def runTests(testNums: List[Int], isTalkative: Boolean) {
-        testNums foreach ( tests(_)(thingToTest, isTalkative) )
+    def getTestsToRun(testNums: List[Int]) : List[TestFunction[PathFinder[StepData]]] = {
+        tests.zipWithIndex.filter { case(x, y) => testNums.contains(y) }.map ( _._1 ).toList
     }
 
     def getSize : Int = {
         tests.length - 1
     }
 
-    private def analyze[T <: StepData](status: ExecutionStatus[T], isTalkative: Boolean, testNumber: Int, shouldSucceed: Boolean = true) {
-
-        val successStr = "Test number " + testNumber + " was a success."
-        val failureStr = "Test number " + testNumber + " failed miserably!"
+    private def analyze[T <: StepData](status: ExecutionStatus[T], isTalkative: Boolean, testNumber: Int) : Boolean = {
 
         status match {
             case Success(x) => {
-
-                if (shouldSucceed)
-                    println(successStr)
-                else
-                    println(failureStr)
-
-                if (isTalkative)
-                    println("Found a solution!")
-
+                if (isTalkative) println("Found a solution!")
                 retracePath(x.breadcrumbArr, x.endGoal, x.pathingMap, isTalkative)
-
+                true
             }
             case Failure(_) => {
-
-                if (shouldSucceed)
-                    println(failureStr)
-                else
-                    println(successStr)
-
                 if (isTalkative) println("Failed to find a solution....\n")
-
+                false
             }
-            case _          => println("Absurd failure of test number " + testNumber + "!")
+            case _          => throw new MysteriousDataException("Unexpected ExecutionStatus!")
         }
 
     }
@@ -110,237 +86,237 @@ object PathingTestCluster extends TestCluster[PathFinder[StepData]] {
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>|   Code for tests starts here    |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     // =====================================+---------------------------------+======================================
 
-    private object Test1 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString1), isTalkative, 1)
+    private object Test1 extends TestFunction[PathFinder[StepData]](1) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString1), isTalkative, testNum)
         }
     }
 
-    private object Test2 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString2), isTalkative, 2)
+    private object Test2 extends TestFunction[PathFinder[StepData]](2) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString2), isTalkative, testNum)
         }
     }
 
-    private object Test3 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString3), isTalkative, 3, false)
+    private object Test3 extends TestFunction[PathFinder[StepData]](3, false) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString3), isTalkative, testNum)
         }
     }
 
-    private object Test4 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString4), isTalkative, 4)
+    private object Test4 extends TestFunction[PathFinder[StepData]](4) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString4), isTalkative, testNum)
         }
     }
 
-    private object Test5 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString5), isTalkative, 5)
+    private object Test5 extends TestFunction[PathFinder[StepData]](5) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString5), isTalkative, testNum)
         }
     }
 
-    private object Test6 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString6), isTalkative, 6)
+    private object Test6 extends TestFunction[PathFinder[StepData]](6) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString6), isTalkative, testNum)
         }
     }
 
-    private object Test7 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString7), isTalkative, 7, false)
-        }
-    }
-    
-    private object Test8 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString8), isTalkative, 8)
-        }
-    }
-    
-    private object Test9 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString9), isTalkative, 9)
-        }
-    }
-    
-    private object Test10 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString10), isTalkative, 10)
-        }
-    }
-    
-    private object Test11 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString11), isTalkative, 11)
-        }
-    }
-    
-    private object Test12 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString12), isTalkative, 12)
-        }
-    }
-    
-    private object Test13 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString13), isTalkative, 13)
-        }
-    }
-    
-    private object Test14 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString14), isTalkative, 14)
-        }
-    }
-    
-    private object Test15 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString15), isTalkative, 15)
-        }
-    }
-    
-    private object Test16 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString16), isTalkative, 16)
-        }
-    }
-    
-    private object Test17 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString17), isTalkative, 17)
-        }
-    }
-    
-    private object Test18 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString18), isTalkative, 18)
-        }
-    }
-    
-    private object Test19 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString19), isTalkative, 19)
-        }
-    }
-    
-    private object Test20 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString20), isTalkative, 20)
-        }
-    }
-    
-    private object Test21 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString21), isTalkative, 21)
-        }
-    }
-    
-    private object Test22 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString22), isTalkative, 22)
-        }
-    }
-    
-    private object Test23 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString23), isTalkative, 23)
-        }
-    }
-    
-    private object Test24 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString24), isTalkative, 24)
-        }
-    }
-    
-    private object Test25 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString25), isTalkative, 25)
-        }
-    }
-    
-    private object Test26 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString26), isTalkative, 26)
-        }
-    }
-    
-    private object Test27 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString27), isTalkative, 27)
-        }
-    }
-    
-    private object Test28 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString28), isTalkative, 28)
-        }
-    }
-    
-    private object Test29 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString29), isTalkative, 29)
-        }
-    }
-    
-    private object Test30 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString30), isTalkative, 30)
-        }
-    }
-    
-    private object Test31 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString31), isTalkative, 31)
-        }
-    }
-    
-    private object Test32 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString32), isTalkative, 32)
-        }
-    }
-    
-    private object Test33 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString33), isTalkative, 33)
-        }
-    }
-    
-    private object Test34 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString34), isTalkative, 34)
+    private object Test7 extends TestFunction[PathFinder[StepData]](7, false) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString7), isTalkative, testNum)
         }
     }
 
-    private object Test35 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString35), isTalkative, 35, false)
+    private object Test8 extends TestFunction[PathFinder[StepData]](8) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString8), isTalkative, testNum)
         }
     }
 
-    private object Test36 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString36), isTalkative, 36, false)
+    private object Test9 extends TestFunction[PathFinder[StepData]](9) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString9), isTalkative, testNum)
         }
     }
 
-    private object Test37 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString37), isTalkative, 37, false)
+    private object Test10 extends TestFunction[PathFinder[StepData]](10) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString10), isTalkative, testNum)
         }
     }
 
-    private object Test38 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString38), isTalkative, 38, false)
+    private object Test11 extends TestFunction[PathFinder[StepData]](11) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString11), isTalkative, testNum)
         }
     }
 
-    private object Test39 extends TestFunction[PathFinder[StepData]] {
-        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) {
-            analyze(pathFinder(TestMapString39), isTalkative, 39, false)
+    private object Test12 extends TestFunction[PathFinder[StepData]](12) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString12), isTalkative, testNum)
+        }
+    }
+
+    private object Test13 extends TestFunction[PathFinder[StepData]](13) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString13), isTalkative, testNum)
+        }
+    }
+
+    private object Test14 extends TestFunction[PathFinder[StepData]](14) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString14), isTalkative, testNum)
+        }
+    }
+
+    private object Test15 extends TestFunction[PathFinder[StepData]](15) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString15), isTalkative, testNum)
+        }
+    }
+
+    private object Test16 extends TestFunction[PathFinder[StepData]](16) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString16), isTalkative, testNum)
+        }
+    }
+
+    private object Test17 extends TestFunction[PathFinder[StepData]](17) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString17), isTalkative, testNum)
+        }
+    }
+
+    private object Test18 extends TestFunction[PathFinder[StepData]](18) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString18), isTalkative, testNum)
+        }
+    }
+
+    private object Test19 extends TestFunction[PathFinder[StepData]](19) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString19), isTalkative, testNum)
+        }
+    }
+
+    private object Test20 extends TestFunction[PathFinder[StepData]](20) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString20), isTalkative, testNum)
+        }
+    }
+
+    private object Test21 extends TestFunction[PathFinder[StepData]](21) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString21), isTalkative, testNum)
+        }
+    }
+
+    private object Test22 extends TestFunction[PathFinder[StepData]](22) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString22), isTalkative, testNum)
+        }
+    }
+
+    private object Test23 extends TestFunction[PathFinder[StepData]](23) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString23), isTalkative, testNum)
+        }
+    }
+
+    private object Test24 extends TestFunction[PathFinder[StepData]](24) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString24), isTalkative, testNum)
+        }
+    }
+
+    private object Test25 extends TestFunction[PathFinder[StepData]](25) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString25), isTalkative, testNum)
+        }
+    }
+
+    private object Test26 extends TestFunction[PathFinder[StepData]](26) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString26), isTalkative, testNum)
+        }
+    }
+
+    private object Test27 extends TestFunction[PathFinder[StepData]](27) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString27), isTalkative, testNum)
+        }
+    }
+
+    private object Test28 extends TestFunction[PathFinder[StepData]](28) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString28), isTalkative, testNum)
+        }
+    }
+
+    private object Test29 extends TestFunction[PathFinder[StepData]](29) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString29), isTalkative, testNum)
+        }
+    }
+
+    private object Test30 extends TestFunction[PathFinder[StepData]](30) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString30), isTalkative, testNum)
+        }
+    }
+
+    private object Test31 extends TestFunction[PathFinder[StepData]](31) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString31), isTalkative, testNum)
+        }
+    }
+
+    private object Test32 extends TestFunction[PathFinder[StepData]](32) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString32), isTalkative, testNum)
+        }
+    }
+
+    private object Test33 extends TestFunction[PathFinder[StepData]](33) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString33), isTalkative, testNum)
+        }
+    }
+
+    private object Test34 extends TestFunction[PathFinder[StepData]](34) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString34), isTalkative, testNum)
+        }
+    }
+
+    private object Test35 extends TestFunction[PathFinder[StepData]](35, false) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString35), isTalkative, testNum)
+        }
+    }
+
+    private object Test36 extends TestFunction[PathFinder[StepData]](36, false) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString36), isTalkative, testNum)
+        }
+    }
+
+    private object Test37 extends TestFunction[PathFinder[StepData]](37, false) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString37), isTalkative, testNum)
+        }
+    }
+
+    private object Test38 extends TestFunction[PathFinder[StepData]](38, false) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString38), isTalkative, testNum)
+        }
+    }
+
+    private object Test39 extends TestFunction[PathFinder[StepData]](39, false) {
+        def apply(pathFinder: PathFinder[StepData], isTalkative: Boolean) : Boolean = {
+            analyze(pathFinder(TestMapString39), isTalkative, testNum)
         }
     }
 

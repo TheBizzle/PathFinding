@@ -3,8 +3,8 @@ package tester
 import criteria._
 import exceptions._
 import collection.immutable.{List, HashMap, Map}
-import testcluster.TestCluster
 import annotation.tailrec
+import testcluster.{TestFunction, TestCluster}
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,13 +19,13 @@ object TestingCore {
     private[tester] val ArgKeyRange = "range"
     private[tester] val ArgKeyToggle = "toggle"
 
-    // @address These existential types displease me...
-    def apply(args: List[TestCriteria[_]], cluster: TestCluster[_]) {
+    def apply[T <: Testable](args: List[TestCriteria[_]], testable: T, cluster: TestCluster[T]) {
         val argMap = sortArgLists(args)
-        makeTestRunningDecisions(argMap, cluster)
+        makeTestRunningDecisions(argMap, testable, cluster)
     }
 
-    private def makeTestRunningDecisions(argMap: Map[String, List[TestCriteria[_]]], cluster: TestCluster[_]) {
+    // @address These existential types displease me...
+    private def makeTestRunningDecisions[T <: Testable](argMap: Map[String, List[TestCriteria[_]]], testable: T, cluster: TestCluster[T]) {
 
         val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[List[TestCriteriaToggleFlag]]] match {
             case None    => throw new MysteriousDataException("OMG, what did you do?!")
@@ -34,7 +34,7 @@ object TestingCore {
 
         val toggles = new TestToggleFlagWrapper(rawToggles)
         val wantsToRunPathing = assessPathingDesire(argMap)
-        val (isTalkative, isRunningBaseTests, isSkippingPathingTests) = (toggles.get(Talkative), toggles.get(RunBaseTests), toggles.get(SkipPathingTests))
+        val (isTalkative, isRunningBaseTests, isSkippingPathingTests, isStacktracing) = (toggles.get(Talkative), toggles.get(RunBaseTests), toggles.get(SkipPathingTests), toggles.get(StackTrace))
 
         if (isSkippingPathingTests)
             if(wantsToRunPathing)
@@ -58,13 +58,35 @@ object TestingCore {
             }
 
             val testsToRun = handleTestIntervals(values, ranges, cluster.getSize)
-            cluster.runTests(testsToRun, isTalkative)
+            runTests(cluster.getTestsToRun(testsToRun), testable, isTalkative, isStacktracing)
 
         }
 
         if (isRunningBaseTests)
             runBaseTests()
 
+    }
+
+    private def runTests[T <: Testable](tests: List[TestFunction[T]], testable: T, isTalkative: Boolean, isStacktracing: Boolean) {
+
+        def successStr(testNumber: Int) = "Test number " + testNumber + " was a success."
+        def failureStr(testNumber: Int) = "Test number " + testNumber + " failed miserably!"
+
+        tests foreach {
+            test =>
+            try {
+                val result = test(testable, isTalkative)
+                if (test.shouldSucceed == result) println(successStr(test.testNum))
+                else                              println(failureStr(test.testNum))
+            }
+            catch {
+                case e: Exception => {
+                    println("Test number " + test.testNum + " failed with an exception (" + e.getClass + ").")
+                    if (isStacktracing) print(e.getStackTrace)
+                }
+            }
+        }
+        
     }
 
     // Basically, takes advantage of bucketing to quickly deal with test numbers and their test-ness/skip-ness

@@ -13,7 +13,7 @@ import annotation.tailrec
 
 class TestToggleFlagWrapper(toggles: List[TestCriteriaToggleFlag]) {
 
-    private val FlagList = List(Talkative, RunBaseTests, SkipPathingTests)
+    private val FlagList = List(Talkative, RunBaseTests, SkipPathingTests, StackTrace)
 
     private val flagMap = initializeFlagMap(FlagList)
     toggles map ( verifyAndInsert(_) )

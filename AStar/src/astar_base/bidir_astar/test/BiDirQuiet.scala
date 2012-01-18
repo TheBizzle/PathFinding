@@ -14,6 +14,5 @@ import pathfinding.test.{TestScript, PathingTestCluster}
  */
 
 object BiDirQuiet extends TestScript {
-    PathingTestCluster.setThingToTest(BiDirAStar.asInstanceOf[PathFinder[StepData]])
-    TestingCore(List[TestCriteria[_]]((1, 39, RunTest)), PathingTestCluster)
+    TestingCore(List[TestCriteria[_]]((1, 39, RunTest)), BiDirAStar.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
 }

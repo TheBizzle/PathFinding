@@ -2,6 +2,7 @@ package pathfinding
 
 import pathingmap.pathingmapdata.PathingMapString
 import statuses.ExecutionStatus
+import tester.Testable
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,6 +11,6 @@ import statuses.ExecutionStatus
  * Time: 5:09 PM
  */
 
-trait PathFinder[T <: StepData] {
+trait PathFinder[T <: StepData] extends Testable {
     def apply(mapString: PathingMapString) : ExecutionStatus[T]
 }

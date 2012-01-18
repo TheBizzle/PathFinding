@@ -1,6 +1,8 @@
 package tester.test.dummies
 
-import tester.testcluster.TestCluster
+import tester.testcluster.{TestFunction, TestCluster}
+import tester.Testable
+
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,8 +11,7 @@ import tester.testcluster.TestCluster
  * Time: 8:23 PM
  */
 
-object DummyTestCluster extends TestCluster[Int] {
-    def setThingToTest(thing: Int) { null }
-    def runTests(testNums: List[Int], isTalkative: Boolean) { null }
+object DummyTestCluster extends TestCluster[Testable] {
+    def getTestsToRun(testNums: List[Int]) : List[TestFunction[Testable]] = { null }
     def getSize = 10
 }

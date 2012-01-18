@@ -23,6 +23,7 @@ case object SkipTest extends TestRunningnessFlag
 case object Talkative extends TestToggleFlag             // Enables the "Here, let me draw that for you on the map!" thing
 case object RunBaseTests extends TestToggleFlag          // Enables running the ScalaTest tests on the core data structures and such
 case object SkipPathingTests extends TestToggleFlag      // Skips the running of any of the actual pathfinding tests
+case object StackTrace extends TestToggleFlag            // Signifies the desire to see stacktraces when tests fail as a result of throwing exceptions
 
 object TestingFlag {
     def flipRunningness(flag: TestRunningnessFlag) : TestRunningnessFlag = {
