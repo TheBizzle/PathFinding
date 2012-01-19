@@ -12,5 +12,5 @@ import tester.test.suitereporter.{TesterSuiteReporter, SuiteCoagulator}
  * Time: 11:01 PM
  */
 
-// Pass all of the SuiteReporters of your class—and of yours dependencies—to the superclass's constructor!
+// Pass all of the SuiteReporters of your class—and of your dependencies—to the superclass's constructor!
 object AStarSuiteCoagulator extends SuiteCoagulator(AStarSuiteReporter, DataStructureSuiteReporter, PathFindingSuiteReporter, TesterSuiteReporter)

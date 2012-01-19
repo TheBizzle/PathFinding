@@ -28,7 +28,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         when("the tester is invoked")
         then("NotRunningTestsException should be thrown")
         intercept[NotRunningTestsException] {
-            TestingCore(inList, dummyTestable, DummyTestCluster, null)
+            TestingCore(inList, dummyTestable, DummyTestCluster)
         }
 
     }
@@ -41,7 +41,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         when("the tester is invoked")
         then("NotRunningTestsException should be thrown")
         intercept[NotRunningTestsException] {
-            TestingCore(inList, dummyTestable, DummyTestCluster, null)
+            TestingCore(inList, dummyTestable, DummyTestCluster)
         }
 
     }
@@ -54,7 +54,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         when("the tester is invoked")
         then("ContradictoryArgsException should be thrown")
         intercept[ContradictoryArgsException] {
-            TestingCore(inList, dummyTestable, DummyTestCluster, null)
+            TestingCore(inList, dummyTestable, DummyTestCluster)
         }
 
     }
@@ -67,7 +67,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         when("the tester is invoked")
         then("InvalidTestNumberException should be thrown")
         intercept[InvalidTestNumberException] {
-            TestingCore(inList, dummyTestable, DummyTestCluster, null)
+            TestingCore(inList, dummyTestable, DummyTestCluster)
         }
 
     }
@@ -80,7 +80,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         when("the tester is invoked")
         then("InvalidTestNumberException should be thrown")
         intercept[InvalidTestNumberException] {
-            TestingCore(inList, dummyTestable, DummyTestCluster, null)
+            TestingCore(inList, dummyTestable, DummyTestCluster)
         }
 
     }
@@ -93,7 +93,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         when("the tester is invoked")
         then("RedundancyException should be thrown")
         intercept[RedundancyException] {
-            TestingCore(inList, dummyTestable, DummyTestCluster, null)
+            TestingCore(inList, dummyTestable, DummyTestCluster)
         }
 
     }
@@ -106,7 +106,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         when("the tester is invoked")
         then("RedundancyException should be thrown")
         intercept[RedundancyException] {
-            TestingCore(inList, dummyTestable, DummyTestCluster, null)
+            TestingCore(inList, dummyTestable, DummyTestCluster)
         }
 
     }
@@ -119,7 +119,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         when("the tester is invoked")
         then("RedundancyException should be thrown")
         intercept[RedundancyException] {
-            TestingCore(inList, dummyTestable, DummyTestCluster, null)
+            TestingCore(inList, dummyTestable, DummyTestCluster)
         }
 
     }
@@ -132,7 +132,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         when("the tester is invoked")
         then("RedundancyException should be thrown")
         intercept[RedundancyException] {
-            TestingCore(inList, dummyTestable, DummyTestCluster, null)
+            TestingCore(inList, dummyTestable, DummyTestCluster)
         }
 
     }
@@ -145,7 +145,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         when("the tester is invoked")
         then("RedundancyException should be thrown")
         intercept[RedundancyException] {
-            TestingCore(inList, dummyTestable, DummyTestCluster, null)
+            TestingCore(inList, dummyTestable, DummyTestCluster)
         }
 
     }
@@ -158,7 +158,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         when("the tester is invoked")
         then("RedundancyException should be thrown")
         intercept[RedundancyException] {
-            TestingCore(inList, dummyTestable, DummyTestCluster, null)
+            TestingCore(inList, dummyTestable, DummyTestCluster)
         }
 
     }
@@ -171,7 +171,7 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
         when("the tester is invoked")
         then("RedundancyException should be thrown")
         intercept[RedundancyException] {
-            TestingCore(inList, dummyTestable, DummyTestCluster, null)
+            TestingCore(inList, dummyTestable, DummyTestCluster)
         }
 
     }
