@@ -1,7 +1,8 @@
 package astar_base.astar.test
 
 import astar_base.astar.AStar
-import pathfinding.test.{TestScript, PathingTestCluster}
+import pathfinding.test.PathingTestCluster
+import pathfinding.test.misc.TestScript
 import pathfinding.{StepData, PathFinder}
 import tester.criteria._
 import tester.{TestingCore}

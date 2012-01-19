@@ -5,6 +5,7 @@ import exceptions._
 import collection.immutable.{List, HashMap, Map}
 import annotation.tailrec
 import testcluster.{TestFunction, TestCluster}
+import org.scalatest.Suite
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,12 +20,12 @@ object TestingCore {
     private[tester] val ArgKeyRange = "range"
     private[tester] val ArgKeyToggle = "toggle"
 
-    def apply[T <: Testable](args: List[TestCriteria[_]], testable: T, cluster: TestCluster[T]) {
+    def apply[T <: Testable](args: List[TestCriteria[_]], testable: T = null, cluster: TestCluster[T] = null, baseTests: Seq[Suite] = Seq[Suite]()) {
         val argMap = sortArgLists(args)
-        makeTestRunningDecisions(argMap, testable, cluster)
+        makeTestRunningDecisions(argMap, testable, cluster, baseTests)
     }
 
-    private def makeTestRunningDecisions[T <: Testable](argMap: Map[String, List[TestCriteria[_]]], testable: T, cluster: TestCluster[T]) {
+    private def makeTestRunningDecisions[T <: Testable](argMap: Map[String, List[TestCriteria[_]]], testable: T, cluster: TestCluster[T], baseTests: Seq[Suite]) {
 
         val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[List[TestCriteriaToggleFlag]]] match {
             case None    => throw new MysteriousDataException("OMG, what did you do?!")
@@ -35,13 +36,13 @@ object TestingCore {
         val wantsToRunPathing = assessPathingDesire(argMap)
         val (isTalkative, isRunningBaseTests, isSkippingPathingTests, isStacktracing) = (toggles.get(Talkative), toggles.get(RunBaseTests), toggles.get(SkipPathingTests), toggles.get(StackTrace))
 
-        if (isSkippingPathingTests)
-            if(wantsToRunPathing)
-                throw new ContradictoryArgsException("If you want skip the pathing tests, you should not specify pathing tests to run.")
-            else if (!isRunningBaseTests)
-                throw new NotRunningTestsException("You can't run the test suite if you're going to skip the pathing tests AND the base tests")
+        if (isSkippingPathingTests && wantsToRunPathing)
+            throw new ContradictoryArgsException("If you want skip the pathing tests, you should not specify pathing tests to run.")
 
-        if (!isSkippingPathingTests) {
+        if (!wantsToRunPathing && !isRunningBaseTests)
+            throw new NotRunningTestsException("You can't run the test suite if you're going to skip the pathing tests AND the base tests")
+
+        if (!isSkippingPathingTests && wantsToRunPathing) {
 
             val valuesOption = argMap.get(ArgKeyValue).asInstanceOf[Option[List[TestCriteriaValueTuple]]]
             val rangesOption = argMap.get(ArgKeyRange).asInstanceOf[Option[List[TestCriteriaRangeTuple]]]
@@ -62,7 +63,7 @@ object TestingCore {
         }
 
         if (isRunningBaseTests)
-            runBaseTests()
+            runBaseTests(baseTests)
 
     }
 
@@ -181,8 +182,8 @@ object TestingCore {
             (Nil, Nil, 0)
     }
 
-    private def runBaseTests() {
-        // @address Probably just call execute() on a ScalaTest class or something
+    private def runBaseTests(baseTests: Seq[Suite]) {
+        baseTests foreach { x => print("\n"); x.execute() }
     }
 
     private[tester] def assessPathingDesire(argMap:  Map[String, List[TestCriteria[_]]]) : Boolean = {

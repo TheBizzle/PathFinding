@@ -15,7 +15,6 @@ import tester.exceptions.MysteriousDataException
  * Time: 4:28 PM
  */
 
-// If I see that fucking non-variant StepData one more time...!
 object PathingTestCluster extends TestCluster[PathFinder[StepData]] {
 
     // There is no test #0—IS NOT AND NEVER WILL BE
@@ -32,20 +31,18 @@ object PathingTestCluster extends TestCluster[PathFinder[StepData]] {
     }
 
     private def analyze[T <: StepData](status: ExecutionStatus[T], isTalkative: Boolean) : Boolean = {
-
         status match {
             case Success(x) => {
-                if (isTalkative) println("Found a solution!")
+                if (isTalkative) println("\n\nFound a solution!")
                 retracePath(x.breadcrumbArr, x.endGoal, x.pathingMap, isTalkative)
                 true
             }
             case Failure(_) => {
-                if (isTalkative) println("Failed to find a solution....\n")
+                if (isTalkative) println("\n\nFailed to find a solution....")
                 false
             }
             case _          => throw new MysteriousDataException("Unexpected ExecutionStatus!")
         }
-
     }
 
     private def retracePath(breadcrumbs: Array[Array[Coordinate]], goal: Coordinate, pathingMap: PathingMap, isTalkative: Boolean) {
@@ -64,7 +61,7 @@ object PathingTestCluster extends TestCluster[PathFinder[StepData]] {
         val suggestedLoc = pathTaken.tail.head
 
         if (isTalkative)
-            println("So, anyway... you should move " + PathingMap.findDirection(pathTaken.head, suggestedLoc) + " towards " + suggestedLoc + "\n\n")
+            println("So, anyway... you should move " + PathingMap.findDirection(pathTaken.head, suggestedLoc) + " towards " + suggestedLoc)
 
     }
 

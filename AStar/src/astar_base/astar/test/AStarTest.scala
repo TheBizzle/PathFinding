@@ -4,7 +4,8 @@ import astar_base.astar.AStar
 import pathfinding.{StepData, PathFinder}
 import tester.criteria._
 import tester.{TestingCore}
-import pathfinding.test.{TestScript, PathingTestCluster}
+import pathfinding.test.PathingTestCluster
+import pathfinding.test.misc.TestScript
 
 /**
  * Created by IntelliJ IDEA.
