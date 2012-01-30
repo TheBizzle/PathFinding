@@ -19,12 +19,12 @@ import pathfinding.statuses._
 // If one reaches a location that the other has reached, or if the current locations are next to each other, it returns.
 object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDistance) {
 
-    override def apply(mapString: PathingMapString) : ExecutionStatus[BiDirStepData] = {
+    override def apply(mapString: PathingMapString) : PathingStatus[BiDirStepData] = {
         val stepData = BiDirStepData(mapString)
         execute(primeStepData(stepData), maxIters = calculateMaxIters(stepData.pathingMap.colCount, stepData.pathingMap.rowCount))
     }
 
-    override protected def execute(stepData: BiDirStepData, maxIters: Int) : ExecutionStatus[BiDirStepData] = {
+    override protected def execute(stepData: BiDirStepData, maxIters: Int) : PathingStatus[BiDirStepData] = {
 
         val (stgStepData, stgCrumbs) = step(stepData.clone())
         val (gtsStepData, gtsCrumbs) = step(stepData.cloneForBiBackwards())
@@ -33,7 +33,7 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
         val director = new BiDirDirector(decide(_: BiDirStepData, maxIters), step)    // decide() gets partially applied
 
         director.direct(stgStepData, gtsStepData) match {
-            case status: ExecutionStatus[BiDirStepData] => status
+            case status: PathingStatus[BiDirStepData] => status
             case _ => throw new UnexpectedDataException
         }
         

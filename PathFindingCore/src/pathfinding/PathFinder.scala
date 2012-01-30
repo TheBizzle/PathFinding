@@ -1,7 +1,7 @@
 package pathfinding
 
 import pathingmap.pathingmapdata.PathingMapString
-import statuses.ExecutionStatus
+import statuses.PathingStatus
 import tester.Testable
 
 /**
@@ -12,5 +12,5 @@ import tester.Testable
  */
 
 trait PathFinder[T <: StepData] extends Testable {
-    def apply(mapString: PathingMapString) : ExecutionStatus[T]
+    def apply(mapString: PathingMapString) : PathingStatus[T]
 }

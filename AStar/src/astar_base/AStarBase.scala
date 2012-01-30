@@ -19,7 +19,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
     protected val scalingFactor = branchingFactor        // How much of the map you're willing to query (from 0 to 1)
     protected val heuristic = heuristicFunc              // The heuristic function that A* will be using
 
-    override protected def decide(stepData: T, maxIters: Int) : ExecutionStatus[T] = {
+    override protected def decide(stepData: T, maxIters: Int) : PathingStatus[T] = {
 
         import stepData._
 

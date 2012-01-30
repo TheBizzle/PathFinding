@@ -25,13 +25,13 @@ import annotation.tailrec
 
 object AStar extends AStarBase[AStarStepData](1.0, HeuristicLib.manhattanDistance) {
 
-    override def apply(mapString: PathingMapString) : ExecutionStatus[AStarStepData] = {
+    override def apply(mapString: PathingMapString) : PathingStatus[AStarStepData] = {
         val stepData = AStarStepData(mapString)
         execute(primeStepData(stepData), maxIters = calculateMaxIters(stepData.pathingMap.colCount, stepData.pathingMap.rowCount))
     }
 
-    override protected def execute(stepData: AStarStepData, maxIters: Int) : ExecutionStatus[AStarStepData] = {
-        @tailrec def executeHelper(stepData: AStarStepData, maxIters: Int) : ExecutionStatus[AStarStepData] = {
+    override protected def execute(stepData: AStarStepData, maxIters: Int) : PathingStatus[AStarStepData] = {
+        @tailrec def executeHelper(stepData: AStarStepData, maxIters: Int) : PathingStatus[AStarStepData] = {
             val decision = decide(stepData, maxIters)
             decision match {
                 case Continue(x: AStarStepData) => executeHelper(step(x)._1, maxIters)

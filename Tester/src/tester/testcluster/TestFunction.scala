@@ -1,6 +1,8 @@
 package tester.testcluster
 
-import tester.Testable
+import tester.testanalyzer.AnalysisFlagBundle
+import tester.{TestSubject, ExecutionStatus, Testable}
+
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,11 +11,17 @@ import tester.Testable
  * Time: 7:45 PM
  */
 
-abstract class TestFunction[T <: Testable](testNumber: Int, shouldPass: Boolean = true) extends Function2[T, Boolean, Boolean] {
-    // Consider not passing the toggle flags to apply() and just batch-processing toggles into function object local variables.
-    // That way, the signatures of the functions wouldn't need to change if ever more toggles were added.
-    // However... maybe they should HAVE TO change (to be sure of compliance).... :food for thought:
+// Constructor is passed things that are statically known about the TestFunction
+// apply() is passed things that dynamically affect the outcome of the function
+abstract class TestFunction[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, FuncFlags <: TestFuncFlagBundle, AnalysisFlags <: AnalysisFlagBundle]
+                           (subject: Subject, analysisFunction: (Status, AnalysisFlags) => Boolean, testNumber: Int, shouldPass: Boolean) extends Function2[T, FuncFlags, Boolean] {
+
+    val testSubject = subject
     val testNum = testNumber
     val shouldSucceed = shouldPass
-    def apply(testable: T, isTalkative: Boolean) : Boolean
+    protected val analysisFunc = analysisFunction
+
+    def apply(testable: T, testFlags: FuncFlags) : Boolean
+    protected def extractAnalysisFlags(testFlags: FuncFlags) : AnalysisFlags
+
 }

@@ -14,12 +14,12 @@ import pathfinding.breadcrumb.Breadcrumb
  * Time: 4:19 PM
  */
 
-class BiDirDirector[T <: BiDirStepData](decisionFunc: T => ExecutionStatus[T], stepFunc: T => (T, List[Breadcrumb])) {
+class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], stepFunc: T => (T, List[Breadcrumb])) {
 
     val decide = decisionFunc
     val step = stepFunc
 
-    def direct(forwardStepData: T, backwardsStepData: T) : ExecutionStatus[T] = {
+    def direct(forwardStepData: T, backwardsStepData: T) : PathingStatus[T] = {
         val stg = new StartToGoal[T](Continue(forwardStepData), decide, step)
         val gts = new GoalToStart[T](Continue(backwardsStepData), decide, step)
         val outVal = evaluateActions(stg, gts)
@@ -28,7 +28,7 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => ExecutionStatus[T], s
     }
 
     @tailrec
-    private def evaluateActions(stg: StartToGoal[T], gts: GoalToStart[T]) : ExecutionStatus[T] = {
+    private def evaluateActions(stg: StartToGoal[T], gts: GoalToStart[T]) : PathingStatus[T] = {
 
         val ((stgStatus, stgCrumbs), (gtsStatus, gtsCrumbs)) = runActionsForResult(stg, gts)
 
@@ -84,7 +84,7 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => ExecutionStatus[T], s
         actorArgs.foreach(_ ! BiDirActor.stopMessageStr)
     }
 
-    def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : ((ExecutionStatus[T], List[Breadcrumb]), (ExecutionStatus[T], List[Breadcrumb])) = {
+    def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : ((PathingStatus[T], List[Breadcrumb]), (PathingStatus[T], List[Breadcrumb])) = {
 
         stg.start()
         val stgFuture = (stg !! BiDirActor.startMessageStr)
@@ -92,8 +92,8 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => ExecutionStatus[T], s
         gts.start()
         val gtsFuture = (gts !! BiDirActor.startMessageStr)
 
-        val stgTuple = stgFuture().asInstanceOf[(ExecutionStatus[T], List[Breadcrumb])]
-        val gtsTuple = gtsFuture().asInstanceOf[(ExecutionStatus[T], List[Breadcrumb])]
+        val stgTuple = stgFuture().asInstanceOf[(PathingStatus[T], List[Breadcrumb])]
+        val gtsTuple = gtsFuture().asInstanceOf[(PathingStatus[T], List[Breadcrumb])]
 
         (stgTuple, gtsTuple)
 

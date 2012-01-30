@@ -1,8 +1,8 @@
 package astar_base.bidir_astar.test
 
 import astar_base.bidir_astar.BiDirAStar
-import pathfinding.test.PathingTestCluster
-import pathfinding.test.misc.TestScript
+import pathfinding.testcluster.PathingTestCluster
+import pathfinding.test.TestScript
 import pathfinding.{StepData, PathFinder}
 import tester.criteria._
 import tester.TestingCore

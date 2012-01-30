@@ -4,8 +4,8 @@ import criteria._
 import exceptions._
 import collection.immutable.{List, HashMap, Map}
 import annotation.tailrec
-import testcluster.{TestFunction, TestCluster}
 import org.scalatest.Suite
+import testcluster.{TestFuncFlagBundle, TestFunction, TestCluster}
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,16 +16,21 @@ import org.scalatest.Suite
 
 object TestingCore {
 
+    type T <: Testable
+    type TFunc <: TestFunction[T, _, _, _, _]
+    type TCluster <: TestCluster[TFunc, _]
+
     private[tester] val ArgKeyValue = "value"
     private[tester] val ArgKeyRange = "range"
     private[tester] val ArgKeyToggle = "toggle"
 
-    def apply[T <: Testable](args: List[TestCriteria[_]], testable: T = null, cluster: TestCluster[T] = null, baseTests: Seq[Suite] = Seq[Suite]()) {
+
+    def apply(args: List[TestCriteria[_]], testable: T = null, cluster: TCluster = null, baseTests: Seq[Suite] = Seq[Suite]()) {
         val argMap = sortArgLists(args)
         makeTestRunningDecisions(argMap, testable, cluster, baseTests)
     }
 
-    private def makeTestRunningDecisions[T <: Testable](argMap: Map[String, List[TestCriteria[_]]], testable: T, cluster: TestCluster[T], baseTests: Seq[Suite]) {
+    private def makeTestRunningDecisions(argMap: Map[String, List[TestCriteria[_]]], testable: T, cluster: TCluster, baseTests: Seq[Suite]) {
 
         val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[List[TestCriteriaToggleFlag]]] match {
             case None    => throw new MysteriousDataException("OMG, what did you do?!")
@@ -58,7 +63,9 @@ object TestingCore {
             }
 
             val testsToRun = handleTestIntervals(values, ranges, cluster.getSize)
-            runTests(cluster.getTestsToRun(testsToRun), testable, isTalkative, isStacktracing)
+            val testFlags = null//@ val testFlags        Somehow, create a TestFuncFlagsBundle from the applicable flags.  (Here, just isTalkative)
+
+            runTests(cluster.getTestsToRun(testsToRun), testable, testFlags, isStacktracing)
 
         }
 
@@ -67,7 +74,7 @@ object TestingCore {
 
     }
 
-    private def runTests[T <: Testable](tests: List[TestFunction[T]], testable: T, isTalkative: Boolean, isStacktracing: Boolean) {
+    private def runTests(tests: List[TFunc], testable: T, flags: TestFuncFlagBundle, isStacktracing: Boolean) {
 
         def successStr(testNumber: Int) = "Test number " + testNumber + " was a success."
         def failureStr(testNumber: Int) = "Test number " + testNumber + " failed miserably!"
@@ -75,7 +82,7 @@ object TestingCore {
         tests foreach {
             test =>
             try {
-                val result = test(testable, isTalkative)
+                val result = test(testable, flags)
                 if (test.shouldSucceed == result) println(successStr(test.testNum))
                 else                              println(failureStr(test.testNum))
             }

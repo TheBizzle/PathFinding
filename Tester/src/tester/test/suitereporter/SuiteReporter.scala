@@ -9,7 +9,7 @@ import org.scalatest.Suite
  * Time: 10:50 PM
  */
 
-abstract class SuiteReporter(suites: List[Suite]) {
+abstract class SuiteReporter(suites: Seq[Suite]) {
     def report : Seq[Suite] = suites
 }
 

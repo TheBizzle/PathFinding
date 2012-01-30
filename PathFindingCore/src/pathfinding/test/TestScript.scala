@@ -1,4 +1,4 @@
-package pathfinding.test.misc
+package pathfinding.test
 
 import tester.criteria.{TestCriteriaValueTuple, TestCriteriaRangeTuple, TestRunningnessFlag}
 

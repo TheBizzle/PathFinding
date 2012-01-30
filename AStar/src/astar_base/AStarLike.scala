@@ -2,7 +2,7 @@ package astar_base
 
 import pathfinding.coordinate.Coordinate
 import pathfinding.pathingmap.pathingmapdata.PathingMapString
-import pathfinding.statuses.ExecutionStatus
+import pathfinding.statuses.PathingStatus
 import pathfinding.breadcrumb.Breadcrumb
 
 /**
@@ -14,11 +14,11 @@ import pathfinding.breadcrumb.Breadcrumb
 
 trait AStarLike[T <: AStarStepData] {
 
-    def apply(mapString: PathingMapString) : ExecutionStatus[T]
-    protected def execute(stepData: T,  maxIters: Int) : ExecutionStatus[T]
+    def apply(mapString: PathingMapString) : PathingStatus[T]
+    protected def execute(stepData: T,  maxIters: Int) : PathingStatus[T]
     protected def goalIsFound(inSeq: Any*) : Boolean
     protected def makeNewStepData(freshLoc: Coordinate, stepData: T) : T
-    protected def decide(stepData: T, maxIters: Int) : ExecutionStatus[T]
+    protected def decide(stepData: T, maxIters: Int) : PathingStatus[T]
     protected def step(stepData: T) : (T, List[Breadcrumb])
     protected def primeStepData(stepData: T) : T
 
