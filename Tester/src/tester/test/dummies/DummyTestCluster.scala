@@ -1,7 +1,9 @@
 package tester.test.dummies
 
-import tester.testcluster.{TestFunction, TestCluster}
-import tester.Testable
+import java.lang.reflect.Field
+import tester.{ExecutionStatus, TestSubject, Testable}
+import tester.testcluster.{TestFuncFlagBundle, TestFunction, TestCluster}
+import tester.testanalyzer.TestAnalysisFlagBundle
 
 
 /**
@@ -11,7 +13,9 @@ import tester.Testable
  * Time: 8:23 PM
  */
 
-object DummyTestCluster extends TestCluster[Testable] {
-    def getTestsToRun(testNums: List[Int]) : List[TestFunction[Testable]] = { null }
+object DummyTestCluster extends TestCluster[TestFunction[Testable, TestSubject, ExecutionStatus, TestAnalysisFlagBundle], TestSubject] {
     def getSize = 10
+    def getTestsToRun(testNums: List[Int]) : List[TestFunction[Testable, TestSubject, ExecutionStatus, TestAnalysisFlagBundle]] = { null }
+    protected def generateTestFunction(fieldData: (Field, String), regex: String) = null
+    protected def construct(subject: TestSubject, testNumber: Int, shouldPass: Boolean) = null
 }

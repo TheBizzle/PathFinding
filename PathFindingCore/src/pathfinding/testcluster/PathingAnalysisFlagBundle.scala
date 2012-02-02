@@ -1,6 +1,6 @@
 package pathfinding.testcluster
 
-import tester.testanalyzer.AnalysisFlagBundle
+import tester.testanalyzer.TestAnalysisFlagBundle
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,4 +9,4 @@ import tester.testanalyzer.AnalysisFlagBundle
  * Time: 6:39 PM
  */
 
-class PathingAnalysisFlagBundle(inFlags: List[Boolean]) extends AnalysisFlagBundle(inFlags)
+class PathingAnalysisFlagBundle(inFlags: List[Boolean]) extends TestAnalysisFlagBundle(inFlags)

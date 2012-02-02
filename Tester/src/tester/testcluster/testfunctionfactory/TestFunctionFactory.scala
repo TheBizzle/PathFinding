@@ -12,7 +12,7 @@ import java.lang.reflect.Field
  */
 
 // Uses reflection to do satanical things.  Use at your own risk!
-trait TestFunctionFactory[T <: TestFunction[_, U, _, _, _], U <: TestSubject] {
+trait TestFunctionFactory[T <: TestFunction[_, U, _, _], U <: TestSubject] {
 
     self: TestCluster[T, U] =>
     
@@ -22,11 +22,8 @@ trait TestFunctionFactory[T <: TestFunction[_, U, _, _, _], U <: TestSubject] {
         val generator = generateTestFunction(_: (Field, String), regex = testFunctionRegex)  // Partial application
 
         val clazz = this.getClass
-        val pack = clazz.getPackage.getName
-        val name = clazz.getName.dropRight(clazz.getName.size - 1)
-
-        val fullName = pack + "." + name
-        val fieldTuples = Class.forName(fullName).getDeclaredFields.map { case x => (x, x.getName) }
+        val name = clazz.getName
+        val fieldTuples = Class.forName(name).getDeclaredFields.map { case x => (x, x.getName) }
 
         fieldTuples.foldRight (List[T]()) { case(x, acc) =>
             generator(x) match {

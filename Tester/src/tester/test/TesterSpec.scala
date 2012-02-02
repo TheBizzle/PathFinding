@@ -2,10 +2,9 @@ package tester.test
 
 import dummies.DummyTestCluster
 import org.scalatest.{FlatSpec, GivenWhenThen}
-import tester.TestingCore
 import tester.criteria._
 import tester.exceptions._
-import tester.Testable
+import tester.{TestingCore, Testable}
 
 /**
  * Created by IntelliJ IDEA.

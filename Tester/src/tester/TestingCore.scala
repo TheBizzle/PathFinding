@@ -5,6 +5,7 @@ import exceptions._
 import collection.immutable.{List, HashMap, Map}
 import annotation.tailrec
 import org.scalatest.Suite
+import testanalyzer.TestAnalysisFlagBundle
 import testcluster.{TestFuncFlagBundle, TestFunction, TestCluster}
 
 /**
@@ -16,21 +17,29 @@ import testcluster.{TestFuncFlagBundle, TestFunction, TestCluster}
 
 object TestingCore {
 
-    type T <: Testable
-    type TFunc <: TestFunction[T, _, _, _, _]
-    type TCluster <: TestCluster[TFunc, _]
-
     private[tester] val ArgKeyValue = "value"
     private[tester] val ArgKeyRange = "range"
     private[tester] val ArgKeyToggle = "toggle"
 
 
-    def apply(args: List[TestCriteria[_]], testable: T = null, cluster: TCluster = null, baseTests: Seq[Suite] = Seq[Suite]()) {
+    def apply[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle,
+              TFunc <: TestFunction[T, Subject, Status, AnalysisFlags], TCluster <: TestCluster[TFunc, Subject]]
+             (args: List[TestCriteria[_]],
+              testable: T = null,
+              cluster: TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags], Subject] = null,
+              baseTests: Seq[Suite] = Seq[Suite]()) {
+
         val argMap = sortArgLists(args)
         makeTestRunningDecisions(argMap, testable, cluster, baseTests)
+        
     }
 
-    private def makeTestRunningDecisions(argMap: Map[String, List[TestCriteria[_]]], testable: T, cluster: TCluster, baseTests: Seq[Suite]) {
+    private def makeTestRunningDecisions[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle,
+                                         TFunc <: TestFunction[T, Subject, Status, AnalysisFlags], TCluster <: TestCluster[TFunc, Subject]]
+                                        (argMap: Map[String, List[TestCriteria[_]]],
+                                         testable: T,
+                                         cluster: TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags], Subject],
+                                         baseTests: Seq[Suite]) {
 
         val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[List[TestCriteriaToggleFlag]]] match {
             case None    => throw new MysteriousDataException("OMG, what did you do?!")
@@ -63,7 +72,7 @@ object TestingCore {
             }
 
             val testsToRun = handleTestIntervals(values, ranges, cluster.getSize)
-            val testFlags = null//@ val testFlags        Somehow, create a TestFuncFlagsBundle from the applicable flags.  (Here, just isTalkative)
+            val testFlags = new TestFuncFlagBundle(List(isTalkative))
 
             runTests(cluster.getTestsToRun(testsToRun), testable, testFlags, isStacktracing)
 
@@ -74,7 +83,9 @@ object TestingCore {
 
     }
 
-    private def runTests(tests: List[TFunc], testable: T, flags: TestFuncFlagBundle, isStacktracing: Boolean) {
+    private def runTests[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle,
+                        TFunc <: TestFunction[T, Subject, Status, AnalysisFlags]]
+                        (tests: List[TFunc with TestFunction[T, Subject, Status, AnalysisFlags]], testable: T, flags: TestFuncFlagBundle, isStacktracing: Boolean) {
 
         def successStr(testNumber: Int) = "Test number " + testNumber + " was a success."
         def failureStr(testNumber: Int) = "Test number " + testNumber + " failed miserably!"
@@ -161,7 +172,8 @@ object TestingCore {
                     if (value <= testCount)
                         value
                     else
-                        throw new InvalidTestNumberException("Test range " + testList.last.toString + " extends to a number for which there is no corresponding test")
+                        throw new InvalidTestNumberException("Test range " + testList.last.toString + " extends to a number for which there is no corresponding test.  " +
+                                                             "Min is 1.  Max is " + testCount + ".")
                 }
                 else
                     0

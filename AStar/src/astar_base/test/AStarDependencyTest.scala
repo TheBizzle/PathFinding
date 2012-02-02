@@ -2,7 +2,7 @@ package astar_base.test
 
 import suitereporter.AStarSuiteCoagulator
 import tester.criteria.{RunBaseTests, TestCriteria}
-import pathfinding.test.misc.TestScript
+import pathfinding.test.TestScript
 import tester.TestingCore
 
 /**

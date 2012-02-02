@@ -22,11 +22,11 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
     lazy val tests = generateTests
 
     def getTestsToRun(testNums: List[Int]) : List[PathingTestFunction] = {
-        tests.zipWithIndex.filter { case(x, y) => testNums.contains(y) }.map ( _._1 ).toList
+        tests.zipWithIndex.filter { case(x, y) => testNums.contains(y + 1) }.map ( _._1 ).toList
     }
 
     def getSize : Int = {
-        tests.length - 1
+        tests.length
     }
 
     protected def analyze(status: PathingStatus[StepData], flags: PathingAnalysisFlagBundle) : Boolean = {
@@ -87,8 +87,8 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
     protected def generateTestFunction(testField: (Field, String), regex: String) : Option[PathingTestFunction] = {
         if (testField._2.matches(regex)) {
             val Matcher = regex.r
-            val Matcher(testNum, shouldPass) = testField
-            val func = construct(testField._1.asInstanceOf[PathingMapString], testNum.toInt, (shouldPass == null))
+            val Matcher(testNum, shouldPass) = testField._2
+            val func = construct(testField._1.get(this).asInstanceOf[PathingMapString], testNum.toInt, (shouldPass == null))
             Some(func)
         }
         else None
@@ -116,301 +116,301 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
     // |                                                                                                            |
     // \============================================================================================================/
 
-    object TestMapString1 extends PathingMapString("*_____________G", "akjshdkjashldjaksdhljakds")
+    private val TestMapString1 = new PathingMapString("*_____________G", "akjshdkjashldjaksdhljakds")
 
-    object TestMapString2 extends PathingMapString("_*asdf" +
-                                                   "G_asdf", "asdf")
+    private val TestMapString2 = new PathingMapString("_*asdf" +
+                                                      "G_asdf", "asdf")
 
-    object TestMapString3F extends PathingMapString("_%__*|" +
-                                                    "OG%_%|" +
-                                                    "%%___|", "\\|")
+    private val TestMapString3F = new PathingMapString("_%__*|" +
+                                                       "OG%_%|" +
+                                                       "%%___|", "\\|")
 
-    object TestMapString4 extends PathingMapString("_%__*|" +
-                                                   "OG%_%|" +
-                                                   "%____|", "\\|")
+    private val TestMapString4 = new PathingMapString("_%__*|" +
+                                                      "OG%_%|" +
+                                                      "%____|", "\\|")
 
-    object TestMapString5 extends PathingMapString("_______________|" +
-                                                   "___________*___|" +
-                                                   "_______________|" +
-                                                   "_______________|" +
-                                                   "%%%%%%%%%%_____|" +
-                                                   "________GD_____|" +
-                                                   "D_DDDDDDDD_____|" +
-                                                   "__D_D____D_____|" +
-                                                   "_DD______D_____|" +
-                                                   "____D_DDDD_____|" +
-                                                   "DDDDD____D_____|" +
-                                                   "____DDDD_D_____|" +
-                                                   "_______________|" +
-                                                   "_______________|" +
-                                                   "_______________", "\\|")
+    private val TestMapString5 = new PathingMapString("_______________|" +
+                                                      "___________*___|" +
+                                                      "_______________|" +
+                                                      "_______________|" +
+                                                      "%%%%%%%%%%_____|" +
+                                                      "________GD_____|" +
+                                                      "D_DDDDDDDD_____|" +
+                                                      "__D_D____D_____|" +
+                                                      "_DD______D_____|" +
+                                                      "____D_DDDD_____|" +
+                                                      "DDDDD____D_____|" +
+                                                      "____DDDD_D_____|" +
+                                                      "_______________|" +
+                                                      "_______________|" +
+                                                      "_______________", "\\|")
 
-    object TestMapString6 extends PathingMapString("_______________|" +
-                                                   "___________*___|" +
-                                                   "_________O%%%%%|" +
-                                                   "_______________|" +
-                                                   "%%%%%%%%%%%%%%_|" +
-                                                   "________GD_____|" +
-                                                   "D_DDDDDDDD_%%%%|" +
-                                                   "__D_D____D_____|" +
-                                                   "_DD______D%%%%_|" +
-                                                   "____D_DDDD_____|" +
-                                                   "DDDDD____D_____|" +
-                                                   "____DDDD_D_____|" +
-                                                   "_______%_%_____|" +
-                                                   "_______%_%_____|" +
-                                                   "_______________", "\\|")
+    private val TestMapString6 = new PathingMapString("_______________|" +
+                                                      "___________*___|" +
+                                                      "_________O%%%%%|" +
+                                                      "_______________|" +
+                                                      "%%%%%%%%%%%%%%_|" +
+                                                      "________GD_____|" +
+                                                      "D_DDDDDDDD_%%%%|" +
+                                                      "__D_D____D_____|" +
+                                                      "_DD______D%%%%_|" +
+                                                      "____D_DDDD_____|" +
+                                                      "DDDDD____D_____|" +
+                                                      "____DDDD_D_____|" +
+                                                      "_______%_%_____|" +
+                                                      "_______%_%_____|" +
+                                                      "_______________", "\\|")
 
-    object TestMapString7F extends PathingMapString("*DG", "\\|")
+    private val TestMapString7F = new PathingMapString("*DG", "\\|")
 
-    object TestMapString8 extends PathingMapString("G_____________*", "\\|")
+    private val TestMapString8 = new PathingMapString("G_____________*", "\\|")
 
-    object TestMapString9 extends PathingMapString("*|" +
-                                                   "_|" +
-                                                   "_|" +
-                                                   "_|" +
-                                                   "_|" +
-                                                   "_|" +
-                                                   "_|" +
-                                                   "_|" +
-                                                   "_|" +
-                                                   "_|" +
-                                                   "_|" +
-                                                   "_|" +
-                                                   "_|" +
-                                                   "_|" +
-                                                   "G", "\\|")
+    private val TestMapString9 = new PathingMapString("*|" +
+                                                      "_|" +
+                                                      "_|" +
+                                                      "_|" +
+                                                      "_|" +
+                                                      "_|" +
+                                                      "_|" +
+                                                      "_|" +
+                                                      "_|" +
+                                                      "_|" +
+                                                      "_|" +
+                                                      "_|" +
+                                                      "_|" +
+                                                      "_|" +
+                                                      "G", "\\|")
 
-    object TestMapString10 extends PathingMapString("G|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "*", "\\|")
+    private val TestMapString10 = new PathingMapString("G|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "*", "\\|")
 
-    object TestMapString11 extends PathingMapString("_______*______G", "\\|")
+    private val TestMapString11 = new PathingMapString("_______*______G", "\\|")
 
-    object TestMapString12 extends PathingMapString("_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "*|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "_|" +
-                                                    "G", "\\|")
+    private val TestMapString12 = new PathingMapString("_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "*|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "_|" +
+                                                       "G", "\\|")
 
-    object TestMapString13 extends PathingMapString("*_____________G|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________", "\\|")
+    private val TestMapString13 = new PathingMapString("*_____________G|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________", "\\|")
 
-    object TestMapString14 extends PathingMapString("G_____________*|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________", "\\|")
+    private val TestMapString14 = new PathingMapString("G_____________*|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________", "\\|")
 
-    object TestMapString15 extends PathingMapString("_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "*_____________G", "\\|")
+    private val TestMapString15 = new PathingMapString("_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "*_____________G", "\\|")
 
-    object TestMapString16 extends PathingMapString("_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "G_____________*", "\\|")
+    private val TestMapString16 = new PathingMapString("_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "G_____________*", "\\|")
 
-    object TestMapString17 extends PathingMapString("_______________|" +
-                                                    "_______________|" +
-                                                    "*_____________G|" +
-                                                    "_______________|" +
-                                                    "_______________", "\\|")
+    private val TestMapString17 = new PathingMapString("_______________|" +
+                                                       "_______________|" +
+                                                       "*_____________G|" +
+                                                       "_______________|" +
+                                                       "_______________", "\\|")
 
-    object TestMapString18 extends PathingMapString("*______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "G______________", "\\|")
+    private val TestMapString18 = new PathingMapString("*______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "G______________", "\\|")
 
-    object TestMapString19 extends PathingMapString("G______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "*______________", "\\|")
+    private val TestMapString19 = new PathingMapString("G______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "*______________", "\\|")
 
-    object TestMapString20 extends PathingMapString("______________*|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "______________G", "\\|")
+    private val TestMapString20 = new PathingMapString("______________*|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "______________G", "\\|")
 
-    object TestMapString21 extends PathingMapString("______________G|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "______________*", "\\|")
+    private val TestMapString21 = new PathingMapString("______________G|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "______________*", "\\|")
 
-    object TestMapString22 extends PathingMapString("_______*_______|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______G_______", "\\|")
+    private val TestMapString22 = new PathingMapString("_______*_______|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______G_______", "\\|")
 
-    object TestMapString23 extends PathingMapString("_______G_______|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______*_______", "\\|")
+    private val TestMapString23 = new PathingMapString("_______G_______|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______*_______", "\\|")
 
-    object TestMapString24 extends PathingMapString("______________G|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "*______________", "\\|")
+    private val TestMapString24 = new PathingMapString("______________G|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "*______________", "\\|")
 
-    object TestMapString25 extends PathingMapString("G______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "______________*", "\\|")
+    private val TestMapString25 = new PathingMapString("G______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "______________*", "\\|")
 
-    object TestMapString26 extends PathingMapString("G______________|" +
-                                                    "_______________|" +
-                                                    "_______*_______|" +
-                                                    "_______________|" +
-                                                    "_______________", "\\|")
+    private val TestMapString26 = new PathingMapString("G______________|" +
+                                                       "_______________|" +
+                                                       "_______*_______|" +
+                                                       "_______________|" +
+                                                       "_______________", "\\|")
 
-    object TestMapString27 extends PathingMapString("GD_DD___D______|" +
-                                                    "___DD__D__D_D__|" +
-                                                    "_D______D______|" +
-                                                    "____D__D_____D_|" +
-                                                    "_D__D______D__*", "\\|")
+    private val TestMapString27 = new PathingMapString("GD_DD___D______|" +
+                                                       "___DD__D__D_D__|" +
+                                                       "_D______D______|" +
+                                                       "____D__D_____D_|" +
+                                                       "_D__D______D__*", "\\|")
 
-    object TestMapString28 extends PathingMapString("______________G|" +
-                                                    "_____________D_|" +
-                                                    "_____________D_|" +
-                                                    "_____________D_|" +
-                                                    "_____________D*", "\\|")
+    private val TestMapString28 = new PathingMapString("______________G|" +
+                                                       "_____________D_|" +
+                                                       "_____________D_|" +
+                                                       "_____________D_|" +
+                                                       "_____________D*", "\\|")
 
-    object TestMapString29 extends PathingMapString("G______________|" +
-                                                    "_______________|" +
-                                                    "_______________|" +
-                                                    "DDDDDDDDDDDDDD_|" +
-                                                    "*______________", "\\|")
+    private val TestMapString29 = new PathingMapString("G______________|" +
+                                                       "_______________|" +
+                                                       "_______________|" +
+                                                       "DDDDDDDDDDDDDD_|" +
+                                                       "*______________", "\\|")
 
-    object TestMapString30 extends PathingMapString("______D________|" +
-                                                    "______D________|" +
-                                                    "______D*D______|" +
-                                                    "______DDD______|" +
-                                                    "G______________", "\\|")
+    private val TestMapString30 = new PathingMapString("______D________|" +
+                                                       "______D________|" +
+                                                       "______D*D______|" +
+                                                       "______DDD______|" +
+                                                       "G______________", "\\|")
 
-    object TestMapString31 extends PathingMapString("_______________|" +
-                                                    "______D_D______|" +
-                                                    "______D*D______|" +
-                                                    "______DDD______|" +
-                                                    "G______________", "\\|")
+    private val TestMapString31 = new PathingMapString("_______________|" +
+                                                       "______D_D______|" +
+                                                       "______D*D______|" +
+                                                       "______DDD______|" +
+                                                       "G______________", "\\|")
 
-    object TestMapString32 extends PathingMapString("________D______|" +
-                                                    "______D_D______|" +
-                                                    "______D*D______|" +
-                                                    "______DDD______|" +
-                                                    "G______________", "\\|")
+    private val TestMapString32 = new PathingMapString("________D______|" +
+                                                       "______D_D______|" +
+                                                       "______D*D______|" +
+                                                       "______DDD______|" +
+                                                       "G______________", "\\|")
 
-    object TestMapString33 extends PathingMapString("______D________|" +
-                                                    "______D________|" +
-                                                    "______D*D______|" +
-                                                    "______D_D______|" +
-                                                    "G______________", "\\|")
+    private val TestMapString33 = new PathingMapString("______D________|" +
+                                                       "______D________|" +
+                                                       "______D*D______|" +
+                                                       "______D_D______|" +
+                                                       "G______________", "\\|")
 
-    object TestMapString34 extends PathingMapString("______D________|" +
-                                                    "______D________|" +
-                                                    "_______*D______|" +
-                                                    "______DDD______|" +
-                                                    "G______________", "\\|")
+    private val TestMapString34 = new PathingMapString("______D________|" +
+                                                       "______D________|" +
+                                                       "_______*D______|" +
+                                                       "______DDD______|" +
+                                                       "G______________", "\\|")
 
-    object TestMapString35F extends PathingMapString("_______________|" +
-                                                     "______DDD______|" +
-                                                     "______D*D______|" +
-                                                     "______DDD______|" +
-                                                     "G______________", "\\|")
+    private val TestMapString35F = new PathingMapString("_______________|" +
+                                                        "______DDD______|" +
+                                                        "______D*D______|" +
+                                                        "______DDD______|" +
+                                                        "G______________", "\\|")
 
-    object TestMapString36F extends PathingMapString("______________________________________________|" +
-                                                     "______________________________________________|" +
-                                                     "______________________________________________|" +
-                                                     "_________________DDDDDDDDDDDDD________________|" +
-                                                     "_________________D____D__D___D________________|" +
-                                                     "_________________D__D________D________________|" +
-                                                     "_________________D_________D_D________________|" +
-                                                     "_________________D_D_________D________________|" +
-                                                     "_________________D____*______D________________|" +
-                                                     "_________________D__________DD________________|" +
-                                                     "_________________D___D_______D________________|" +
-                                                     "_________________DD__D___D___D________________|" +
-                                                     "_________________DDDDDDDDDDDDD________________|" +
-                                                     "______________________________________________|" +
-                                                     "_______G______________________________________|" +
-                                                     "______________________________________________|" +
-                                                     "______________________________________________", "\\|")
+    private val TestMapString36F = new PathingMapString("______________________________________________|" +
+                                                        "______________________________________________|" +
+                                                        "______________________________________________|" +
+                                                        "_________________DDDDDDDDDDDDD________________|" +
+                                                        "_________________D____D__D___D________________|" +
+                                                        "_________________D__D________D________________|" +
+                                                        "_________________D_________D_D________________|" +
+                                                        "_________________D_D_________D________________|" +
+                                                        "_________________D____*______D________________|" +
+                                                        "_________________D__________DD________________|" +
+                                                        "_________________D___D_______D________________|" +
+                                                        "_________________DD__D___D___D________________|" +
+                                                        "_________________DDDDDDDDDDDDD________________|" +
+                                                        "______________________________________________|" +
+                                                        "_______G______________________________________|" +
+                                                        "______________________________________________|" +
+                                                        "______________________________________________", "\\|")
 
-    object TestMapString37F extends PathingMapString("_______________|" +
-                                                     "______DDD______|" +
-                                                     "______DGD______|" +
-                                                     "______DDD______|" +
-                                                     "*______________", "\\|")
+    private val TestMapString37F = new PathingMapString("_______________|" +
+                                                        "______DDD______|" +
+                                                        "______DGD______|" +
+                                                        "______DDD______|" +
+                                                        "*______________", "\\|")
 
-    object TestMapString38F extends PathingMapString("______________________________________________|" +
-                                                     "______________________________________________|" +
-                                                     "______________________________________________|" +
-                                                     "_________________DDDDDDDDDDDDD________________|" +
-                                                     "_________________D____D__D___D________________|" +
-                                                     "_________________D__D________D________________|" +
-                                                     "_________________D_________D_D________________|" +
-                                                     "_________________D_D_________D________________|" +
-                                                     "_________________D____G______D________________|" +
-                                                     "_________________D__________DD________________|" +
-                                                     "_________________D___D_______D________________|" +
-                                                     "_________________DD__D___D___D________________|" +
-                                                     "_________________DDDDDDDDDDDDD________________|" +
-                                                     "______________________________________________|" +
-                                                     "_______*______________________________________|" +
-                                                     "______________________________________________|" +
-                                                     "______________________________________________", "\\|")
+    private val TestMapString38F = new PathingMapString("______________________________________________|" +
+                                                        "______________________________________________|" +
+                                                        "______________________________________________|" +
+                                                        "_________________DDDDDDDDDDDDD________________|" +
+                                                        "_________________D____D__D___D________________|" +
+                                                        "_________________D__D________D________________|" +
+                                                        "_________________D_________D_D________________|" +
+                                                        "_________________D_D_________D________________|" +
+                                                        "_________________D____G______D________________|" +
+                                                        "_________________D__________DD________________|" +
+                                                        "_________________D___D_______D________________|" +
+                                                        "_________________DD__D___D___D________________|" +
+                                                        "_________________DDDDDDDDDDDDD________________|" +
+                                                        "______________________________________________|" +
+                                                        "_______*______________________________________|" +
+                                                        "______________________________________________|" +
+                                                        "______________________________________________", "\\|")
 
-    object TestMapString39F extends PathingMapString("______________________________________________|" +
-                                                     "_*____________________________________________|" +
-                                                     "________________DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD|" +
-                                                     "________________DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD|" +
-                                                     "________________DD____D__D____________________|" +
-                                                     "________________DD__D____f___DDDDDDDDDDDDDDDD_|" +
-                                                     "________________DD_______f_D_DD_____________D_|" +
-                                                     "________________DD_D______fffDD____________D__|" +
-                                                     "________________DD____G______DD_____________D_|" +
-                                                     "________________DD___D______DDD_DDDDDDDDDDDDD_|" +
-                                                     "________________DD___D___D___DD_DD____________|" +
-                                                     "_DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD_DDDDDDDDDDDDD_|" +
-                                                     "_DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD_D_D___D___D_|" +
-                                                     "__________________________D___D___D_D_D_D_D_D_|" +
-                                                     "DDDDDDDDDDDDDDDDDDDDDDDDD___D_____D___D___D___|" +
-                                                     "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD|" +
-                                                     "________________________DDDDDDDDDDDDDDDDDDDDDD", "\\|")
+    private val TestMapString39F = new PathingMapString("______________________________________________|" +
+                                                        "_*____________________________________________|" +
+                                                        "________________DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD|" +
+                                                        "________________DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD|" +
+                                                        "________________DD____D__D____________________|" +
+                                                        "________________DD__D____f___DDDDDDDDDDDDDDDD_|" +
+                                                        "________________DD_______f_D_DD_____________D_|" +
+                                                        "________________DD_D______fffDD____________D__|" +
+                                                        "________________DD____G______DD_____________D_|" +
+                                                        "________________DD___D______DDD_DDDDDDDDDDDDD_|" +
+                                                        "________________DD___D___D___DD_DD____________|" +
+                                                        "_DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD_DDDDDDDDDDDDD_|" +
+                                                        "_DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD_D_D___D___D_|" +
+                                                        "__________________________D___D___D_D_D_D_D_D_|" +
+                                                        "DDDDDDDDDDDDDDDDDDDDDDDDD___D_____D___D___D___|" +
+                                                        "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD|" +
+                                                        "________________________DDDDDDDDDDDDDDDDDDDDDD", "\\|")
 
 }

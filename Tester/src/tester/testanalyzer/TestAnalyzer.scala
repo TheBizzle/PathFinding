@@ -9,6 +9,6 @@ import tester.ExecutionStatus
  * Time: 6:24 PM
  */
 
-trait TestAnalyzer[T <: ExecutionStatus, U <: AnalysisFlagBundle] {
+trait TestAnalyzer[T <: ExecutionStatus, U <: TestAnalysisFlagBundle] {
     protected def analyze(status: T, flags: U) : Boolean
 }

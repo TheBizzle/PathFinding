@@ -10,7 +10,7 @@ import tester.TestSubject
  * Time: 7:45 PM
  */
 
-trait TestCluster[T <: TestFunction[_, U, _, _, _], U <: TestSubject] extends TestFunctionFactory[T, U] {
+trait TestCluster[T <: TestFunction[_, U, _, _], U <: TestSubject] extends TestFunctionFactory[T, U] {
     protected val testFunctionRegex = "TestMapString([0-9]+)(F)?"
     def getTestsToRun(testNums: List[Int]) : List[T]
     def getSize : Int

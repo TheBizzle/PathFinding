@@ -8,8 +8,8 @@ package tester.testanalyzer
  */
 
 // I might spice that class up a bit more later.  I wanted it returning tuples, but found it too cumbersome....
-// Should probably receive a list of TestToggleFlags and search through it for the ones relevant to it.  Hold onto those ones.
-abstract class AnalysisFlagBundle(inFlags: List[Boolean]) {
+//@ Should probably receive a list of TestToggleFlags and search through it for the ones relevant to it.  Hold onto those ones.
+abstract class TestAnalysisFlagBundle(inFlags: List[Boolean]) {
     private val flagList = inFlags
     def get : List[Boolean] = flagList
 }

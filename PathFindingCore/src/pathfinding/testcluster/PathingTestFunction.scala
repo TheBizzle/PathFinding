@@ -1,9 +1,9 @@
 package pathfinding.testcluster
 
-import tester.testcluster.TestFunction
 import pathfinding.{StepData, PathFinder}
 import pathfinding.statuses.PathingStatus
 import pathfinding.pathingmap.pathingmapdata.PathingMapString
+import tester.testcluster.{TestFuncFlagBundle, TestFunction}
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,15 +13,15 @@ import pathfinding.pathingmap.pathingmapdata.PathingMapString
  */
 
 class PathingTestFunction(testString: PathingMapString, analysisFunction: (PathingStatus[StepData], PathingAnalysisFlagBundle) => Boolean, testNumber: Int, shouldPass: Boolean)
-                          extends TestFunction[PathFinder[StepData], PathingMapString, PathingStatus[StepData], PathingTestFlagBundle, PathingAnalysisFlagBundle](testString, analysisFunction, testNumber, shouldPass) {
+                          extends TestFunction[PathFinder[StepData], PathingMapString, PathingStatus[StepData], PathingAnalysisFlagBundle](testString, analysisFunction, testNumber, shouldPass) {
 
-    def apply(pathFinder: PathFinder[StepData], flags: PathingTestFlagBundle) : Boolean = {
+    def apply(pathFinder: PathFinder[StepData], flags: TestFuncFlagBundle) : Boolean = {
         val analysisFlags = extractAnalysisFlags(flags)
         analysisFunc(pathFinder(testSubject), analysisFlags)
     }
 
-    protected def extractAnalysisFlags(flags: PathingTestFlagBundle) : PathingAnalysisFlagBundle = {
-        new PathingAnalysisFlagBundle(flags.getAnalysisFlags)
+    protected def extractAnalysisFlags(flags: TestFuncFlagBundle) : PathingAnalysisFlagBundle = {
+        new PathingAnalysisFlagBundle(flags.get)
     }
     
 }

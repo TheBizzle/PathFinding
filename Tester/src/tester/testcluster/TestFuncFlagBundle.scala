@@ -7,15 +7,10 @@ package tester.testcluster
  * Time: 10:26 PM
  */
 
-//@ Should be using TestToggleFlags.  As should the AnalysisFlagBundle
-abstract class TestFuncFlagBundle(flagList: List[Boolean]) {
-
+//@ Should be using TestToggleFlags.  As should the TestAnalysisFlagBundle
+class TestFuncFlagBundle(flagList: List[Boolean]) {
     val flags = flagList
-
     def get : List[Boolean] = {
         flags
     }
-
-    def getAnalysisFlags : List[Boolean]
-
 }
