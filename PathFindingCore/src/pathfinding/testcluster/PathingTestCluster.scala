@@ -22,7 +22,7 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
     lazy val tests = generateTests
 
     def getTestsToRun(testNums: List[Int]) : List[PathingTestFunction] = {
-        tests.zipWithIndex.filter { case(x, y) => testNums.contains(y + 1) }.map ( _._1 ).toList
+        tests.zipWithIndex.filter { case (x, y) => testNums.contains(y + 1) }.map ( _._1 ).toList
     }
 
     def getSize : Int = {

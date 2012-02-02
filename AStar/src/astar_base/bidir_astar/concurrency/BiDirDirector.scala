@@ -76,8 +76,8 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
     }
 
     private def debugMerge(myCrumbs: Array[Array[Coordinate]], thoseCrumbs: Array[Array[Coordinate]]) {
-        List(myCrumbs, thoseCrumbs) foreach { x => x foreach ( y => print( y(1).toString + "||") ); print("\n")
-                                                   x foreach ( y => print( y(0).toString + "||") ); print("\n\n") }
+        List(myCrumbs, thoseCrumbs) foreach { case x => x foreach { case y => print( y(1).toString + "||") }; print("\n")
+                                                        x foreach { case y => print( y(0).toString + "||") }; print("\n\n") }
     }
 
     def terminateActors(actorArgs: BiDirActor[T]*) {

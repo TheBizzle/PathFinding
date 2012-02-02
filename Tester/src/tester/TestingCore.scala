@@ -91,7 +91,7 @@ object TestingCore {
         def failureStr(testNumber: Int) = "Test number " + testNumber + " failed miserably!"
 
         tests foreach {
-            test =>
+            case test =>
             try {
                 val result = test(testable, flags)
                 if (test.shouldSucceed == result) println(successStr(test.testNum))
@@ -121,7 +121,7 @@ object TestingCore {
 
     private[tester] def applyValuesToArr(values: List[TestCriteriaValueTuple], arr: Array[Boolean]) : Array[Boolean] = {
         values.foreach {
-            x => {
+            case x => {
                 val isTesting = (x.criteria.flag == RunTest)
                 if (arr(x.criteria.guide) != isTesting)
                     arr(x.criteria.guide) = isTesting
@@ -202,7 +202,7 @@ object TestingCore {
     }
 
     private def runBaseTests(baseTests: Seq[Suite]) {
-        baseTests foreach { x => print("\n"); x.execute() }
+        baseTests foreach { case x => print("\n"); x.execute() }
     }
 
     private[tester] def assessPathingDesire(argMap:  Map[String, List[TestCriteria[_]]]) : Boolean = {
@@ -237,12 +237,12 @@ object TestingCore {
         inList match {
             case Nil    => Nil
             case h::t   => {
-                val zippedList = inList.zipWithIndex                                        // Make (Tuple, Index) pairs
-                val mediaryList = zippedList map ( x => (x._1.getKey, x._2) )               // Make (TupleKey, Index) pairs
-                val sortedList = mediaryList.sortWith((a, b) => a._1 < b._1)                // Sort on TupleKey
-                val sortedIndexes = sortedList map ( x => x._2 )                            // Just keep the sorted list of Indexes
-                val bucketedArr = bucketAListOn_2(zippedList)                               // Make an array that maps Index->Tuple
-                sortedIndexes.foldRight (List[T]()) ( (x, acc) => bucketedArr(x) :: acc )   // Fold the Indexes to generate an ordered list of Tuples
+                val zippedList = inList.zipWithIndex                                          // Make (Tuple, Index) pairs
+                val mediaryList = zippedList map { case x => (x._1.getKey, x._2) }            // Make (TupleKey, Index) pairs
+                val sortedList = mediaryList.sortWith{ case (a, b) => a._1 < b._1}            // Sort on TupleKey
+                val sortedIndexes = sortedList map { case x => x._2 }                         // Just keep the sorted list of Indexes
+                val bucketedArr = bucketAListOn_2(zippedList)                                 // Make an array that maps Index->Tuple
+                sortedIndexes.foldRight(List[T]()){ case (x, acc) => bucketedArr(x) :: acc }  // Fold the Indexes to generate an ordered list of Tuples
             }
         }
     }
@@ -251,7 +251,7 @@ object TestingCore {
     // If you don't know what that means... you'll figure it out in due time.  Don't say that I didn't warn you, though.
     private[tester] def bucketAListOn_2[T : Manifest](inList: List[(T, Int)]) : Array[T] = {
         val buckets = new Array[T](inList.size)
-        inList.foreach ( x => buckets(x._2) = x._1 )
+        inList.foreach { case x => buckets(x._2) = x._1 }
         buckets
     }
 

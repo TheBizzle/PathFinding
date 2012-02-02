@@ -116,7 +116,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     }
 
     def foreach[U](f: (T => U)) {
-        val tempArr = heapArr.foldRight(List[T]())( (x, acc) => if (x != None) x.get :: acc else acc )
+        val tempArr = heapArr.foldRight(List[T]()){ case (x, acc) => if (x != None) x.get :: acc else acc }
         tempArr.foreach(f)
     }
 

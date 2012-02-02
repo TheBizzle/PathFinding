@@ -39,7 +39,7 @@ trait FactoryThatTakesAStarStepData[T] {
     }
 
     protected def initialize2DArr[T: Manifest](cols: Int, rows: Int, defaultVal: T) : Array[Array[T]] = {
-        new Array[Array[T]](cols) map ( x => new Array[T](rows) map (y => defaultVal) )
+        new Array[Array[T]](cols) map { case x => new Array[T](rows) map (y => defaultVal) }
     }
 
     protected def generateExtras(stepData: AStarStepData) : Seq[Any] = {

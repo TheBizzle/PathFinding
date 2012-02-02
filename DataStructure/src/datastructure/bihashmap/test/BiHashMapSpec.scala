@@ -32,10 +32,10 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen {
         size === inList.size
 
         and("the set of As should hold all and only the As that were passed in")
-        ((aSet.foldLeft(true)( (acc, x) => aList.contains(x) && acc )) && (aList.foldLeft(true)( (acc, x) => aSet.contains(x) && acc ))) === true
+        ((aSet.foldLeft(true){ case (acc, x) => aList.contains(x) && acc }) && (aList.foldLeft(true){ case (acc, x) => aSet.contains(x) && acc })) === true
 
         and("the set of Bs should hold all and only the Bs that were passed in")
-        ((bSet.foldLeft(true)( (acc, x) => bList.contains(x) && acc )) && (bList.foldLeft(true)( (acc, x) => bSet.contains(x) && acc ))) === true
+        ((bSet.foldLeft(true){ case (acc, x) => bList.contains(x) && acc }) && (bList.foldLeft(true){ case (acc, x) => bSet.contains(x) && acc })) === true
 
     }
 
@@ -80,16 +80,16 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen {
         val origBs = biHash.BSet
 
         and("the clone should contain all of the original's As")
-        (origAs.foldLeft(true)( (acc, x) => cloneAs.contains(x) && acc )) === true
+        (origAs.foldLeft(true){ case (acc, x) => cloneAs.contains(x) && acc }) === true
 
         and("the original should contain all of the clone's As")
-        (cloneAs.foldLeft(true)( (acc, x) => origAs.contains(x) && acc )) === true
+        (cloneAs.foldLeft(true){ case (acc, x) => origAs.contains(x) && acc }) === true
 
         and("the clone should contain all of the original's Bs")
-        (origBs.foldLeft(true)( (acc, x) => cloneBs.contains(x) && acc )) === true
+        (origBs.foldLeft(true){ case (acc, x) => cloneBs.contains(x) && acc }) === true
 
         and("the original should contain all of the clone's Bs")
-        (cloneBs.foldLeft(true)( (acc, x) => origBs.contains(x) && acc )) === true
+        (cloneBs.foldLeft(true){ case (acc, x) => origBs.contains(x) && acc }) === true
 
     }
 
