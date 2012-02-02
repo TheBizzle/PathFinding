@@ -1,6 +1,7 @@
 package pathfinding.testcluster
 
 import tester.testanalyzer.TestAnalysisFlagBundle
+import tester.criteria.TestToggleFlag
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,4 +10,4 @@ import tester.testanalyzer.TestAnalysisFlagBundle
  * Time: 6:39 PM
  */
 
-class PathingAnalysisFlagBundle(inFlags: List[Boolean]) extends TestAnalysisFlagBundle(inFlags)
+class PathingAnalysisFlagBundle(inToggles: List[TestToggleFlag]) extends TestAnalysisFlagBundle(inToggles)

@@ -71,10 +71,12 @@ object TestingCore {
                 case _                => Nil
             }
 
+            val testFlagPairs = List(isTalkative) zip List(Talkative)
+            val testToggles = testFlagPairs.foldRight(List[TestToggleFlag]()){ case (x,acc) => if (x._1) x._2 :: acc else acc }
+            val testFlagBundle = new TestFuncFlagBundle(testToggles)
             val testsToRun = handleTestIntervals(values, ranges, cluster.getSize)
-            val testFlags = new TestFuncFlagBundle(List(isTalkative))
 
-            runTests(cluster.getTestsToRun(testsToRun), testable, testFlags, isStacktracing)
+            runTests(cluster.getTestsToRun(testsToRun), testable, testFlagBundle, isStacktracing)
 
         }
 

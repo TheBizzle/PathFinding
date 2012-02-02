@@ -7,8 +7,9 @@ import pathfinding.statuses.{Failure, Success, PathingStatus}
 import pathfinding.StepData
 import pathfinding.coordinate.{PriorityCoordinate, Coordinate}
 import tester.testanalyzer.TestAnalyzer
-import tester.exceptions.{InvalidConstructionException, MysteriousDataException}
+import tester.exceptions.{MysteriousDataException}
 import java.lang.reflect.Field
+import tester.criteria.Talkative
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,10 +32,7 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
 
     protected def analyze(status: PathingStatus[StepData], flags: PathingAnalysisFlagBundle) : Boolean = {
 
-        val (isTalkative) = flags.get match {
-            case h :: Nil => (h)
-            case _        => throw new InvalidConstructionException("Improperly-constructed flag bundle!")
-        }
+        val isTalkative = flags.get(Talkative)
 
         status match {
             case Success(x) => {

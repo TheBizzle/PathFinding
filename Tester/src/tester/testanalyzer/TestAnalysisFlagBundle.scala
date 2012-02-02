@@ -1,5 +1,8 @@
 package tester.testanalyzer
 
+import tester.criteria.{BaseToggleFlagWrapper, Talkative, TestToggleFlag}
+
+
 /**
  * Created by IntelliJ IDEA.
  * User: Jason
@@ -8,8 +11,6 @@ package tester.testanalyzer
  */
 
 // I might spice that class up a bit more later.  I wanted it returning tuples, but found it too cumbersome....
-//@ Should probably receive a list of TestToggleFlags and search through it for the ones relevant to it.  Hold onto those ones.
-abstract class TestAnalysisFlagBundle(inFlags: List[Boolean]) {
-    private val flagList = inFlags
-    def get : List[Boolean] = flagList
-}
+abstract class TestAnalysisFlagBundle(inToggles: List[TestToggleFlag], listExpansion: List[TestToggleFlag] = List())
+                                     (implicit passItOn: List[TestToggleFlag] = listExpansion ::: List(Talkative))
+                                      extends BaseToggleFlagWrapper(inToggles, passItOn)

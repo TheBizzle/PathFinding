@@ -15,7 +15,7 @@ import java.lang.reflect.Field
 trait TestFunctionFactory[T <: TestFunction[_, U, _, _], U <: TestSubject] {
 
     self: TestCluster[T, U] =>
-    
+
     // Essentially, uses reflection to find to find all U-type fields of PathingTestCluster
     def generateTests : List[T] = {
 

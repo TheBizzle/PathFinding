@@ -1,5 +1,7 @@
 package tester.testcluster
 
+import tester.criteria.{BaseToggleFlagWrapper, Talkative, TestToggleFlag}
+
 /**
  * Created by IntelliJ IDEA.
  * User: Jason
@@ -7,10 +9,6 @@ package tester.testcluster
  * Time: 10:26 PM
  */
 
-//@ Should be using TestToggleFlags.  As should the TestAnalysisFlagBundle
-class TestFuncFlagBundle(flagList: List[Boolean]) {
-    val flags = flagList
-    def get : List[Boolean] = {
-        flags
-    }
-}
+class TestFuncFlagBundle(inToggles: List[TestToggleFlag], listExpansion: List[TestToggleFlag] = List())
+                        (implicit passItOn: List[TestToggleFlag] = listExpansion ::: List(Talkative))
+                         extends BaseToggleFlagWrapper(inToggles, passItOn)

@@ -21,7 +21,7 @@ class PathingTestFunction(testString: PathingMapString, analysisFunction: (Pathi
     }
 
     protected def extractAnalysisFlags(flags: TestFuncFlagBundle) : PathingAnalysisFlagBundle = {
-        new PathingAnalysisFlagBundle(flags.get)
+        new PathingAnalysisFlagBundle(flags.getAll)
     }
     
 }
