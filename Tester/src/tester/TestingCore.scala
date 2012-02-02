@@ -202,7 +202,7 @@ object TestingCore {
     }
 
     private def runBaseTests(baseTests: Seq[Suite]) {
-        baseTests foreach { case x => print("\n"); x.execute() }
+        baseTests foreach { case x => print("\n"); x.execute(stats = true) }
     }
 
     private[tester] def assessPathingDesire(argMap:  Map[String, List[TestCriteria[_]]]) : Boolean = {
