@@ -26,7 +26,7 @@ trait AStarGruntwork[T <: AStarStepData] {
     protected def getFreshLoc(queue: PriorityQueue[PriorityCoordinate], beenThere: Array[Array[Boolean]]) : Option[PriorityCoordinate] = {
         queue.dequeue() match {
             case None => throw new UnexpectedDataException("Popped a None off the queue!")
-            case Some(loc) => {
+            case Some(loc) =>
                 if (beenThere(loc.x)(loc.y)) {
                     if (!queue.isEmpty)
                         getFreshLoc(queue, beenThere)
@@ -35,7 +35,6 @@ trait AStarGruntwork[T <: AStarStepData] {
                 }
                 else
                     Some(loc)     // Exit point (success)
-            }
         }
     }
 

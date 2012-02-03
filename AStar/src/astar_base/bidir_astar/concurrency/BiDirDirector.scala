@@ -39,11 +39,10 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
                 gtsStatus match {
                     case (result @ Failure(_)) => result
                     case Success(x) => mergeBreadcrumbsForBackwardsOnSuccess(x, stgStatus.stepData)
-                    case Continue(_) => {
+                    case Continue(_) =>
                         stg ! (BiDirActor.assimilateMessageStr, gtsCrumbs)
                         gts ! (BiDirActor.assimilateMessageStr, stgCrumbs)
                         evaluateActions(stg, gts)
-                    }
                 }
         }
 
@@ -62,12 +61,11 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
         @tailrec def mergeHelper(holder: Coordinate, myCrumbs: Array[Array[Coordinate]], thoseCrumbs: Array[Array[Coordinate]]) {
             holder match {
                 case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => throw new UnexpectedDataException(holder.toString)
-                case _ => {
+                case _ =>
                     val crumb = thoseCrumbs(holder.x)(holder.y)
                     val (indexer, updater) = if (isForwards) (crumb, holder) else (holder, crumb)
                     myCrumbs(indexer.x)(indexer.y) = updater
                     if (!(crumb overlaps endLoc)) mergeHelper(crumb, myCrumbs, thoseCrumbs)
-                }
             }
         }
         // debugMerge(myCrumbs, thoseCrumbs)

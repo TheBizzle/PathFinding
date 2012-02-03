@@ -55,10 +55,9 @@ class BiDirStepData(currentLocation: Coordinate,
     final def assimilateBreadcrumbs(crumbList: List[Breadcrumb]) {
         crumbList match {
             case Nil =>      // We stop
-            case h::t => {
+            case h::t =>
                 othersBreadcrumbs(h.to.x)(h.to.y) = h.from
                 assimilateBreadcrumbs(t)
-            }
         }
     }
 
@@ -78,10 +77,9 @@ class BiDirStepData(currentLocation: Coordinate,
             val crumb = crumbArr(loc.x)(loc.y)
             crumb match {
                 case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => // Let the recursion die on invalid Coordinates
-                case _ => {
+                case _ =>
                     reversalHelper(crumb, crumbArr)
                     crumbArr(crumb.x)(crumb.y) = loc
-                }
             }
         }
         reversalHelper(loc, breadcrumbArr)

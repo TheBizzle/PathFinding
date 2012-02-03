@@ -122,7 +122,7 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
         abMap.update(a, bVal)
 
         hold match {
-            case Some(b) => { baMap.remove(b); baMap.put(bVal, a) }
+            case Some(b) => baMap.remove(b); baMap.put(bVal, a)
             case None => // Doesn't matter
         }
 
@@ -134,7 +134,7 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
         baMap.update(bKey, aVal)
 
         hold match {
-            case Some(a) => { abMap.remove(a); abMap.put(aVal, bKey) }
+            case Some(a) => abMap.remove(a); abMap.put(aVal, bKey)
             case None => // Doesn't matter
         }
 
@@ -186,7 +186,7 @@ object BiHashMap {
     def apply[A: Manifest, B: Manifest] (tupSeq: (A, B)*) : BiHashMap[A, B] = {
         @tailrec def applyHelper[A,B] (retMap: BiHashMap[A,B], tupList: List[(A, B)]) : BiHashMap[A, B] = {
             tupList match {
-                case (a, b)::t => { retMap.put(a, b); applyHelper(retMap, t) }
+                case (a, b)::t => retMap.put(a, b); applyHelper(retMap, t)
                 case Nil => retMap
             }
         }
