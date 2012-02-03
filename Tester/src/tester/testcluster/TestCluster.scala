@@ -1,7 +1,6 @@
 package tester.testcluster
 
-import testfunctionfactory.TestFunctionFactory
-import tester.TestSubject
+import testfunction.{TestFunctionFactory, TestFunction}
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,7 +10,7 @@ import tester.TestSubject
  */
 
 trait TestCluster[T <: TestFunction[_, U, _, _], U <: TestSubject] extends TestFunctionFactory[T, U] {
-    protected val testFunctionRegex = "TestMapString([0-9]+)(F)?"
+    protected val testFunctionRegex = "TestMapString([0-9]+)(F?)"
     def getTestsToRun(testNums: List[Int]) : List[T]
     def getSize : Int
 }

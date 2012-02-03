@@ -1,9 +1,9 @@
 package tester.test.dummies
 
 import java.lang.reflect.Field
-import tester.{ExecutionStatus, TestSubject, Testable}
-import tester.testcluster.{TestFuncFlagBundle, TestFunction, TestCluster}
-import tester.testanalyzer.TestAnalysisFlagBundle
+import tester.testcluster.{TestSubject, Testable, TestCluster}
+import tester.testcluster.testfunction.TestFunction
+import tester.testanalyzer.{ExecutionStatus, TestAnalysisFlagBundle}
 
 
 /**

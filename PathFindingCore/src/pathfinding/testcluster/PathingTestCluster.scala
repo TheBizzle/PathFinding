@@ -35,15 +35,13 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
         val isTalkative = flags.get(Talkative)
 
         status match {
-            case Success(x) => {
+            case Success(x) =>
                 if (isTalkative) println("\n\nFound a solution!")
                 retracePath(x.breadcrumbArr, x.endGoal, x.pathingMap, isTalkative)
                 true
-            }
-            case Failure(_) => {
+            case Failure(_) =>
                 if (isTalkative) println("\n\nFailed to find a solution....")
                 false
-            }
             case _          => throw new MysteriousDataException("Unexpected ExecutionStatus!")
         }
 
@@ -86,7 +84,7 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
         if (testField._2.matches(regex)) {
             val Matcher = regex.r
             val Matcher(testNum, shouldPass) = testField._2
-            val func = construct(testField._1.get(this).asInstanceOf[PathingMapString], testNum.toInt, (shouldPass == null))
+            val func = construct(testField._1.get(this).asInstanceOf[PathingMapString], testNum.toInt, (shouldPass isEmpty))
             Some(func)
         }
         else None

@@ -15,9 +15,9 @@ abstract class SuiteReporter(suites: Seq[Suite]) {
 
 object SuiteReporter {
     def coalesce(seqs: Seq[Seq[Suite]]) : Seq[Suite] = {
-        seqs.toList.reduce(_ ++ _)
+        seqs.flatten
     }
     implicit def reporterSeqToSuiteSeqSeq(reporters: Seq[SuiteReporter]) : Seq[Seq[Suite]] = {
-        reporters map (_.report)
+        reporters map ( _.report )
     }
 }

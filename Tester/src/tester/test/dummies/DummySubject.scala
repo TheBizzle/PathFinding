@@ -1,6 +1,6 @@
 package tester.test.dummies
 
-import tester.TestSubject
+import tester.testcluster.TestSubject
 
 /**
  * Created by IntelliJ IDEA.

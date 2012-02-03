@@ -1,6 +1,6 @@
 package tester.test.dummies
 
-import tester.ExecutionStatus
+import tester.testanalyzer.ExecutionStatus
 
 /**
  * Created by IntelliJ IDEA.

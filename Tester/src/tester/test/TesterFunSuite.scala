@@ -426,21 +426,21 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
     }
 
     test("siftOutTestsAndSkips - No runs, no skips") {
-        val (result1, result2) = TestingCore.siftOutTestsAndSkips(Nil)
+        val (result1, result2) = TestingCore.separateTestsAndSkips(Nil)
         result1 should equal (Nil)
         result2 should equal (Nil)
     }
 
     test("siftOutTestsAndSkips - One run, no skips") {
         val tuple = TestCriteriaRangeTuple(1, 1, RunTest)
-        val (result1, result2) = TestingCore.siftOutTestsAndSkips(List(tuple))
+        val (result1, result2) = TestingCore.separateTestsAndSkips(List(tuple))
         result1 should equal (List(tuple))
         result2 should equal (Nil)
     }
 
     test("siftOutTestsAndSkips - No runs, one skip") {
         val tuple = TestCriteriaRangeTuple(1, 1, SkipTest)
-        val (result1, result2) = TestingCore.siftOutTestsAndSkips(List(tuple))
+        val (result1, result2) = TestingCore.separateTestsAndSkips(List(tuple))
         result1 should equal (Nil)
         result2 should equal (List(tuple))
     }
@@ -448,7 +448,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
     test("siftOutTestsAndSkips - One run, one skip") {
         val runTuple = TestCriteriaRangeTuple(1, 1, RunTest)
         val skipTuple = TestCriteriaRangeTuple(1, 1, SkipTest)
-        val (result1, result2) = TestingCore.siftOutTestsAndSkips(List(runTuple, skipTuple))
+        val (result1, result2) = TestingCore.separateTestsAndSkips(List(runTuple, skipTuple))
         result1 should equal (List(runTuple))
         result2 should equal (List(skipTuple))
     }

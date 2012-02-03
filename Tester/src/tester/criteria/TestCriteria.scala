@@ -46,12 +46,12 @@ class TestCriteriaValueTuple(tuple: TestTuple[Int, TestRunningnessFlag]) extends
         }
     }
 
-    override def hashCode : Int = {
-        41 * (4111 + criteria.guide) + criteria.flag.hashCode()
-    }
-
     def canEqual(that: Any) : Boolean = {
         that.isInstanceOf[TestCriteriaValueTuple]
+    }
+
+    override def hashCode : Int = {
+        41 * (4111 + criteria.guide) + criteria.flag.hashCode()
     }
 
 }
@@ -72,6 +72,10 @@ class TestCriteriaRangeTuple(tuple: TestTuple[(Int, Int), TestRunningnessFlag]) 
         criteria.guide._1
     }
 
+    override def toString : String = {
+        "(" + criteria.guide._1 + ", " + criteria.guide._2 + ")"
+    }
+
     def isValid : Boolean = {
         criteria.guide._1 <= criteria.guide._2
     }
@@ -79,17 +83,13 @@ class TestCriteriaRangeTuple(tuple: TestTuple[(Int, Int), TestRunningnessFlag]) 
     def intersects(that: TestCriteriaRangeTuple) : Boolean = {
         val thisRange = Range(criteria.guide._1, criteria.guide._2)
         val thatRange = Range(that.criteria.guide._1, that.criteria.guide._2)
-        thisRange.intersect(thatRange).size > 0       // There's certainly a better way to do this
+        thisRange.intersect(thatRange).size > 0       // There's certainly a better way to do this (true... but writing out the boolean gymnastics for it just isn't fun)
     }
 
     def encapsulates(that: TestCriteriaRangeTuple) : Boolean = {
         val thisRange = Range(criteria.guide._1, criteria.guide._2)
         val thatRange = Range(that.criteria.guide._1, that.criteria.guide._2)
         thisRange containsSlice thatRange
-    }
-
-    override def toString : String = {
-        "(" + criteria.guide._1 + ", " + criteria.guide._2 + ")"
     }
 
     override def equals(that: Any) : Boolean = {
@@ -101,12 +101,12 @@ class TestCriteriaRangeTuple(tuple: TestTuple[(Int, Int), TestRunningnessFlag]) 
         }
     }
 
-    override def hashCode : Int = {
-        41 * (41 * (4111 + criteria.guide._1) + criteria.guide._2) + criteria.flag.hashCode()
-    }
-
     def canEqual(that: Any) : Boolean = {
         that.isInstanceOf[TestCriteriaRangeTuple]
+    }
+
+    override def hashCode : Int = {
+        41 * (41 * (4111 + criteria.guide._1) + criteria.guide._2) + criteria.flag.hashCode()
     }
 
 }

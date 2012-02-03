@@ -1,4 +1,4 @@
-package tester
+package tester.testanalyzer
 
 /**
  * Created by IntelliJ IDEA.

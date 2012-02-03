@@ -1,8 +1,7 @@
-package tester.testcluster.testfunctionfactory
+package tester.testcluster.testfunction
 
-import tester.testcluster.{TestFunction, TestCluster}
-import tester.TestSubject
 import java.lang.reflect.Field
+import tester.testcluster.{TestSubject, TestCluster}
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,10 +19,7 @@ trait TestFunctionFactory[T <: TestFunction[_, U, _, _], U <: TestSubject] {
     def generateTests : List[T] = {
 
         val generator = generateTestFunction(_: (Field, String), regex = testFunctionRegex)  // Partial application
-
-        val clazz = this.getClass
-        val name = clazz.getName
-        val fieldTuples = Class.forName(name).getDeclaredFields.map { case x => (x, x.getName) }
+        val fieldTuples = this.getClass.getDeclaredFields.map { case x => (x, x.getName) }
 
         fieldTuples.foldRight (List[T]()) { case(x, acc) =>
             generator(x) match {

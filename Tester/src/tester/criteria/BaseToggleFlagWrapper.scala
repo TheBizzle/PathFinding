@@ -23,7 +23,7 @@ class BaseToggleFlagWrapper(toggles: List[TestToggleFlag], supportedToggles: Lis
         @tailrec def initializationHelper(flags: List[TestToggleFlag], flagMap: HashMap[TestToggleFlag, Boolean]) : HashMap[TestToggleFlag, Boolean] = {
             flags match {
                 case Nil  => flagMap
-                case h::t => { flagMap.put(h, false); initializationHelper(t, flagMap) }
+                case h::t => flagMap.put(h, false); initializationHelper(t, flagMap)
             }
         }
         initializationHelper(flags, new HashMap[TestToggleFlag, Boolean]())

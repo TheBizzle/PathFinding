@@ -5,8 +5,9 @@ import exceptions._
 import collection.immutable.{List, HashMap, Map}
 import annotation.tailrec
 import org.scalatest.Suite
-import testanalyzer.TestAnalysisFlagBundle
-import testcluster.{TestFuncFlagBundle, TestFunction, TestCluster}
+import testanalyzer.{ExecutionStatus, TestAnalysisFlagBundle}
+import testcluster._
+import testfunction.{TestFunction, TestFuncFlagBundle}
 
 /**
  * Created by IntelliJ IDEA.
@@ -85,9 +86,8 @@ object TestingCore {
 
     }
 
-    private def runTests[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle,
-                        TFunc <: TestFunction[T, Subject, Status, AnalysisFlags]]
-                        (tests: List[TFunc with TestFunction[T, Subject, Status, AnalysisFlags]], testable: T, flags: TestFuncFlagBundle, isStacktracing: Boolean) {
+    private def runTests[T <: Testable, TFunc <: TestFunction[T, _, _, _]]
+                        (tests: List[TFunc], testable: T, flags: TestFuncFlagBundle, isStacktracing: Boolean) {
 
         def successStr(testNumber: Int) = "Test number " + testNumber + " was a success."
         def failureStr(testNumber: Int) = "Test number " + testNumber + " failed miserably!"
@@ -100,10 +100,9 @@ object TestingCore {
                 else                              println(failureStr(test.testNum))
             }
             catch {
-                case e: Exception => {
+                case e: Exception =>
                     println("Test number " + test.testNum + " failed with an exception (" + e.getClass + ").")
                     if (isStacktracing) println("\n" + e.getStackTraceString)
-                }
             }
         }
         
@@ -123,13 +122,12 @@ object TestingCore {
 
     private[tester] def applyValuesToArr(values: List[TestCriteriaValueTuple], arr: Array[Boolean]) : Array[Boolean] = {
         values.foreach {
-            case x => {
+            case x =>
                 val isTesting = (x.criteria.flag == RunTest)
                 if (arr(x.criteria.guide) != isTesting)
                     arr(x.criteria.guide) = isTesting
                 else
                     throw new RedundancyException("Setting " + x.toString + " to" + {if (isTesting) " run " else " skip "} + "is unnecessary.")
-            }
         }
         arr
     }
@@ -160,7 +158,7 @@ object TestingCore {
 
         if (!ranges.isEmpty) {
 
-            val (testList, skipList) = siftOutTestsAndSkips(ranges)
+            val (testList, skipList) = separateTestsAndSkips(ranges)
 
             val (testsHaveOverlap, firstTest, secondTest) = containsOverlaps(testList)
             if (testsHaveOverlap) throw new RedundancyException("Test list has an overlap between " + firstTest.get.toString + " and " + secondTest.get.toString)
@@ -192,7 +190,7 @@ object TestingCore {
     // Expects values to be sorted
     private[tester] def handleValues(values: List[TestCriteriaValueTuple], testCount: Int) : (List[TestCriteriaValueTuple], List[TestCriteriaValueTuple], Int) = {
         if (!values.isEmpty) {
-            val (testList, skipList) = siftOutTestsAndSkips(values)
+            val (testList, skipList) = separateTestsAndSkips(values)
             val value = if (!testList.isEmpty) testList.last.criteria.guide else 0
             if (value <= testCount)
                 (testList, skipList, value)
@@ -218,7 +216,7 @@ object TestingCore {
         @tailrec def sortHelper(args: List[TestCriteria[_]], argMap: Map[String, List[TestCriteria[_]]]) : Map[String, List[TestCriteria[_]]] = {
             args match {
                 case Nil  => argMap
-                case h::t => {
+                case h::t =>
                     val key = {
                         h match {
                             case x: TestCriteriaValueTuple => ArgKeyValue
@@ -227,7 +225,6 @@ object TestingCore {
                         }
                     }
                     sortHelper(t, argMap + (key -> (h :: argMap(key))))
-                }
             }
         }
         sortHelper(args, HashMap[String, List[TestCriteria[_]]](ArgKeyValue  -> List[TestCriteriaValueTuple](),
@@ -238,14 +235,15 @@ object TestingCore {
     private[tester] def sortCriteria[T <: TestCriteriaTuple[_, _] : Manifest](inList: List[T]) : List[T] = {
         inList match {
             case Nil    => Nil
-            case h::t   => {
-                val zippedList = inList.zipWithIndex                                          // Make (Tuple, Index) pairs
-                val mediaryList = zippedList map { case x => (x._1.getKey, x._2) }            // Make (TupleKey, Index) pairs
-                val sortedList = mediaryList.sortWith{ case (a, b) => a._1 < b._1}            // Sort on TupleKey
-                val sortedIndexes = sortedList map { case x => x._2 }                         // Just keep the sorted list of Indexes
-                val bucketedArr = bucketAListOn_2(zippedList)                                 // Make an array that maps Index->Tuple
-                sortedIndexes.foldRight(List[T]()){ case (x, acc) => bucketedArr(x) :: acc }  // Fold the Indexes to generate an ordered list of Tuples
-            }
+            case h::t   =>
+                // Alternatively, I could probably just do 'inList sortWith { case (a, b) => a.getKey < b.getKey }', but... I find this much more clever
+
+                val zippedList = inList.zipWithIndex                                           // Make (Tuple, Index) pairs
+                val mediaryList = zippedList map { case x => (x._1.getKey, x._2) }             // Make (TupleKey, Index) pairs
+                val sortedList = mediaryList sortWith { case (a, b) => a._1 < b._1 }           // Sort on TupleKey
+                val sortedIndexes = sortedList map { case x => x._2 }                          // Just keep the sorted list of Indexes
+                val bucketedArr = bucketAListOn_2(zippedList)                                  // Make an array that maps Index->Tuple
+                sortedIndexes.foldRight(List[T]()) { case (x, acc) => bucketedArr(x) :: acc }  // Fold the Indexes to generate an ordered list of Tuples
         }
     }
 
@@ -261,21 +259,20 @@ object TestingCore {
     @tailrec
     private[tester] def containsOverlaps(inList: List[TestCriteriaRangeTuple]) : (Boolean, Option[TestCriteriaRangeTuple], Option[TestCriteriaRangeTuple]) = {
         inList match {
-            case h1::h2::t => {
+            case h1::h2::t =>
                 if (h1 intersects h2)
                     (true, Some(h1), Some(h2))
                 else
                     containsOverlaps(inList.tail)
-            }
             case _  => (false, None, None)
         }
     }
 
-    private[tester] def siftOutTestsAndSkips[T <: TestCriteriaTuple[_, _] : Manifest](list: List[T]) : (List[T], List[T]) = {
+    private[tester] def separateTestsAndSkips[T <: TestCriteriaTuple[_, _] : Manifest](list: List[T]) : (List[T], List[T]) = {
         @tailrec def siftHelper(inList: List[T], testList: List[T], skipList: List[T]) : (List[T], List[T]) = {
             inList match {
                 case Nil                  => (testList.reverse, skipList.reverse)
-                case h::t                 => {
+                case h::t                 =>
                     val flag = h.criteria.flag
                     if (flag == RunTest)
                         siftHelper(t, h :: testList, skipList)
@@ -283,7 +280,6 @@ object TestingCore {
                         siftHelper(t, testList, h :: skipList)
                     else
                         throw new UnexpectedTypeException("Unexpected type of TestRunningnessFlag!")   // EXPLODE!
-                }
             }
         }
         siftHelper(list, List[T](), List[T]())

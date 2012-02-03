@@ -9,13 +9,13 @@ import tester.exceptions.MysteriousDataException
  * Time: 9:21 PM
  */
 
-sealed trait TestingFlag                             // Marker traits
-sealed trait TestToggleFlag extends TestingFlag {    // Everytime something is made to inherit from this, it MUST be added to TestToggleFlagWrapper's FlagList
+sealed trait TestingFlag                              // A marker trait
+sealed trait TestRunningnessFlag extends TestingFlag  // A trait whose possessors will represent signs of about whether or not a test(s) should be run
+sealed trait TestToggleFlag extends TestingFlag {     // Everytime something is made to inherit from this, it MUST be added to TestToggleFlagWrapper's FlagList
     implicit def flagToCriteria(that: TestToggleFlag) : TestCriteriaToggleFlag = {
         TestCriteriaToggleFlag(that)
     }
 }
-sealed trait TestRunningnessFlag extends TestingFlag
 
 case object RunTest extends TestRunningnessFlag
 case object SkipTest extends TestRunningnessFlag

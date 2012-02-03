@@ -1,7 +1,5 @@
 package tester.testanalyzer
 
-import tester.ExecutionStatus
-
 /**
  * Created by IntelliJ IDEA.
  * User: Jason

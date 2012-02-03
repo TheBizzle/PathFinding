@@ -1,4 +1,4 @@
-package tester.testcluster
+package tester.testcluster.testfunction
 
 import tester.criteria.{BaseToggleFlagWrapper, Talkative, TestToggleFlag}
 

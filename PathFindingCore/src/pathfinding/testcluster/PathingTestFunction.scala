@@ -3,7 +3,7 @@ package pathfinding.testcluster
 import pathfinding.{StepData, PathFinder}
 import pathfinding.statuses.PathingStatus
 import pathfinding.pathingmap.pathingmapdata.PathingMapString
-import tester.testcluster.{TestFuncFlagBundle, TestFunction}
+import tester.testcluster.testfunction.{TestFuncFlagBundle, TestFunction}
 
 /**
  * Created by IntelliJ IDEA.
