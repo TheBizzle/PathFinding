@@ -1,6 +1,7 @@
 package datastructure.heap
 
 import annotation.tailrec
+import java.lang.IllegalStateException
 
 /**
  * Created by IntelliJ IDEA.
@@ -54,8 +55,10 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
 
     @tailrec
     private def heapUp(elemIndex: Int) {
-        val parentIndex = parentIndexOf(elemIndex)
-        if ((elemIndex != 0) && isBetter(elemIndex, parentIndex)) { swap(elemIndex, parentIndex); heapUp(parentIndex) }
+        if (elemIndex != 0) {
+            val parentIndex = parentIndexOf(elemIndex)
+            if (isBetter(elemIndex, parentIndex)) { swap(elemIndex, parentIndex); heapUp(parentIndex) }
+        }
     }
 
     private def parentIndexOf(index: Int) : Int = {
@@ -68,36 +71,51 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
         heapArr(startIndex) = temp
     }
 
-    def remove() : Option[T] = {
+    def remove() : T = {
         val retVal = heapArr(0)
         if (retVal == None) throw new NoSuchElementException
-        val myLast = size - 1
-        heapArr(0) = heapArr(myLast)
-        heapArr(myLast) = None
+        val lastIndex = size - 1
+        heapArr(0) = heapArr(lastIndex)
+        heapArr(lastIndex) = None
         heapDown(0)
-        retVal
+        retVal.get
     }
 
     @tailrec
     private def heapDown(elemIndex: Int) {
-        val myLast = size - 1
-        if (elemIndex < myLast) {
+        if (!isLeaf(elemIndex)) {
             val childIndex = findBestChildIndex(elemIndex)
-            if (isBetter(childIndex, elemIndex)) { swap(elemIndex, childIndex); heapDown(childIndex) }
+            if (isBetter(childIndex, elemIndex)) { swap(childIndex, elemIndex); heapDown(childIndex) }
         }
     }
 
+    private def isLeaf(index: Int) : Boolean = {
+        ((size == 0) || (depthOf(index) == depthOf(size - 1)) || (firstChildIndexOf(index) > (size - 1)))
+    }
+
+    private def depthOf(index: Int) : Int = {
+        log2(index + 1).floor.toInt
+    }
+
+    private def log2(num: Int) : Double = {
+        import scala.math.log
+        log(num) / log(2)
+    }
+
     private def findBestChildIndex(parentIndex: Int) : Int = {
-        val first = (2 * parentIndex) + 1
+        val first = firstChildIndexOf(parentIndex)
         val second = first + 1
         if (isBetter(first, second)) first else second
     }
 
-    private def isBetter(first: Int, second: Int) : Boolean = {
-        val myLast = size - 1
-        if ((first > myLast) || (second > myLast) || (heapArr(first) == None)) false
-        else if (heapArr(second) == None) true
-        else orderProp(heapArr(first).get, heapArr(second).get) > 0
+    private def firstChildIndexOf(parentIndex: Int) : Int = {
+        (2 * parentIndex) + 1
+    }
+
+    private def isBetter(firstIndex: Int, secondIndex: Int) : Boolean = {
+        if (heapArr(firstIndex) == None) throw new IllegalStateException("What did you do to my heap?!")
+        else if (heapArr(secondIndex) == None) true
+        else orderProp(heapArr(firstIndex).get, heapArr(secondIndex).get) > 0
     }
 
     def peek : Option[T] = {

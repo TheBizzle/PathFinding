@@ -21,7 +21,7 @@ class PriorityQueue[T : Manifest] protected (ordering: (T, T) => Int, elemArr: A
         insert(elem)
     }
 
-    def dequeue() : Option[T] = {
+    def dequeue() : T = {
         remove()
     }
 

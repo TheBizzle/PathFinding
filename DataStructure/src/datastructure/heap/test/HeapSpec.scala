@@ -65,33 +65,33 @@ class HeapSpec extends FlatSpec with GivenWhenThen with BeforeAndAfterEach with 
 
         when("each element is removed (one at a time)")
         then("it should return the first one correctly")
-        heap.remove().get should equal (0)
+        heap.remove() should equal (0)
 
         and("reflect its size accordingly")
         heap.size should equal (3)
 
         and("the second one")
-        heap.remove().get should equal (1)
+        heap.remove() should equal (1)
 
         and("reflect its size accordingly")
         heap.size should equal (2)
 
         and("the third")
-        heap.remove().get should equal (4)
+        heap.remove() should equal (4)
 
         and("reflect its size accordingly")
         heap.size should equal (1)
 
         and("the fourth")
-        heap.remove().get should equal (8)
+        heap.remove() should equal (8)
 
         and("reflect its size accordingly")
         heap.size should equal (0)
 
         and("trying to remove the fifth, sixth, and seventh should throw a NoSuchElementException")
-        intercept[NoSuchElementException] { heap.remove().get }
-        intercept[NoSuchElementException] { heap.remove().get }
-        intercept[NoSuchElementException] { heap.remove().get }
+        intercept[NoSuchElementException] { heap.remove() }
+        intercept[NoSuchElementException] { heap.remove() }
+        intercept[NoSuchElementException] { heap.remove() }
 
         and("peeking at the fifth, sixth, and seventh should repeatedly result in \"None\"")
         heap.peek should equal (None)
@@ -113,44 +113,44 @@ class HeapSpec extends FlatSpec with GivenWhenThen with BeforeAndAfterEach with 
 
         when("poppped")
         then("it should return the proper value")
-        heap.remove().get should equal (1)
+        heap.remove() should equal (1)
 
         when("a value is added to the end and a 'pop' occurs")
         then("it should return the proper value")
         heap.insert(13)
-        heap.remove().get should equal (3)
+        heap.remove() should equal (3)
 
         when ("a value is added to the middle and a 'pop' occurs")
         then("it should return the proper value")
         heap.insert(6)
-        heap.remove().get should equal (4)
+        heap.remove() should equal (4)
 
         when("a value is added to the front and a 'pop' occurs")
         then("it should return the newly-added value")
         heap.insert(1)
-        heap.remove().get should equal (1)
+        heap.remove() should equal (1)
 
         when("another value is added to the middle and a 'pop' occurs")
         then("it should return the proper value")
         heap.insert(8)
-        heap.remove().get should equal (5)
+        heap.remove() should equal (5)
 
         when("another value is added to the end and a 'pop' occurs")
         then("it should return the proper value")
         heap.insert(16)
-        heap.remove().get should equal (6)
+        heap.remove() should equal (6)
 
         when("another value is added to the end and a 'pop' occurs")
         then("it should return the proper value")
         heap.insert(19)
-        heap.remove().get should equal (7)
+        heap.remove() should equal (7)
 
         when("two values are added to the front and two 'pop's occur")
         then("it should return both of those values")
         heap.insert(4)
         heap.insert(6)
-        heap.remove().get should equal (4)
-        heap.remove().get should equal (6)
+        heap.remove() should equal (4)
+        heap.remove() should equal (6)
 
     }
 
@@ -184,57 +184,57 @@ class HeapSpec extends FlatSpec with GivenWhenThen with BeforeAndAfterEach with 
 
         when("poppped")
         then("it should return the proper value")
-        heap.remove().get should equal (4)
+        heap.remove() should equal (4)
 
         when("a value is added and a 'pop' occurs")
         then("it should return the proper value")
         heap.insert(39)
-        heap.remove().get should equal (5)
+        heap.remove() should equal (5)
 
         when("a burst of pops occur")
         then("they should all return the proper values")
-        heap.remove().get should equal (9)
-        heap.remove().get should equal (13)
-        heap.remove().get should equal (21)
-        heap.remove().get should equal (27)
-        heap.remove().get should equal (32)
+        heap.remove() should equal (9)
+        heap.remove() should equal (13)
+        heap.remove() should equal (21)
+        heap.remove() should equal (27)
+        heap.remove() should equal (32)
 
         when("a value is added to the front and a 'pop occurs")
         then("it should return that value")
         heap.insert(3)
-        heap.remove().get should equal (3)
+        heap.remove() should equal (3)
 
         when("another burst of pops occur")
         then("they should all return the proper values")
-        heap.remove().get should equal (36)
-        heap.remove().get should equal (39)
-        heap.remove().get should equal (43)
-        heap.remove().get should equal (45)
+        heap.remove() should equal (36)
+        heap.remove() should equal (39)
+        heap.remove() should equal (43)
+        heap.remove() should equal (45)
 
         when("a value is added to the end and a 'pop occurs")
         then("it should return the proper value")
         heap.insert(103)
-        heap.remove().get should equal (103)
+        heap.remove() should equal (103)
 
         when("another burst of pops occur")
         then("they should all return the proper values")
-        heap.remove().get should equal (46)
-        heap.remove().get should equal (50)
-        heap.remove().get should equal (51)
-        heap.remove().get should equal (53)
-        heap.remove().get should equal (58)
-        heap.remove().get should equal (62)
+        heap.remove() should equal (46)
+        heap.remove() should equal (50)
+        heap.remove() should equal (51)
+        heap.remove() should equal (53)
+        heap.remove() should equal (58)
+        heap.remove() should equal (62)
 
         when("a value is added to the middle and a 'pop occurs")
         then("it should return the proper value")
         heap.insert(89)
-        heap.remove().get should equal (68)
+        heap.remove() should equal (68)
 
         when("a final burst of pops occur")
         then("they should all return the proper values")
-        heap.remove().get should equal (71)
-        heap.remove().get should equal (78)
-        heap.remove().get should equal (84)
+        heap.remove() should equal (71)
+        heap.remove() should equal (78)
+        heap.remove() should equal (84)
 
     }
 
@@ -258,9 +258,9 @@ class HeapSpec extends FlatSpec with GivenWhenThen with BeforeAndAfterEach with 
 
         then("it should return an exact replica heap")
         anotherHeap.size should equal (3)
-        anotherHeap.remove().get should equal (1)
-        anotherHeap.remove().get should equal (2)
-        anotherHeap.remove().get should equal (5)
+        anotherHeap.remove() should equal (1)
+        anotherHeap.remove() should equal (2)
+        anotherHeap.remove() should equal (5)
 
     }
 
