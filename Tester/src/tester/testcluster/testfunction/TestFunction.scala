@@ -1,7 +1,7 @@
 package tester.testcluster.testfunction
 
-import tester.testanalyzer.{ExecutionStatus, TestAnalysisFlagBundle}
 import tester.testcluster.{TestSubject, Testable}
+import tester.testanalyzer.{TestAnalysisResultBundle, ExecutionStatus, TestAnalysisFlagBundle}
 
 
 /**
@@ -13,8 +13,8 @@ import tester.testcluster.{TestSubject, Testable}
 
 // Constructor is passed things that are statically known about the TestFunction
 // apply() is passed things that dynamically affect the outcome of the function
-abstract class TestFunction[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle]
-                           (subject: Subject, analysisFunction: (Status, AnalysisFlags) => Boolean, testNumber: Int, shouldPass: Boolean) extends ((T, TestFuncFlagBundle) => Boolean) {
+abstract class TestFunction[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle, AnalysisResult <: TestAnalysisResultBundle]
+                           (subject: Subject, analysisFunction: (Status, AnalysisFlags) => AnalysisResult, testNumber: Int, shouldPass: Boolean) extends ((T, TestFuncFlagBundle) => Boolean) {
 
     val testNum = testNumber
     val shouldSucceed = shouldPass

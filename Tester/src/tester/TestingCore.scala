@@ -5,9 +5,9 @@ import exceptions._
 import collection.immutable.{List, HashMap, Map}
 import annotation.tailrec
 import org.scalatest.Suite
-import testanalyzer.{ExecutionStatus, TestAnalysisFlagBundle}
+import testanalyzer.{TestAnalysisResultBundle, ExecutionStatus, TestAnalysisFlagBundle}
 import testcluster._
-import testfunction.{TestFunction, TestFuncFlagBundle}
+import testfunction.{TestFuncConstructionBundle, TestFunction, TestFuncFlagBundle}
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,11 +23,11 @@ object TestingCore {
     private[tester] val ArgKeyToggle = "toggle"
 
 
-    def apply[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle,
-              TFunc <: TestFunction[T, Subject, Status, AnalysisFlags], TCluster <: TestCluster[TFunc, Subject]]
+    def apply[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle, ResultFlags <: TestAnalysisResultBundle,
+              TFConsBundle <: TestFuncConstructionBundle, TFunc <: TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], TCluster <: TestCluster[TFunc, Subject, TFConsBundle]]
              (args: List[TestCriteria[_]],
               testable: T = null,
-              cluster: TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags], Subject] = null,
+              cluster: TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], Subject, TFConsBundle] = null,
               baseTests: Seq[Suite] = Seq[Suite]()) {
 
         val argMap = sortArgLists(args)
@@ -36,10 +36,11 @@ object TestingCore {
     }
 
     private def makeTestRunningDecisions[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle,
-                                         TFunc <: TestFunction[T, Subject, Status, AnalysisFlags], TCluster <: TestCluster[TFunc, Subject]]
+                                         ResultFlags <: TestAnalysisResultBundle, TFConsBundle <: TestFuncConstructionBundle,
+                                         TFunc <: TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], TCluster <: TestCluster[TFunc, Subject, TFConsBundle]]
                                         (argMap: Map[String, List[TestCriteria[_]]],
                                          testable: T,
-                                         cluster: TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags], Subject],
+                                         cluster: TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], Subject, TFConsBundle],
                                          baseTests: Seq[Suite]) {
 
         val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[List[TestCriteriaToggleFlag]]] match {
@@ -86,7 +87,7 @@ object TestingCore {
 
     }
 
-    private def runTests[T <: Testable, TFunc <: TestFunction[T, _, _, _]]
+    private def runTests[T <: Testable, TFunc <: TestFunction[T, _, _, _, _]]
                         (tests: List[TFunc], testable: T, flags: TestFuncFlagBundle, isStacktracing: Boolean) {
 
         def successStr(testNumber: Int) = "Test number " + testNumber + " was a success."

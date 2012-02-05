@@ -1,4 +1,4 @@
-package pathfinding.testcluster
+package pathfinding.testanalyzer
 
 import tester.testanalyzer.TestAnalysisFlagBundle
 import tester.criteria.TestToggleFlag

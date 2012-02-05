@@ -11,9 +11,9 @@ import tester.testcluster.{TestSubject, TestCluster}
  */
 
 // Uses reflection to do satanical things.  Use at your own risk!
-trait TestFunctionFactory[T <: TestFunction[_, U, _, _], U <: TestSubject] {
+trait TestFunctionFactory[T <: TestFunction[_, U, _, _, _], U <: TestSubject, V <: TestFuncConstructionBundle] {
 
-    self: TestCluster[T, U] =>
+    self: TestCluster[T, U, V] =>
 
     // Essentially, uses reflection to find to find all U-type fields of PathingTestCluster
     def generateTests : List[T] = {
@@ -31,6 +31,6 @@ trait TestFunctionFactory[T <: TestFunction[_, U, _, _], U <: TestSubject] {
     }
 
     protected def generateTestFunction(fieldData: (Field, String), regex: String) : Option[T]
-    protected def construct(subject: U, testNumber: Int, shouldPass: Boolean) : T
+    protected def construct(subject: U, testNumber: Int, shouldPass: Boolean, bundle: V) : T
 
 }

@@ -7,6 +7,6 @@ package tester.testanalyzer
  * Time: 6:24 PM
  */
 
-trait TestAnalyzer[T <: ExecutionStatus, U <: TestAnalysisFlagBundle] {
-    protected def analyze(status: T, flags: U) : Boolean
+trait TestAnalyzer[T <: ExecutionStatus, U <: TestAnalysisFlagBundle, V <: TestAnalysisResultBundle] {
+    protected def analyze(status: T, flags: U) : V
 }
