@@ -2,6 +2,7 @@ package datastructure.bihashmap.test
 
 import org.scalatest.{GivenWhenThen, FlatSpec}
 import datastructure.bihashmap.BiHashMap
+import org.scalatest.matchers.ShouldMatchers
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,7 +11,7 @@ import datastructure.bihashmap.BiHashMap
  * Time: 4:43 PM
  */
 
-class BiHashMapSpec extends FlatSpec with GivenWhenThen {
+class BiHashMapSpec extends FlatSpec with GivenWhenThen with ShouldMatchers {
 
     val aList = List(5, 17, 1, 9, 4)
     val bList = List("five", "seventeen", "one", "nine", "four")
@@ -28,14 +29,14 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen {
         val aSet = biHash.ASet
         val bSet = biHash.BSet
 
-        then("the size should be equal to the size of what was passed in")
-        size === inList.size
+        then("the size should equal equal to the size of what was passed in")
+        size should equal (inList.size)
 
         and("the set of As should hold all and only the As that were passed in")
-        ((aSet.foldLeft(true){ case (acc, x) => aList.contains(x) && acc }) && (aList.foldLeft(true){ case (acc, x) => aSet.contains(x) && acc })) === true
+        ((aSet.foldLeft(true){ case (acc, x) => aList.contains(x) && acc }) && (aList.foldLeft(true){ case (acc, x) => aSet.contains(x) && acc })) should equal (true)
 
         and("the set of Bs should hold all and only the Bs that were passed in")
-        ((bSet.foldLeft(true){ case (acc, x) => bList.contains(x) && acc }) && (bList.foldLeft(true){ case (acc, x) => bSet.contains(x) && acc })) === true
+        ((bSet.foldLeft(true){ case (acc, x) => bList.contains(x) && acc }) && (bList.foldLeft(true){ case (acc, x) => bSet.contains(x) && acc })) should equal (true)
 
     }
 
@@ -52,13 +53,13 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen {
         bhm.put(5, "five")
 
         then("it should retrieve existing elements correctly")
-        ((bhm.get(1).get == "one") && (bhm.get("nine").get == 9) && bhm.get("four").get == 4) === true
+        ((bhm.get(1).get == "one") && (bhm.get("nine").get == 9) && bhm.get("four").get == 4) should equal (true)
 
         and("it should fail out on retrieving bad elements")
-        ((bhm.get(2) == None) && (bhm.get("three") == None) && (bhm.get(6) == None)) === true
+        ((bhm.get(2) == None) && (bhm.get("three") == None) && (bhm.get(6) == None)) should equal (true)
 
         and("it should have equality to the pre-made BHM")
-        (bhm == biHash) === true
+        (bhm == biHash) should equal (true)
 
     }
 
@@ -69,10 +70,10 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen {
         val bhm = biHash.clone()
 
         then("the original should equal the clone")
-        biHash === bhm
+        biHash should equal (bhm)
 
         and("the clone should equal the original")
-        bhm === biHash
+        bhm should equal (biHash)
 
         val cloneAs = bhm.ASet
         val cloneBs = bhm.BSet
@@ -80,16 +81,16 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen {
         val origBs = biHash.BSet
 
         and("the clone should contain all of the original's As")
-        (origAs.foldLeft(true){ case (acc, x) => cloneAs.contains(x) && acc }) === true
+        (origAs.foldLeft(true){ case (acc, x) => cloneAs.contains(x) && acc }) should equal (true)
 
         and("the original should contain all of the clone's As")
-        (cloneAs.foldLeft(true){ case (acc, x) => origAs.contains(x) && acc }) === true
+        (cloneAs.foldLeft(true){ case (acc, x) => origAs.contains(x) && acc }) should equal (true)
 
         and("the clone should contain all of the original's Bs")
-        (origBs.foldLeft(true){ case (acc, x) => cloneBs.contains(x) && acc }) === true
+        (origBs.foldLeft(true){ case (acc, x) => cloneBs.contains(x) && acc }) should equal (true)
 
         and("the original should contain all of the clone's Bs")
-        (cloneBs.foldLeft(true){ case (acc, x) => origBs.contains(x) && acc }) === true
+        (cloneBs.foldLeft(true){ case (acc, x) => origBs.contains(x) && acc }) should equal (true)
 
     }
 
@@ -100,27 +101,27 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen {
 
         when("manipulating the clone")
         then("it should apply correctly")
-        bhm(1) === "one"
+        bhm(1) should equal ("one")
         bhm("five") == 5
 
         and("update As correctly")
         bhm.update(1, "eins")
-        bhm("eins") === 1
-        bhm(1) === "eins"
+        bhm("eins") should equal (1)
+        bhm(1) should equal ("eins")
 
         and("update Bs correctly")
         bhm.update("five", 15)
-        bhm(15) === "five"
-        bhm("five") === 15
+        bhm(15) should equal ("five")
+        bhm("five") should equal (15)
 
         and("remove correctly")
         bhm.remove("five")
-        bhm.get("five") === None
-        bhm.get(15) === None
+        bhm.get("five") should equal (None)
+        bhm.get(15) should equal (None)
 
         bhm.remove(1)
-        bhm.get(1) === None
-        bhm.get("one") === None
+        bhm.get(1) should equal (None)
+        bhm.get("one") should equal (None)
 
         and("apply on bads correctly")
         intercept[NoSuchElementException] {
@@ -135,12 +136,12 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen {
 
         and("the clone should clear correctly")
         bhm.clear()
-        bhm.size === 0
-        bhm.ASet.size === 0
-        bhm.BSet.size === 0
-        bhm.get("five") === None
-        bhm.get(17) === None
-        bhm.get(3) === None
+        bhm.size should equal (0)
+        bhm.ASet.size should equal (0)
+        bhm.BSet.size should equal (0)
+        bhm.get("five") should equal (None)
+        bhm.get(17) should equal (None)
+        bhm.get(3) should equal (None)
 
     }
 
@@ -153,21 +154,21 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen {
 
         then("+= should work correctly")
         bhm += 8080 -> "eighty-eighty"
-        bhm(8080) === "eighty-eighty"
-        bhm("eighty-eighty") === 8080
+        bhm(8080) should equal ("eighty-eighty")
+        bhm("eighty-eighty") should equal (8080)
 
         bhm += "zero" -> 0
-        bhm(0) === "zero"
-        bhm("zero") === 0
+        bhm(0) should equal ("zero")
+        bhm("zero") should equal (0)
 
         and("-= should work correctly")
         bhm -= 8080
-        bhm.get(8080) === None
-        bhm.get("eighty-eighty") === None
+        bhm.get(8080) should equal (None)
+        bhm.get("eighty-eighty") should equal (None)
 
         bhm -= "zero"
-        bhm.get(0) === None
-        bhm.get("zero") === None
+        bhm.get(0) should equal (None)
+        bhm.get("zero") should equal (None)
 
     }
 

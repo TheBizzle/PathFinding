@@ -18,6 +18,11 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
         initializeArr()
     }
 
+    def clear() {
+        heapArr = new Array[Option[T]](heapArr.size)
+        initializeArr()
+    }
+
     def insert(elem: T) {
         insertAtEnd(elem)
         heapUp(size - 1)
