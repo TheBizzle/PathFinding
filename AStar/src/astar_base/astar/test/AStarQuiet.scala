@@ -5,7 +5,7 @@ import pathfinding.testcluster.PathingTestCluster
 import pathfinding.test.TestScript
 import pathfinding.{StepData, PathFinder}
 import tester.criteria._
-import tester.{TestingCore}
+import tester.TestingCore
 
 /**
  * Created by IntelliJ IDEA.

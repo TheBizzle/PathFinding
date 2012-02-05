@@ -3,7 +3,7 @@ package astar_base.astar.test
 import astar_base.astar.AStar
 import pathfinding.{StepData, PathFinder}
 import tester.criteria._
-import tester.{TestingCore}
+import tester.TestingCore
 import pathfinding.testcluster.PathingTestCluster
 import pathfinding.test.TestScript
 
@@ -15,5 +15,5 @@ import pathfinding.test.TestScript
  */
 
 object AStarTest extends TestScript {
-    TestingCore(List[TestCriteria[_]]((17, RunTest), TestCriteriaToggleFlag(Talkative)), AStar.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
+    TestingCore(List[TestCriteria[_]]((25, RunTest), TestCriteriaToggleFlag(Talkative)), AStar.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
 }

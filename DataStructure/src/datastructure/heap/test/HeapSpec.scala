@@ -214,27 +214,27 @@ class HeapSpec extends FlatSpec with GivenWhenThen with BeforeAndAfterEach with 
         when("a value is added to the end and a 'pop occurs")
         then("it should return the proper value")
         heap.insert(103)
-        heap.remove() should equal (103)
+        heap.remove() should equal (46)
 
         when("another burst of pops occur")
         then("they should all return the proper values")
-        heap.remove() should equal (46)
         heap.remove() should equal (50)
         heap.remove() should equal (51)
         heap.remove() should equal (53)
         heap.remove() should equal (58)
         heap.remove() should equal (62)
+        heap.remove() should equal (68)
 
         when("a value is added to the middle and a 'pop occurs")
         then("it should return the proper value")
         heap.insert(89)
-        heap.remove() should equal (68)
+        heap.remove() should equal (71)
 
         when("a final burst of pops occur")
         then("they should all return the proper values")
-        heap.remove() should equal (71)
         heap.remove() should equal (78)
         heap.remove() should equal (84)
+        heap.remove() should equal (88)
 
     }
 

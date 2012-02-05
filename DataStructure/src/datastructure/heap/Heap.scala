@@ -31,7 +31,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
 
     private def insertAtEnd(elem: T) {
         val arrSize = size
-        if (arrSize >= heapArr.size) increaseArrSize()
+        if (arrSize == heapArr.size) increaseArrSize()
         heapArr(arrSize) = Some(elem)
     }
 
@@ -43,7 +43,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
 
     private def arrTransfer(newArr: Array[Option[T]], originalArr: Array[Option[T]]) : Array[Option[T]] = {
         @tailrec def arrTransferHelper(newArr: Array[Option[T]], originalArr: Array[Option[T]], originalSize: Int, counter: Int) : Array[Option[T]] = {
-            if (counter < (originalSize - 1)) {
+            if (counter < originalSize) {
                 newArr(counter) = originalArr(counter)
                 arrTransferHelper(newArr, originalArr, originalSize, counter + 1)
             }
@@ -72,13 +72,12 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     }
 
     def remove() : T = {
-        val retVal = heapArr(0)
-        if (retVal == None) throw new NoSuchElementException
+        val retVal = heapArr(0).get
         val lastIndex = size - 1
         heapArr(0) = heapArr(lastIndex)
         heapArr(lastIndex) = None
         heapDown(0)
-        retVal.get
+        retVal
     }
 
     @tailrec
@@ -103,9 +102,14 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     }
 
     private def findBestChildIndex(parentIndex: Int) : Int = {
-        val first = firstChildIndexOf(parentIndex)
-        val second = first + 1
-        if (isBetter(first, second)) first else second
+
+        val firstIndex = firstChildIndexOf(parentIndex)
+        val secondIndex = firstIndex + 1
+
+        if (heapArr(firstIndex) == None) throw new IllegalStateException("What did you do to my heap?!")
+        else if ((heapArr(secondIndex) == None) || isBetter(firstIndex, secondIndex)) firstIndex
+        else secondIndex
+        
     }
 
     private def firstChildIndexOf(parentIndex: Int) : Int = {
@@ -113,9 +117,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     }
 
     private def isBetter(firstIndex: Int, secondIndex: Int) : Boolean = {
-        if (heapArr(firstIndex) == None) throw new IllegalStateException("What did you do to my heap?!")
-        else if (heapArr(secondIndex) == None) true
-        else orderProp(heapArr(firstIndex).get, heapArr(secondIndex).get) > 0
+        orderProp(heapArr(firstIndex).get, heapArr(secondIndex).get) > 0
     }
 
     def peek : Option[T] = {
