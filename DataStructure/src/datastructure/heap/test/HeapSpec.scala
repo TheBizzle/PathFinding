@@ -120,7 +120,6 @@ class HeapSpec extends FlatSpec with GivenWhenThen {
 
     }
 
-
     it should ("know how to do operations on each element") in {
 
         given("a filled Heap")

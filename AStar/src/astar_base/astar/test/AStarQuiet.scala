@@ -15,5 +15,5 @@ import tester.{TestingCore}
  */
 
 object AStarQuiet extends TestScript {
-    TestingCore(List[TestCriteria[_]](TestCriteriaRangeTuple(1, 39, RunTest)), AStar.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
+    TestingCore(List[TestCriteria[_]]((1, 39, RunTest)), AStar.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
 }

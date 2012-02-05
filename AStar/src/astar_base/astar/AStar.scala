@@ -1,6 +1,5 @@
 package astar_base.astar
 
-//import collection.mutable.PriorityQueue
 import astar_base._
 import heuristics.HeuristicLib
 import pathfinding.pathingmap.pathingmapdata.PathingMapString
