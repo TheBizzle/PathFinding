@@ -187,6 +187,10 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
 //        outList.reverse
 //    }
 
+    def toList : List[T] = {
+        heapArr.filter(_ != None).map(_.get).toList
+    }
+
     override def clone() : Heap[T] = {
         new Heap[T](ordering, heapArr.clone())
     }
