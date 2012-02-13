@@ -163,38 +163,6 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
         }
     }
 
-//    // For debugging right now (write correctly later)
-//    override def toString : String = {
-//
-//        var outStr = ""
-//        var counter = 0
-//        var elem = heapArr(counter)
-//
-//        while (!elem.isEmpty) {
-//            outStr += elem.asInstanceOf[PriorityCoordinate].priority + ","
-//            counter += 1
-//            elem = heapArr(counter)
-//        }
-//
-//        "[" + outStr + "]"
-//
-//    }
-//
-//    // For debugging (not actually all that awesome)
-//    def toAwesomeString : String = {
-//        "[" + orderedListMaker.foldLeft("")((acc, x) => x.priority + "," + acc) + "]"
-//    }
-//
-//    // For debugging
-//    private def orderedListMaker : List[PriorityCoordinate] = {
-//        var outList = List[PriorityCoordinate]()
-//        val clonedHeap = clone()
-//        while (!clonedHeap.isEmpty) {
-//            outList = clonedHeap.remove().asInstanceOf[PriorityCoordinate] :: outList
-//        }
-//        outList.reverse
-//    }
-
     def toList : List[T] = {
         heapArr.filter(_ != None).map(_.get).toList
     }
