@@ -81,7 +81,7 @@ object PathingMapStringInterpreter {
     }
 
     private def initialize2DTerrainArr(cols: Int, rows: Int, defaultVal: Terrain) : Array[Array[Terrain]] = {
-        new Array[Array[Terrain]](cols) map { case x => new Array[Terrain](rows) map (y => defaultVal) }
+        new Array[Array[Terrain]](cols) map { case x => new Array[Terrain](rows) map {case y => defaultVal} }
     }
 
 }
