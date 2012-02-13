@@ -101,7 +101,7 @@ object PathingMap {
 
     def generateCloneWithPath(path: List[Coordinate], inMap: PathingMap) : PathingMap = {
         val outMap = inMap.clone()
-        path.foreach { case (coord) => outMap.pathingMap(coord.x)(coord.y) = Path }
+        path.foreach { case coord => outMap.pathingMap(coord.x)(coord.y) = Path }
         outMap
     }
 
