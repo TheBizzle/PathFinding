@@ -1,6 +1,7 @@
 package pathfinding.suitereporter
 
 import tester.suitereporter.SuiteReporter
+import pathfinding.pathingmap.PathingMapSpec
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,4 +10,4 @@ import tester.suitereporter.SuiteReporter
  * Time: 10:57 PM
  */
 
-object PathFindingSuiteReporter extends SuiteReporter(List())
+object PathFindingSuiteReporter extends SuiteReporter(List(new PathingMapSpec()))
