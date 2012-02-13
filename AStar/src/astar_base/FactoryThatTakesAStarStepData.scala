@@ -4,6 +4,7 @@ import datastructure.priorityqueue.PriorityQueue
 import pathfinding.pathingmap.PathingMap
 import pathfinding.pathingmap.pathingmapdata.PathingMapString
 import pathfinding.coordinate.{PriorityCoordinateOrdering, PriorityCoordinate, Coordinate}
+import shapeless._
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,6 +17,8 @@ trait FactoryThatTakesAStarStepData[T] {
 
     // A bad/initial numerical value for some things—NOT COUNTING THE "X" AND "Y" MEMBERS OF COORDINATE OBJECTS; they have their own InvalidValue
     protected val BadVal = -1
+
+    type Extras <: HList
 
     def apply(mapString: PathingMapString) : T = {
         
@@ -42,10 +45,8 @@ trait FactoryThatTakesAStarStepData[T] {
         new Array[Array[T]](cols) map { case x => new Array[T](rows) map (y => defaultVal) }
     }
 
-    protected def generateExtras(stepData: AStarStepData) : Seq[Any] = {
-        Nil
-    }
+    protected def generateExtras(stepData: AStarStepData) : Extras
     
-    protected def mixinExtras(stepData: AStarStepData, extras: Seq[Any]) : T
+    protected def mixinExtras(stepData: AStarStepData, extras: Extras) : T
 
 }

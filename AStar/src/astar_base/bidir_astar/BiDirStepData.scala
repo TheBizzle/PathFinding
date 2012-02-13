@@ -7,6 +7,8 @@ import pathfinding.StepDataSingleton
 import astar_base.{FactoryThatTakesAStarStepData, AStarStepData}
 import pathfinding.breadcrumb.Breadcrumb
 import annotation.tailrec
+import shapeless._
+import astar_base.exceptions.UnexpectedDataException
 
 /**
  * Created by IntelliJ IDEA.
@@ -53,11 +55,11 @@ class BiDirStepData(currentLocation: Coordinate,
 
     @tailrec
     final def assimilateBreadcrumbs(crumbList: List[Breadcrumb]) {
-        crumbList match {
-            case Nil =>      // We stop
-            case h::t =>
-                othersBreadcrumbs(h.to.x)(h.to.y) = h.from
-                assimilateBreadcrumbs(t)
+        if (crumbList != Nil) {
+            val h = crumbList.head
+            val t = crumbList.tail
+            othersBreadcrumbs(h.to.x)(h.to.y) = h.from
+            assimilateBreadcrumbs(t)
         }
     }
 
@@ -90,23 +92,27 @@ class BiDirStepData(currentLocation: Coordinate,
 
 
 object BiDirStepData extends StepDataSingleton[BiDirStepData] with FactoryThatTakesAStarStepData[BiDirStepData] {
-    
+
+    override type Extras = Array[Array[Coordinate]] :: HNil
+
     def apply(freshLoc: Coordinate, stepData: BiDirStepData) : BiDirStepData = {
         import stepData._
         new BiDirStepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr,
                           totalArr, breadcrumbArr, othersBreadcrumbArr, iters, endGoal)
     }
 
-    override protected def generateExtras(stepData: AStarStepData) : Seq[Any] = {
+    override protected def generateExtras(stepData: AStarStepData) : Extras = {
         import stepData.pathingMap._
         val otherBreadcrumbs = initialize2DArr(colCount, rowCount, new Coordinate())
-        Seq(otherBreadcrumbs)
+        otherBreadcrumbs :: HNil
     }
 
-    override protected def mixinExtras(stepData: AStarStepData, extras: Seq[Any]) : BiDirStepData = {
+    override protected def mixinExtras(stepData: AStarStepData, extras: Extras) : BiDirStepData = {
         import stepData._
-        val otherBreadcrumbs = extras(0).asInstanceOf[Array[Array[Coordinate]]]
-        new BiDirStepData(loc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, otherBreadcrumbs, iters, endGoal)
+        extras match {
+            case otherBreadcrumbs :: HNil => new BiDirStepData(loc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, otherBreadcrumbs, iters, endGoal)
+            case _                        => throw new UnexpectedDataException("Malformed HList!")
+        }
     }
 
 }

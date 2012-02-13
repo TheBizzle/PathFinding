@@ -32,15 +32,15 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
             pathingMap.step(loc, freshLoc)
 
             if (goalIsFound(stepData, freshLoc))
-                return Success(makeNewStepData(freshLoc, stepData))     // Exit point (success)
+                return Success(makeNewStepData(stepData, freshLoc))     // Exit point (success)
 
             stepData.incIters()
             beenThereArr(freshLoc.x)(freshLoc.y) = true
-            Continue(makeNewStepData(freshLoc, stepData))               // Exit point (only to return again soon)
+            Continue(makeNewStepData(stepData, freshLoc))               // Exit point (only to return again soon)
 
         }
         else
-            Failure(makeNewStepData(new Coordinate(), stepData))  // Exit point (failure)
+            Failure(makeNewStepData(stepData, new Coordinate()))  // Exit point (failure)
 
     }
 

@@ -5,6 +5,7 @@ import datastructure.priorityqueue.PriorityQueue
 import pathfinding.coordinate.{PriorityCoordinate, Coordinate}
 import pathfinding.pathingmap.PathingMap
 import pathfinding.{StepData, StepDataSingleton}
+import shapeless._
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,12 +42,18 @@ class AStarStepData(currentLocation: Coordinate,
 
 object AStarStepData extends StepDataSingleton[AStarStepData] with FactoryThatTakesAStarStepData[AStarStepData] {
 
+    type Extras = HNil
+
     def apply(freshLoc: Coordinate, stepData: AStarStepData) : AStarStepData = {
         import stepData._
         new AStarStepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, iters)
     }
 
-    override protected def mixinExtras(stepData: AStarStepData, extras: Seq[Any]) : AStarStepData = {
+    override protected def generateExtras(stepData: AStarStepData) : Extras = {
+        HNil
+    }
+
+    override protected def mixinExtras(stepData: AStarStepData, extras: Extras) : AStarStepData = {
         stepData
     }
 

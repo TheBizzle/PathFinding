@@ -40,13 +40,12 @@ object AStar extends AStarBase[AStarStepData](1.0, HeuristicLib.manhattanDistanc
         }
         executeHelper(step(stepData)._1, maxIters)
     }
-    protected def goalIsFound(inSeq: Any*) : Boolean = {
-        val stepData = inSeq(0).asInstanceOf[AStarStepData]
-        val freshLoc = inSeq(1).asInstanceOf[Coordinate]
+    
+    protected def goalIsFound(stepData: AStarStepData, freshLoc: Coordinate) : Boolean = {
         freshLoc overlaps stepData.goal
     }
 
-    protected def makeNewStepData(freshLoc: Coordinate, stepData: AStarStepData) : AStarStepData = {
+    protected def makeNewStepData(stepData: AStarStepData, freshLoc: Coordinate) : AStarStepData = {
         AStarStepData(freshLoc, stepData)
     }
 

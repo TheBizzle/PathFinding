@@ -68,18 +68,12 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
                     if (!(crumb overlaps endLoc)) mergeHelper(crumb, myCrumbs, thoseCrumbs)
             }
         }
-        // debugMerge(myCrumbs, thoseCrumbs)
         mergeHelper(startLoc, myData.breadcrumbArr, thatData.breadcrumbArr)
         myData
     }
 
-    private def debugMerge(myCrumbs: Array[Array[Coordinate]], thoseCrumbs: Array[Array[Coordinate]]) {
-        List(myCrumbs, thoseCrumbs) foreach { case x => x foreach { case y => print(y(1).toString + "||") }; print("\n")
-                                                        x foreach { case y => print(y(0).toString + "||") }; print("\n\n") }
-    }
-
     def terminateActors(actorArgs: BiDirActor[T]*) {
-        actorArgs.foreach(_ ! BiDirActor.stopMessageStr)
+        actorArgs.foreach( _ ! BiDirActor.stopMessageStr )
     }
 
     def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : ((PathingStatus[T], List[Breadcrumb]), (PathingStatus[T], List[Breadcrumb])) = {

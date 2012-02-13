@@ -34,18 +34,16 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
 
         director.direct(stgStepData, gtsStepData) match {
             case status: PathingStatus[BiDirStepData] => status
-            case _ => throw new UnexpectedDataException
+            case _                                    => throw new UnexpectedDataException
         }
         
     }
 
-    override protected def goalIsFound(inSeq: Any*) : Boolean = {
-        val stepData = inSeq(0).asInstanceOf[BiDirStepData]
-        val freshLoc = inSeq(1).asInstanceOf[Coordinate]
+    override protected def goalIsFound(stepData: BiDirStepData, freshLoc: Coordinate) : Boolean = {
         (freshLoc overlaps stepData.goal) || (stepData hasInOthersBreadcrumbs freshLoc)
     }
 
-    override protected def makeNewStepData(freshLoc: Coordinate, stepData: BiDirStepData) : BiDirStepData = {
+    override protected def makeNewStepData(stepData: BiDirStepData, freshLoc: Coordinate) : BiDirStepData = {
         BiDirStepData(freshLoc, stepData)
     }
 
