@@ -117,7 +117,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     }
 
     private def isBetter(firstIndex: Int, secondIndex: Int) : Boolean = {
-        orderProp(heapArr(firstIndex).get, heapArr(secondIndex).get) > 0
+        orderProp(heapArr(firstIndex).get, heapArr(secondIndex).get) >= 0
     }
 
     def peek : Option[T] = {
