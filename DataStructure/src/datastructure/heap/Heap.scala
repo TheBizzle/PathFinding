@@ -57,7 +57,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     private def heapUp(elemIndex: Int) {
         if (elemIndex != 0) {
             val parentIndex = parentIndexOf(elemIndex)
-            if (isBetter(elemIndex, parentIndex)) { swap(elemIndex, parentIndex); heapUp(parentIndex) }
+            if (isBetterNode(elemIndex, parentIndex)) { swap(elemIndex, parentIndex); heapUp(parentIndex) }
         }
     }
 
@@ -84,7 +84,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     private def heapDown(elemIndex: Int) {
         if (!isLeaf(elemIndex)) {
             val childIndex = findBestChildIndex(elemIndex)
-            if (isBetter(childIndex, elemIndex)) { swap(childIndex, elemIndex); heapDown(childIndex) }
+            if (isBetterNode(childIndex, elemIndex)) { swap(childIndex, elemIndex); heapDown(childIndex) }
         }
     }
 
@@ -107,7 +107,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
         val secondIndex = firstIndex + 1
 
         if (heapArr(firstIndex) == None) throw new IllegalStateException("What did you do to my heap?!")
-        else if ((heapArr(secondIndex) == None) || isBetter(firstIndex, secondIndex)) firstIndex
+        else if ((heapArr(secondIndex) == None) || isBetterChild(firstIndex, secondIndex)) firstIndex
         else secondIndex
         
     }
@@ -116,8 +116,16 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
         (2 * parentIndex) + 1
     }
 
-    private def isBetter(firstIndex: Int, secondIndex: Int) : Boolean = {
-        orderProp(heapArr(firstIndex).get, heapArr(secondIndex).get) >= 0
+    private def isBetterChild(firstIndex: Int, secondIndex: Int) : Boolean = {
+        compareNodes(firstIndex, secondIndex) >= 0
+    }
+
+    private def isBetterNode(firstIndex: Int, secondIndex: Int) : Boolean = {
+        compareNodes(firstIndex, secondIndex) > 0
+    }
+
+    private def compareNodes(firstIndex: Int, secondIndex: Int) : Int = {
+        orderProp(heapArr(firstIndex).get, heapArr(secondIndex).get)
     }
 
     def peek : Option[T] = {
