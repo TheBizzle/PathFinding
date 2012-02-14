@@ -23,6 +23,8 @@ import testfunction.{PathingTestFunction, PTFConstructionBundle}
 object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapString, PTFConstructionBundle]
                              with TestAnalyzer[PathingStatus[StepData], PathingAnalysisFlagBundle, PathingAnalysisResultBundle] {
 
+    protected def TestFunctionRegex = "TestMapString([0-9]+)((_L([0-9]+))?)"
+
     lazy val tests = generateTests
 
     def getTestsToRun(testNums: List[Int]) : List[PathingTestFunction] = {
