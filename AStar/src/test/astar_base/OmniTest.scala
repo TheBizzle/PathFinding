@@ -13,15 +13,13 @@ import pathfinding.testscript.TestScript
 
 object OmniTest extends TestScript {
 
-    val dummy = Array[String]()
-    val startString = "Start %s test:\n"
-    val endString = "\nEnd %s test."
+    val tests = List((AStarDependencyTest, "dependency"), (AStarQuiet, "AStar"), (BiDirQuiet, "BiDir"))
 
-    List((AStarDependencyTest, "dependency"), (AStarQuiet, "AStar"), (BiDirQuiet, "BiDir")).foreach {
+    tests.foreach {
       case (test, name) =>
-          println(startString.format(name))
-          test.main(dummy)
-          println(endString.format(name))
+          println("Start %s test:\n".format(name))
+          test.main(Array[String]())
+          println("\nEnd %s test.".format(name))
     }
 
 }
