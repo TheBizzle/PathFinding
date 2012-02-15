@@ -6,6 +6,7 @@ import pathfinding.pathingmap.PathingMap
 import pathfinding.coordinate.{PriorityCoordinate, Coordinate}
 import pathfinding.statuses._
 import pathfinding.breadcrumb.Breadcrumb
+import collection.mutable.ListBuffer
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,7 +48,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
     override protected def step(stepData: T) : (T, List[Breadcrumb]) = {
 
         import stepData._
-        var outList = List[Breadcrumb]()         // Ewwwwww
+        val outList = new ListBuffer[Breadcrumb]()
 
         pathingMap.neighborsOf(loc).foreach { case(n) =>
 
@@ -68,7 +69,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
 
                     val crumb = new Coordinate(loc.x, loc.y)
                     breadcrumbArr(x)(y) = crumb
-                    outList = Breadcrumb(neighbor, crumb) :: outList
+                    outList += Breadcrumb(neighbor, crumb)
                     
                 }
 
@@ -79,7 +80,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
 
         }
 
-        (stepData, outList)
+        (stepData, outList.toList)
 
     }
 

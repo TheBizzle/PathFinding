@@ -5,6 +5,7 @@ import exceptions.{UnknownSubclassException, InvalidParameterException}
 import terrain._
 import pathingmapdata.{PathingMapStringInterpreter, PathingMapString}
 import pathfinding.coordinate.Coordinate
+import collection.mutable.ListBuffer
 
 /**
  * Created by IntelliJ IDEA.
@@ -45,17 +46,18 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
 
     override def toString : String = {
 
-        var acc = List[String]()
+        val acc = new ListBuffer[String]()
 
         for (j <- (rowCount - 1 to 0 by -1)) {
-            var temp = List('\n')
-            for (i <- (colCount - 1 to 0 by -1)) {
-                temp = PathingMap.terrainToChar(pathingMap(i)(j))::temp
+            val buffer = new ListBuffer[Char]()
+            buffer += '\n'
+            for (i <- (0 until colCount)) {
+                buffer += PathingMap.terrainToChar(pathingMap(i)(j))
             }
-            acc = (temp.mkString)::acc  // Prepend to the accumulator the string form of row "j" of this PathingMap
+            acc += buffer.mkString  // Append to the accumulator the string form of row "j" of this PathingMap
         }
 
-        acc.reverse.mkString
+        acc.mkString
 
     }
 

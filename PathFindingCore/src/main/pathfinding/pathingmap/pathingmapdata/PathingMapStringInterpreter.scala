@@ -3,6 +3,7 @@ package pathfinding.pathingmap.pathingmapdata
 import pathfinding.pathingmap.terrain._
 import pathfinding.coordinate.Coordinate
 import pathfinding.pathingmap.exceptions.{InvalidMapStringException, InvalidParameterException}
+import collection.mutable.ListBuffer
 
 /**
  * Created by IntelliJ IDEA.
@@ -51,15 +52,15 @@ object PathingMapStringInterpreter {
 
     private def findStartAndGoal(arr: Array[Array[Terrain]], cols: Int, rows: Int) : (Coordinate, Coordinate) = {
 
-        var selfList = List[Coordinate]()
-        var goalList = List[Coordinate]()
+        val selfList = new ListBuffer[Coordinate]()
+        val goalList = new ListBuffer[Coordinate]()
 
         for (x <- (0 until cols)) {
             for (y <- (0 until rows)) {
                 if (arr(x)(y) == Self)
-                    selfList = new Coordinate(x, y) :: selfList
+                    selfList += new Coordinate(x, y)
                 else if (arr(x)(y) == Goal)
-                    goalList = new Coordinate(x, y) :: goalList
+                    goalList += new Coordinate(x, y)
             }
         }
 
