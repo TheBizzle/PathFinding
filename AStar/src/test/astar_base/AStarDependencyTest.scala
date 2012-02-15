@@ -12,6 +12,6 @@ import tester.TestingCore
  * Time: 11:42 PM
  */
 
-object  AStarDependencyTest extends TestScript {
+object AStarDependencyTest extends TestScript {
     TestingCore(List[TestCriteria[_]](RunBaseTests), baseTests = AStarSuiteCoagulator.coagulate)
 }
