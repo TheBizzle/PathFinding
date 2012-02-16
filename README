@@ -2,4 +2,20 @@ This was initially just an implementation of A* in Scala with some crazy stuff a
 
 Originally, it was designed for use in Ants (for the Google AI challenge) as a preliminary attempt at implementing A* before actually doing so in OCaml (which is the language that my partner and I were using for Ants).
 
-You can pretty easily use the accompanying Coordinate and PathingMap packages to test any other pathfinding algorithm that you might want to interface with.  Additionally, you can pretty easily ignore those silly things in the Datastructure package; Heap and PriorityQueue were made for my preliminary attempt at implementing a PriorityQueue (since OCaml doesn't have a native implementation of one, and including the Base library wasn't really a good option); BiHashMap is kind of interesting, but also a little weird, and it's not entirely complete at the moment (though, it's worth mentioning that TerrainCharConverter relies on it right now).
+The dependencies are as follows:
+a) Tester
+b) DataStructure [relies on a)]
+c) PathFindingCore [relies on a), b)]
+d) AStar [relies on a), b), c)]
+
+Tester:
+A highly-flexible test-running suite.  It can quickly and easily be told to run tests with particular flags on, and you can specify precisely what tests you would like to run in a jiffy.  For example, you can run tests (1,52)U(58)U(75,91) in the verbose mode by passing in the TestCriteria list as follows: List[TestCriteria[_]]((1, 91, RunTest), (53, 74, SkipTest), (58, RunTest), Talkative) .  The code is very generic, and it can be used quite dynamically.  (See AStar.src.test.AStarDependencyTest or AStar.src.test.astar.AStarTest for good examples of its use.)
+
+DataStructure:
+You can pretty easily ignore the silly things in this package; Heap and PriorityQueue were made for my preliminary attempt at implementing a PriorityQueue (since OCaml doesn't have a native implementation of one, and including the Base library wasn't really a good option).  BiHashMap is kind of interesting, but it's also a little weird, and it's not entirely complete at the moment (though, it's worth mentioning that TerrainCharConverter in the AStar module relies on it).
+
+PathFindingCore:
+The bare necessities of building and visually representing your own pathfinding algorithm.
+
+AStar:
+Implementations of A* and bidirectional A* (which uses actors).
