@@ -5,7 +5,7 @@ import pathfinding.pathingmap.PathingMap
 import tester.testcluster.TestCluster
 import pathfinding.statuses.{Failure, Success, PathingStatus}
 import pathfinding.StepData
-import pathfinding.coordinate.{PriorityCoordinate, Coordinate}
+import pathfinding.coordinate.Coordinate
 import tester.testanalyzer.TestAnalyzer
 import tester.exceptions.{MysteriousDataException}
 import java.lang.reflect.Field

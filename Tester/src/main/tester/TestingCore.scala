@@ -2,7 +2,7 @@ package tester
 
 import criteria._
 import exceptions._
-import collection.immutable.{List, HashMap, Map}
+import collection.immutable.{List, Map}
 import annotation.tailrec
 import org.scalatest.Suite
 import testanalyzer.{TestAnalysisResultBundle, ExecutionStatus, TestAnalysisFlagBundle}

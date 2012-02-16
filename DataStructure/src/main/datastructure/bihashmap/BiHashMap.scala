@@ -1,7 +1,6 @@
 package datastructure.bihashmap
 
 import collection.mutable.HashMap
-import annotation.tailrec
 
 /**
  * Created by IntelliJ IDEA.
