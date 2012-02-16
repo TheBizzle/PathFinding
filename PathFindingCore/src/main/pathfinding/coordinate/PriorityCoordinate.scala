@@ -30,7 +30,7 @@ class PriorityCoordinate(xLoc: Int, yLoc: Int, priorityVal: Int) extends Coordin
     override def equals(that: Any) : Boolean = {
         that match {
             case thatCoord: PriorityCoordinate => super.equals(that) && (priority == thatCoord.priority)
-            case _ => false
+            case _                             => false
         }
     }
 

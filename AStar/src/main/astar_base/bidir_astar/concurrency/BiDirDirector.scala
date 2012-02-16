@@ -73,7 +73,7 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
     }
 
     def terminateActors(actorArgs: BiDirActor[T]*) {
-        actorArgs.foreach( _ ! BiDirActor.stopMessageStr )
+        actorArgs foreach( _ ! BiDirActor.stopMessageStr )
     }
 
     def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : ((PathingStatus[T], List[Breadcrumb]), (PathingStatus[T], List[Breadcrumb])) = {

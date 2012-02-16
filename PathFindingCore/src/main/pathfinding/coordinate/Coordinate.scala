@@ -29,14 +29,14 @@ case class Coordinate(xLoc: Int = Coordinate.InvalidValue, yLoc: Int = Coordinat
     def overlaps(that: Any) : Boolean = {
         that match {
             case thatCoord: Coordinate => (x == thatCoord.x) && (y == thatCoord.y)
-            case _ => false
+            case _                     => false
         }
     }
 
     override def equals(that: Any) : Boolean = {
         that match {
             case thatCoord: Coordinate => (thatCoord canEqual this) && (x == thatCoord.x) && (y == thatCoord.y)
-            case _ => false
+            case _                     => false
         }
     }
 

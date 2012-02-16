@@ -77,7 +77,7 @@ object PathingMapStringInterpreter {
     private def charToTerrain(c: Char) : Terrain = {
         TerrainCharConverter(c) match {
             case Some(x) => x
-            case None => throw new InvalidParameterException("" + c)
+            case None    => throw new InvalidParameterException("" + c)
         }
     }
 

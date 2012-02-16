@@ -1,9 +1,5 @@
 package tester.criteria
 
-import collection.mutable.HashMap
-import annotation.tailrec
-import tester.exceptions.MysteriousDataException
-
 /**
  * Created by IntelliJ IDEA.
  * User: Jason
@@ -13,30 +9,11 @@ import tester.exceptions.MysteriousDataException
 
 class BaseToggleFlagWrapper(toggles: List[TestToggleFlag], supportedToggles: List[TestToggleFlag]) {
 
-    private val FlagList = supportedToggles
+    private val flagList = supportedToggles
+    require(!toggles.map(flagList.contains(_)).contains(false))     // FlagList must contain everything in 'toggles'
+                                                                    // If this triggers, you likely created a new flag and forgot to add it to the implementing class's FlagList
 
-    private val flagMap = initializeFlagMap(FlagList)
-    toggles map ( verifyAndInsert(_) )
-
-    // No entries should be ADDED to the map after calling this once
-    private def initializeFlagMap(flags: List[TestToggleFlag]) : HashMap[TestToggleFlag, Boolean] = {
-        @tailrec def initializationHelper(flags: List[TestToggleFlag], flagMap: HashMap[TestToggleFlag, Boolean]) : HashMap[TestToggleFlag, Boolean] = {
-            flags match {
-                case Nil  => flagMap
-                case h::t => flagMap.put(h, false); initializationHelper(t, flagMap)
-            }
-        }
-        initializationHelper(flags, new HashMap[TestToggleFlag, Boolean]())
-    }
-
-    // No entries should be added—or even UPDATED—to the map after calling this once
-    private def verifyAndInsert(flag: TestToggleFlag) {
-        flagMap.get(flag) match {
-            case Some(x) => flagMap.update(flag, true)
-            case None => throw new MysteriousDataException("Unknown toggle: " + flag.toString +
-                                                           "\nDid you make a new flag and forget to add it to " + this.getClass.getName + "'s FlagList?")
-        }
-    }
+    private val flagMap = flagList map { case x => (x, toggles.contains(x)) } toMap
 
     def get(flag: TestToggleFlag) : Boolean = {
         flagMap(flag)

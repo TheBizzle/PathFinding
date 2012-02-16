@@ -30,12 +30,9 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
         val (gtsStepData, gtsCrumbs) = step(stepData.cloneForBiBackwards())
         stgStepData.assimilateBreadcrumbs(gtsCrumbs)
         gtsStepData.assimilateBreadcrumbs(stgCrumbs)
-        val director = new BiDirDirector(decide(_: BiDirStepData, maxIters), step)    // decide() gets partially applied
 
-        director.direct(stgStepData, gtsStepData) match {
-            case status: PathingStatus[BiDirStepData] => status
-            case _                                    => throw new UnexpectedDataException
-        }
+        val director = new BiDirDirector(decide(_: BiDirStepData, maxIters), step)    // decide() gets partially applied
+        director.direct(stgStepData, gtsStepData)
         
     }
 

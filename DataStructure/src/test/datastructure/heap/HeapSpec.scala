@@ -278,7 +278,7 @@ class HeapSpec extends FlatSpec with GivenWhenThen with BeforeAndAfterEach with 
             var evenCount = 0
             var oddCount = 0
 
-            heap.foreach { case x =>
+            heap foreach { case x =>
                 if ((x % 2) == 0) evenCount += 1
                 else oddCount += 1
             }

@@ -32,7 +32,7 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
     }
 
     def neighborsOf(loc: Coordinate) : List[Direction] = {
-        PathingMap.DirList.foldLeft(List[Direction]()){ case (acc,dir) => if ( getTerrain(PathingMap.findNeighborCoord(loc, dir)).isPassable ) dir::acc else acc }
+        PathingMap.DirList.filter { case x => getTerrain(PathingMap.findNeighborCoord(loc, x)).isPassable }
     }
 
     def step(start: Coordinate, end: Coordinate) {
@@ -77,10 +77,7 @@ object PathingMap {
     }
 
     private def terrainToChar(terrain: Terrain) : Char = {
-        TerrainCharConverter(terrain) match {
-            case Some(x) => x
-            case None => throw new InvalidParameterException("" + terrain)
-        }
+        TerrainCharConverter(terrain).get
     }
 
     def findNeighborCoord(loc: Coordinate, dir: Direction) : Coordinate = {
@@ -103,7 +100,7 @@ object PathingMap {
 
     def generateCloneWithPath(path: List[Coordinate], inMap: PathingMap) : PathingMap = {
         val outMap = inMap.clone()
-        path.foreach { case coord => outMap.pathingMap(coord.x)(coord.y) = Path }
+        path foreach { case coord => outMap.pathingMap(coord.x)(coord.y) = Path }
         outMap
     }
 

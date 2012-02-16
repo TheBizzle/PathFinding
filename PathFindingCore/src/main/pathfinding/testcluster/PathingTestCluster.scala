@@ -28,7 +28,7 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
     lazy val tests = generateTests
 
     def getTestsToRun(testNums: List[Int]) : List[PathingTestFunction] = {
-        tests.zipWithIndex.filter { case (x, y) => testNums.contains(y + 1) }.map ( _._1 ).toList
+        tests.zipWithIndex filter { case (x, y) => testNums.contains(y + 1) } map ( _._1 )
     }
 
     def getSize : Int = {
@@ -55,8 +55,7 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
 
     private def retracePath(breadcrumbs: Array[Array[Coordinate]], goal: Coordinate, pathingMap: PathingMap, isTalkative: Boolean) : List[Coordinate] = {
 
-        val pathTaken = eatBreadcrumbsForPath(breadcrumbs, goal).map { case x: PriorityCoordinate => x.asCoordinate
-                                                                       case x                     => x }
+        val pathTaken = eatBreadcrumbsForPath(breadcrumbs, goal) collect { case x: Coordinate => x }
 
         if (isTalkative)
             println("The path taken was: " + pathTaken + "\nHere, let me draw that for you on the map!\n")

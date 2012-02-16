@@ -32,10 +32,10 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen with ShouldMatchers {
         size should equal (inList.size)
 
         and("the set of As should hold all and only the As that were passed in")
-        ((aSet.foldLeft(true){ case (acc, x) => aList.contains(x) && acc }) && (aList.foldLeft(true){ case (acc, x) => aSet.contains(x) && acc })) should equal (true)
+        aList.sorted.zipAll(aSet.toList.sorted, -1, "-1") map { case (x,y) => x should equal (y) }
 
         and("the set of Bs should hold all and only the Bs that were passed in")
-        ((bSet.foldLeft(true){ case (acc, x) => bList.contains(x) && acc }) && (bList.foldLeft(true){ case (acc, x) => bSet.contains(x) && acc })) should equal (true)
+        bList.sorted.zipAll(bSet.toList.sorted, -1, "-1") map { case (x,y) => x should equal (y) }
 
     }
 
@@ -80,16 +80,16 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen with ShouldMatchers {
         val origBs = biHash.BSet
 
         and("the clone should contain all of the original's As")
-        (origAs.foldLeft(true){ case (acc, x) => cloneAs.contains(x) && acc }) should equal (true)
+        origAs foreach { cloneAs.contains(_) should equal (true) }
 
         and("the original should contain all of the clone's As")
-        (cloneAs.foldLeft(true){ case (acc, x) => origAs.contains(x) && acc }) should equal (true)
+        cloneAs foreach { origAs.contains(_) should equal (true) }
 
         and("the clone should contain all of the original's Bs")
-        (origBs.foldLeft(true){ case (acc, x) => cloneBs.contains(x) && acc }) should equal (true)
+        origBs foreach { cloneBs.contains(_) should equal (true) }
 
         and("the original should contain all of the clone's Bs")
-        (cloneBs.foldLeft(true){ case (acc, x) => origBs.contains(x) && acc }) should equal (true)
+        cloneBs foreach { origBs.contains(_) should equal (true) }
 
     }
 

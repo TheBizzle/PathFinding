@@ -50,7 +50,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
         import stepData._
         val outList = new ListBuffer[Breadcrumb]()
 
-        pathingMap.neighborsOf(loc).foreach { case(n) =>
+        pathingMap.neighborsOf(loc) foreach { case(n) =>
 
             val neighbor = PathingMap.findNeighborCoord(loc, n)
             val x = neighbor.x

@@ -73,8 +73,8 @@ object TestingCore {
                 case _                => Nil
             }
 
-            val testFlagPairs = List(isTalkative) zip List(Talkative)
-            val testToggles = testFlagPairs.foldRight(List[TestToggleFlag]()){ case (x,acc) => if (x._1) x._2 :: acc else acc }
+            val testFlagPairs = List(isTalkative) zip List[TestToggleFlag](Talkative)
+            val testToggles = testFlagPairs collect { case (true, x: TestToggleFlag) => x }
             val testFlagBundle = new TestFuncFlagBundle(testToggles)
             val testsToRun = handleTestIntervals(values, ranges, cluster.getSize)
 
@@ -122,7 +122,7 @@ object TestingCore {
     }
 
     private[tester] def applyValuesToArr(values: List[TestCriteriaValueTuple], arr: Array[Boolean]) : Array[Boolean] = {
-        values.foreach {
+        values foreach {
             case x =>
                 val isTesting = (x.criteria.flag == RunTest)
                 if (arr(x.criteria.guide) != isTesting)
@@ -145,7 +145,7 @@ object TestingCore {
 
         val resultArr = generateResultArray(testRanges, testValues, skipRanges, skipValues, overallMax)
         val outList = { for ( i <- 0 until resultArr.size;
-                              if (resultArr(i)) ) yield i }.toList
+                              if (resultArr(i)) ) yield i } toList
 
         if (!outList.isEmpty)
             outList
@@ -214,23 +214,20 @@ object TestingCore {
     }
 
     private[tester] def sortArgLists(args: List[TestCriteria[_]]) : Map[String, List[TestCriteria[_]]] = {
-        @tailrec def sortHelper(args: List[TestCriteria[_]], argMap: Map[String, List[TestCriteria[_]]]) : Map[String, List[TestCriteria[_]]] = {
-            args match {
-                case Nil  => argMap
-                case h::t =>
-                    val key = {
-                        h match {
-                            case x: TestCriteriaValueTuple => ArgKeyValue
-                            case x: TestCriteriaRangeTuple => ArgKeyRange
-                            case x: TestCriteriaToggleFlag => ArgKeyToggle
-                        }
-                    }
-                    sortHelper(t, argMap + (key -> (h :: argMap(key))))
-            }
+
+        val baseMap = Map(ArgKeyValue  -> List[TestCriteriaValueTuple](),
+                          ArgKeyRange  -> List[TestCriteriaRangeTuple](),
+                          ArgKeyToggle -> List[TestCriteriaToggleFlag]())
+
+        val argMap = args.groupBy {
+            case _: TestCriteriaValueTuple => ArgKeyValue
+            case _: TestCriteriaRangeTuple => ArgKeyRange
+            case _: TestCriteriaToggleFlag => ArgKeyToggle
+            case _                         => throw new MysteriousDataException("How did THAT get in there...?")
         }
-        sortHelper(args, HashMap[String, List[TestCriteria[_]]](ArgKeyValue  -> List[TestCriteriaValueTuple](),
-                                                                ArgKeyRange  -> List[TestCriteriaRangeTuple](),
-                                                                ArgKeyToggle -> List[TestCriteriaToggleFlag]()))
+
+        baseMap ++ argMap
+
     }
 
     private[tester] def sortCriteria[T <: TestCriteriaTuple[_, _] : Manifest](inList: List[T]) : List[T] = {
@@ -244,7 +241,7 @@ object TestingCore {
                 val sortedList = mediaryList sortWith { case (a, b) => a._1 < b._1 }           // Sort on TupleKey
                 val sortedIndexes = sortedList map { case x => x._2 }                          // Just keep the sorted list of Indexes
                 val bucketedArr = bucketAListOn_2(zippedList)                                  // Make an array that maps Index->Tuple
-                sortedIndexes.foldRight(List[T]()) { case (x, acc) => bucketedArr(x) :: acc }  // Fold the Indexes to generate an ordered list of Tuples
+                sortedIndexes map { bucketedArr(_) }                                           // Map the Indexes to generate an ordered list of Tuples
         }
     }
 

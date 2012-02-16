@@ -15,7 +15,7 @@ object OmniTest extends TestScript {
 
     val tests = List((AStarDependencyTest, "dependency"), (AStarQuiet, "AStar"), (BiDirQuiet, "BiDir"))
 
-    tests.foreach {
+    tests foreach {
       case (test, name) =>
           println("Start %s test:\n".format(name))
           test.main(Array[String]())

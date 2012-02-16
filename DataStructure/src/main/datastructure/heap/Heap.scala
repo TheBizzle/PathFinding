@@ -149,8 +149,8 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     }
 
     def foreach[U](f: (T => U)) {
-        val tempArr = heapArr.foldRight(List[T]()){ case (x, acc) => if (x != None) x.get :: acc else acc }
-        tempArr.foreach(f)
+        val tempArr = heapArr collect { case Some(x) => x }
+        tempArr foreach(f)
     }
 
     protected def initializeArr() {
@@ -164,7 +164,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     }
 
     def toList : List[T] = {
-        heapArr.filter(_ != None).map(_.get).toList
+        heapArr collect { case Some(x) => x } toList
     }
 
     override def clone() : Heap[T] = {

@@ -87,7 +87,7 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
         val a = aKey
         abMap.get(a) match {
             case Some(b) => baMap.remove(b)
-            case None => // Doesn't matter
+            case None    => // Doesn't matter
         }
         abMap.remove(a)
     }
@@ -95,7 +95,7 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
     def remove(bKey: B) : Option[A] = {
         baMap.get(bKey) match {
             case Some(a) => abMap.remove(a)
-            case None => // Doesn't matter
+            case None    => // Doesn't matter
         }
         baMap.remove(bKey)
     }
@@ -123,7 +123,7 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
 
         hold match {
             case Some(b) => baMap.remove(b); baMap.put(bVal, a)
-            case None => // Doesn't matter
+            case None    => // Doesn't matter
         }
 
     }
@@ -135,7 +135,7 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
 
         hold match {
             case Some(a) => abMap.remove(a); abMap.put(aVal, bKey)
-            case None => // Doesn't matter
+            case None    => // Doesn't matter
         }
 
     }
@@ -156,7 +156,7 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
     override def equals(that: Any) : Boolean = {
         that match {
             case thatHash: BiHashMap[A, B] => ((thatHash.abMap.equals(abMap) && thatHash.baMap.equals(baMap)) || (thatHash.abMap.equals(baMap) && thatHash.baMap.equals(abMap)))
-            case _ => false
+            case _                         => false
         }
     }
 
@@ -184,12 +184,8 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
 
 object BiHashMap {
     def apply[A: Manifest, B: Manifest] (tupSeq: (A, B)*) : BiHashMap[A, B] = {
-        @tailrec def applyHelper[A,B] (retMap: BiHashMap[A,B], tupList: List[(A, B)]) : BiHashMap[A, B] = {
-            tupList match {
-                case (a, b)::t => retMap.put(a, b); applyHelper(retMap, t)
-                case Nil => retMap
-            }
-        }
-        applyHelper(new BiHashMap[A, B](), tupSeq.seq.toList)
+        val bhMap = new BiHashMap[A, B]()
+        tupSeq foreach { case (a, b) => bhMap.put(a, b) }
+        bhMap
     }
 }

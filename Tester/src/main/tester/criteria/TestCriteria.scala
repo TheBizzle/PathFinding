@@ -122,7 +122,7 @@ object TestCriteriaRangeTuple {
         that map ( rangeTupleToValueTupleList(_) )
     }
     implicit def rangeTupleToValueTupleList(that: TestCriteriaRangeTuple) : List[TestCriteriaValueTuple] = {
-        Range(that.criteria.guide._1, that.criteria.guide._2).inclusive.foldLeft(List[TestCriteriaValueTuple]()){ case (acc, x) => TestCriteriaValueTuple(x, that.criteria.flag) :: acc }
+        Range(that.criteria.guide._1, that.criteria.guide._2).inclusive map ( TestCriteriaValueTuple(_, that.criteria.flag) ) toList
     }
 }
 
@@ -135,7 +135,7 @@ class TestCriteriaToggleFlag(criteriaFlag: TestToggleFlag) extends TestCriteria(
     override def equals(that: Any) : Boolean = {
         that match {
             case thatToggle: TestCriteriaToggleFlag => (thatToggle canEqual this) && (criteria == thatToggle.criteria)
-            case _ => false
+            case _                                  => false
         }
     }
 
