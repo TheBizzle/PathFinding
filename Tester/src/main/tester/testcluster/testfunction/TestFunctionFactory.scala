@@ -17,17 +17,9 @@ trait TestFunctionFactory[T <: TestFunction[_, U, _, _, _], U <: TestSubject, V 
 
     // Essentially, uses reflection to find to find all U-type fields of PathingTestCluster
     def generateTests : List[T] = {
-
         val generator = generateTestFunction(_: (Field, String), regex = TestFunctionRegex)  // Partial application
         val fieldTuples = this.getClass.getDeclaredFields.map { case x => (x, x.getName) }
-
-        fieldTuples.foldRight (List[T]()) { case(x, acc) =>
-            generator(x) match {
-                case Some(y) => y :: acc
-                case None    => acc
-            }
-        }
-
+        fieldTuples.map{ generator(_) }.collect{ case Some(x) => x }.toList
     }
 
     protected def generateTestFunction(fieldData: (Field, String), regex: String) : Option[T]
