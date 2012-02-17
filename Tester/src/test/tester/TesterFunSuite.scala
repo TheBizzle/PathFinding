@@ -50,31 +50,31 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
         val inMap = HashMap[String, List[TestCriteria[_]]](TestingCore.ArgKeyValue  -> List[TestCriteriaValueTuple](),
                                                            TestingCore.ArgKeyRange  -> List[TestCriteriaRangeTuple](),
                                                            TestingCore.ArgKeyToggle -> List[TestCriteriaToggleFlag]())
-        val result = TestingCore.assessPathingDesire(inMap)
+        val result = TestingCore.assessExternalityDesire(inMap)
         result should equal (false)
     }
 
     test("assessPathingDesire - Map without values/ranges") {
         val inMap = HashMap[String, List[TestCriteria[_]]](TestingCore.ArgKeyValue  -> List[TestCriteriaValueTuple](),
                                                            TestingCore.ArgKeyRange  -> List[TestCriteriaRangeTuple](),
-                                                           TestingCore.ArgKeyToggle -> List[TestCriteriaToggleFlag](SkipPathingTests))
-        val result = TestingCore.assessPathingDesire(inMap)
+                                                           TestingCore.ArgKeyToggle -> List[TestCriteriaToggleFlag](SkipExternalTests))
+        val result = TestingCore.assessExternalityDesire(inMap)
         result should equal (false)
     }
 
     test("assessPathingDesire - Map without ranges") {
         val inMap = HashMap[String, List[TestCriteria[_]]](TestingCore.ArgKeyValue  -> List[TestCriteriaValueTuple](TestCriteriaValueTuple(1, RunTest)),
                                                            TestingCore.ArgKeyRange  -> List[TestCriteriaRangeTuple](),
-                                                           TestingCore.ArgKeyToggle -> List[TestCriteriaToggleFlag](SkipPathingTests))
-        val result = TestingCore.assessPathingDesire(inMap)
+                                                           TestingCore.ArgKeyToggle -> List[TestCriteriaToggleFlag](SkipExternalTests))
+        val result = TestingCore.assessExternalityDesire(inMap)
         result should equal (true)
     }
 
     test("assessPathingDesire - Map without values") {
         val inMap = HashMap[String, List[TestCriteria[_]]](TestingCore.ArgKeyValue  -> List[TestCriteriaValueTuple](),
                                                            TestingCore.ArgKeyRange  -> List[TestCriteriaRangeTuple](TestCriteriaRangeTuple(1, 1, RunTest)),
-                                                           TestingCore.ArgKeyToggle -> List[TestCriteriaToggleFlag](SkipPathingTests))
-        val result = TestingCore.assessPathingDesire(inMap)
+                                                           TestingCore.ArgKeyToggle -> List[TestCriteriaToggleFlag](SkipExternalTests))
+        val result = TestingCore.assessExternalityDesire(inMap)
         result should equal (true)
     }
 
@@ -82,7 +82,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
         val inMap = HashMap[String, List[TestCriteria[_]]](TestingCore.ArgKeyValue  -> List[TestCriteriaValueTuple](TestCriteriaValueTuple(3, RunTest)),
                                                            TestingCore.ArgKeyRange  -> List[TestCriteriaRangeTuple](TestCriteriaRangeTuple(1, 1, RunTest), TestCriteriaRangeTuple(2, 2, RunTest)),
                                                            TestingCore.ArgKeyToggle -> List[TestCriteriaToggleFlag]())
-        val result = TestingCore.assessPathingDesire(inMap)
+        val result = TestingCore.assessExternalityDesire(inMap)
         result should equal (true)
     }
 
@@ -330,8 +330,8 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
         val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(inList)
 
         result === true
-        offenderPart1 === Some(TestCriteriaRangeTuple(3, 7, RunTest))
-        offenderPart2 === Some(TestCriteriaRangeTuple(7, 9, RunTest))
+        offenderPart1 === Option(TestCriteriaRangeTuple(3, 7, RunTest))
+        offenderPart2 === Option(TestCriteriaRangeTuple(7, 9, RunTest))
 
     }
 
@@ -341,8 +341,8 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
         val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(inList)
 
         result === true
-        offenderPart1 === Some(TestCriteriaRangeTuple(1, 5, RunTest))
-        offenderPart2 === Some(TestCriteriaRangeTuple(3, 7, RunTest))
+        offenderPart1 === Option(TestCriteriaRangeTuple(1, 5, RunTest))
+        offenderPart2 === Option(TestCriteriaRangeTuple(3, 7, RunTest))
 
     }
 
@@ -388,7 +388,7 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
     }
 
     test("sortArgLists - One toggle") {
-        val inToggle = TestCriteriaToggleFlag(SkipPathingTests)
+        val inToggle = TestCriteriaToggleFlag(SkipExternalTests)
         val resultMap = TestingCore.sortArgLists(List(inToggle))
         val (resultValues, resultRanges, resultToggles) = (resultMap(TestingCore.ArgKeyValue), resultMap(TestingCore.ArgKeyRange), resultMap(TestingCore.ArgKeyToggle))
         resultValues should equal (Nil)
@@ -405,8 +405,8 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
         val inRange2 = TestCriteriaRangeTuple(2, 4, SkipTest)
         val inRange3 = TestCriteriaRangeTuple(10, 13, RunTest)
 
-        val inToggle1 = TestCriteriaToggleFlag(SkipPathingTests)
-        val inToggle2 = TestCriteriaToggleFlag(SkipPathingTests)
+        val inToggle1 = TestCriteriaToggleFlag(SkipExternalTests)
+        val inToggle2 = TestCriteriaToggleFlag(SkipExternalTests)
 
         val resultMap = TestingCore.sortArgLists(List(inValue1, inToggle1, inRange3, inRange1, inToggle2, inRange2, inValue2))
         val (valueList, rangeList, toggleList) = (resultMap(TestingCore.ArgKeyValue), resultMap(TestingCore.ArgKeyRange), resultMap(TestingCore.ArgKeyToggle))

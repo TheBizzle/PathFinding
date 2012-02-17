@@ -28,7 +28,7 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
     lazy val tests = generateTests
 
     def getTestsToRun(testNums: List[Int]) : List[PathingTestFunction] = {
-        tests.zipWithIndex filter { case (x, y) => testNums.contains(y + 1) } map ( _._1 )
+        tests.zipWithIndex collect { case (x, y) if (testNums.contains(y + 1)) => x }
     }
 
     def getSize : Int = {
@@ -93,7 +93,7 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
             val Matcher(testNum, shouldPass, _, foundLength) = testField._2
             val expectedPathLength = if (foundLength != null) foundLength.toInt else -1
             val func = construct(testField._1.get(this).asInstanceOf[PathingMapString], testNum.toInt, !(shouldPass isEmpty), new PTFConstructionBundle(expectedPathLength))
-            Some(func)
+            Option(func)
         }
         else None
     }

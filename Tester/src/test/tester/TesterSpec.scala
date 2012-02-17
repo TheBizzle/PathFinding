@@ -47,8 +47,8 @@ class TesterSpec extends FlatSpec with GivenWhenThen {
 
     it should "be mad when you say that you don't want to run tests and then pass it test numbers to run" in {
 
-        given("a SkipPathingTests flag and a request to run a pathing test")
-        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, RunTest), TestCriteriaToggleFlag(SkipPathingTests))
+        given("a SkipExternalTests flag and a request to run a pathing test")
+        val inList = List[TestCriteria[_]](TestCriteriaRangeTuple(1, 6, RunTest), TestCriteriaToggleFlag(SkipExternalTests))
 
         when("the tester is invoked")
         then("ContradictoryArgsException should be thrown")

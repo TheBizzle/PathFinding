@@ -32,7 +32,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     private def insertAtEnd(elem: T) {
         val arrSize = size
         if (arrSize == heapArr.size) increaseArrSize()
-        heapArr(arrSize) = Some(elem)
+        heapArr(arrSize) = Option(elem)
     }
 
     private def increaseArrSize() {

@@ -84,18 +84,12 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
 
     def remove(aKey: => A) : Option[B] = {
         val a = aKey
-        abMap.get(a) match {
-            case Some(b) => baMap.remove(b)
-            case None    => // Doesn't matter
-        }
+        abMap.get(a) foreach (baMap.remove(_))
         abMap.remove(a)
     }
 
     def remove(bKey: B) : Option[A] = {
-        baMap.get(bKey) match {
-            case Some(a) => abMap.remove(a)
-            case None    => // Doesn't matter
-        }
+        baMap.get(bKey) foreach (abMap.remove(_))
         baMap.remove(bKey)
     }
 
@@ -115,28 +109,16 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
     }
 
     def update(aKey: => A, bVal: B) {
-
         val a = aKey
         val hold = abMap.get(a)
         abMap.update(a, bVal)
-
-        hold match {
-            case Some(b) => baMap.remove(b); baMap.put(bVal, a)
-            case None    => // Doesn't matter
-        }
-
+        hold foreach { case b => baMap.remove(b); baMap.put(bVal, a) }
     }
 
     def update(bKey: B, aVal: A) {
-
         val hold = baMap.get(bKey)
         baMap.update(bKey, aVal)
-
-        hold match {
-            case Some(a) => abMap.remove(a); abMap.put(aVal, bKey)
-            case None    => // Doesn't matter
-        }
-
+        hold foreach { case a => abMap.remove(a); abMap.put(aVal, bKey) }
     }
 
     def clear() {

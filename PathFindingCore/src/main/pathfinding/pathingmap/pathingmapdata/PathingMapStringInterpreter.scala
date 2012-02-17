@@ -75,10 +75,7 @@ object PathingMapStringInterpreter {
     }
 
     private def charToTerrain(c: Char) : Terrain = {
-        TerrainCharConverter(c) match {
-            case Some(x) => x
-            case None    => throw new InvalidParameterException("" + c)
-        }
+        TerrainCharConverter(c).get
     }
 
     private def initialize2DTerrainArr(cols: Int, rows: Int, defaultVal: Terrain) : Array[Array[Terrain]] = {

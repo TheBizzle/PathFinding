@@ -43,35 +43,25 @@ object TestingCore {
                                          cluster: TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], Subject, TFConsBundle],
                                          baseTests: Seq[Suite]) {
 
-        val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[List[TestCriteriaToggleFlag]]] match {
-            case None    => throw new MysteriousDataException("OMG, what did you do?!")
-            case Some(x) => x
-        }
+        val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[List[TestCriteriaToggleFlag]]].getOrElse(throw new MysteriousDataException("OMG, what did you do?!"))
 
         val toggles = new TestToggleFlagWrapper(rawToggles)
-        val wantsToRunPathing = assessPathingDesire(argMap)
-        val (isTalkative, isRunningBaseTests, isSkippingPathingTests, isStacktracing) = (toggles.get(Talkative), toggles.get(RunBaseTests), toggles.get(SkipPathingTests), toggles.get(StackTrace))
+        val wantsToRunExternals = assessExternalityDesire(argMap)
+        val (isTalkative, isRunningBaseTests, isSkippingExternalTests, isStacktracing) = (toggles.get(Talkative), toggles.get(RunBaseTests), toggles.get(SkipExternalTests), toggles.get(StackTrace))
 
-        if (isSkippingPathingTests && wantsToRunPathing)
-            throw new ContradictoryArgsException("If you want skip the pathing tests, you should not specify pathing tests to run.")
+        if (isSkippingExternalTests && wantsToRunExternals)
+            throw new ContradictoryArgsException("If you want skip the external tests, you should not specify external tests to run.")
 
-        if (!wantsToRunPathing && !isRunningBaseTests)
-            throw new NotRunningTestsException("You can't run the test suite if you're going to skip the pathing tests AND the base tests")
+        if (!wantsToRunExternals && !isRunningBaseTests)
+            throw new NotRunningTestsException("You can't run the test suite if you're going to skip the external tests AND the base tests")
 
-        if (!isSkippingPathingTests && wantsToRunPathing) {
+        if (!isSkippingExternalTests && wantsToRunExternals) {
 
             val valuesOption = argMap.get(ArgKeyValue).asInstanceOf[Option[List[TestCriteriaValueTuple]]]
             val rangesOption = argMap.get(ArgKeyRange).asInstanceOf[Option[List[TestCriteriaRangeTuple]]]
 
-            val values = valuesOption  match {
-                case Some(x @ (h::t)) => sortCriteria(x)
-                case _                => Nil
-            }
-
-            val ranges = rangesOption match {
-                case Some(x @ (h::t)) => sortCriteria(x)
-                case _                => Nil
-            }
+            val values = valuesOption map (sortCriteria(_)) getOrElse(Nil)
+            val ranges = rangesOption map (sortCriteria(_)) getOrElse(Nil)
 
             val testFlagPairs = List(isTalkative) zip List[TestToggleFlag](Talkative)
             val testToggles = testFlagPairs collect { case (true, x: TestToggleFlag) => x }
@@ -141,7 +131,7 @@ object TestingCore {
         val overallMax = if (maxValueVal > maxRangeVal) maxValueVal else maxRangeVal
 
         if (overallMax < 1)
-            throw new NotRunningTestsException("All runnable tests were excluded!  Use the SkipPathingTests flag, instead!")
+            throw new NotRunningTestsException("All runnable tests were excluded!  Use the SkipExternalTests flag, instead!")
 
         val resultArr = generateResultArray(testRanges, testValues, skipRanges, skipValues, overallMax)
         val outList = { for ( i <- 0 until resultArr.size;
@@ -150,7 +140,7 @@ object TestingCore {
         if (!outList.isEmpty)
             outList
         else
-            throw new NotRunningTestsException("All runnable tests were excluded!  Use the SkipPathingTests flag, instead!")
+            throw new NotRunningTestsException("All runnable tests were excluded!  Use the SkipExternalTests flag, instead!")
 
     }
 
@@ -206,11 +196,11 @@ object TestingCore {
         baseTests foreach { case x => print("\n"); x.execute(stats = true) }
     }
 
-    private[tester] def assessPathingDesire(argMap:  Map[String, List[TestCriteria[_]]]) : Boolean = {
-        def hasPathingDesire(h: TestCriteria[_]) : Boolean = {
+    private[tester] def assessExternalityDesire(argMap:  Map[String, List[TestCriteria[_]]]) : Boolean = {
+        def hasExternalityDesire(h: TestCriteria[_]) : Boolean = {
             h.asInstanceOf[TestCriteria[TestTuple[_,_]]].criteria.flag == RunTest
         }
-        argMap(ArgKeyValue).exists(hasPathingDesire) || argMap(ArgKeyRange).exists(hasPathingDesire)
+        argMap(ArgKeyValue).exists(hasExternalityDesire) || argMap(ArgKeyRange).exists(hasExternalityDesire)
     }
 
     private[tester] def sortArgLists(args: List[TestCriteria[_]]) : Map[String, List[TestCriteria[_]]] = {

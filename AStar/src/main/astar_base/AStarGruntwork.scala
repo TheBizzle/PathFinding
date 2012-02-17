@@ -28,10 +28,10 @@ trait AStarGruntwork[T <: AStarStepData] {
             if (!queue.isEmpty)
                 getFreshLoc(queue, beenThere)
             else
-                None      // Exit point (failure)
+                None        // Exit point (failure)
         }
         else
-            Some(loc)     // Exit point (success)
+            Option(loc)     // Exit point (success)
     }
 
     protected def queueDoesContain(coord: Coordinate, queue: PriorityQueue[PriorityCoordinate]) : Boolean = {
