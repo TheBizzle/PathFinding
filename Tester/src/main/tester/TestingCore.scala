@@ -64,7 +64,7 @@ object TestingCore {
             val ranges = rangesOption map (sortCriteria(_)) getOrElse(Nil)
 
             val testFlagPairs = List(isTalkative) zip List[TestToggleFlag](Talkative)
-            val testToggles = testFlagPairs collect { case (true, x: TestToggleFlag) => x }
+            val testToggles = testFlagPairs collect { case (true, x) => x }
             val testFlagBundle = new TestFuncFlagBundle(testToggles)
             val testsToRun = handleTestIntervals(values, ranges, cluster.getSize)
 
@@ -223,20 +223,21 @@ object TestingCore {
     private[tester] def sortCriteria[T <: TestCriteriaTuple[_, _] : Manifest](inList: List[T]) : List[T] = {
         inList match {
             case Nil    => Nil
-            case h::t   =>
-                // Alternatively, I could probably just do 'inList sortWith { case (a, b) => a.getKey < b.getKey }', but... I find this much more clever
+            case _      =>
+                // Alternatively, I could probably just do "inList sortWith (_.getKey < _.getKey)", but... I find this much more clever
 
                 val zippedList = inList.zipWithIndex                                           // Make (Tuple, Index) pairs
                 val mediaryList = zippedList map { case x => (x._1.getKey, x._2) }             // Make (TupleKey, Index) pairs
-                val sortedList = mediaryList sortWith { case (a, b) => a._1 < b._1 }           // Sort on TupleKey
-                val sortedIndexes = sortedList map { case x => x._2 }                          // Just keep the sorted list of Indexes
+                val sortedList = mediaryList sortWith (_._1 < _._1)                            // Sort on TupleKey
+                val sortedIndexes = sortedList map (_._2)                                      // Just keep the sorted list of Indexes
                 val bucketedArr = bucketAListOn_2(zippedList)                                  // Make an array that maps Index->Tuple
-                sortedIndexes map { bucketedArr(_) }                                           // Map the Indexes to generate an ordered list of Tuples
+                sortedIndexes map (bucketedArr(_))                                             // Map the Indexes to generate an ordered list of Tuples
         }
     }
 
     // This will break terribly if the ordered version of the set of all inList._2 values isn't equivalent to the set of all numbers 0 -> (inList.size - 1)
     // If you don't know what that means... you'll figure it out in due time.  Don't say that I didn't warn you, though.
+    // (P.S. It means that ((inList map (_._2)) == (0 until inList.size)) MUST be true)
     private[tester] def bucketAListOn_2[T : Manifest](inList: List[(T, Int)]) : Array[T] = {
         val buckets = new Array[T](inList.size)
         inList.foreach { case x => buckets(x._2) = x._1 }
@@ -247,7 +248,7 @@ object TestingCore {
     @tailrec
     private[tester] def containsOverlaps(inList: List[TestCriteriaRangeTuple]) : (Boolean, Option[TestCriteriaRangeTuple], Option[TestCriteriaRangeTuple]) = {
         inList match {
-            case h1::h2::t =>
+            case h1::h2::_ =>
                 if (h1 intersects h2)
                     (true, Some(h1), Some(h2))
                 else
