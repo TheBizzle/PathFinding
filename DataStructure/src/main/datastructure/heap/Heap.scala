@@ -106,8 +106,8 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
         val firstIndex = firstChildIndexOf(parentIndex)
         val secondIndex = firstIndex + 1
 
-        if (heapArr(firstIndex) == None) throw new IllegalStateException("What did you do to my heap?!")
-        else if ((heapArr(secondIndex) == None) || isBetterChild(firstIndex, secondIndex)) firstIndex
+        if (heapArr(firstIndex).isEmpty) throw new IllegalStateException("What did you do to my heap?!")
+        else if ((heapArr(secondIndex).isEmpty) || isBetterChild(firstIndex, secondIndex)) firstIndex
         else secondIndex
         
     }

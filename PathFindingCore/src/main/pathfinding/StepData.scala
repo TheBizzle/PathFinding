@@ -20,7 +20,7 @@ abstract class StepData(currentLocation: Coordinate,
     val goal = goalLocation
     val pathingMap = pMap
     val breadcrumbArr = breadcrumbs
-    val endGoal = if (null == endGoalLocation) goalLocation else endGoalLocation    // This is a variable that is useful for A* algorithms that
+    val endGoal = if (null == endGoalLocation) goalLocation else endGoalLocation    // This is a variable that is useful for pathing algorithms that
                                                                                     // might have multiple intermediary goals,
                                                                                     // or for the backwards-moving track of bidirectional A*
 

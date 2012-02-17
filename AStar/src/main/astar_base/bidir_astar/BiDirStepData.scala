@@ -85,7 +85,7 @@ class BiDirStepData(currentLocation: Coordinate,
             }
         }
         reversalHelper(loc, breadcrumbArr)
-        breadcrumbArr(loc.x)(loc.y) = new Coordinate()
+        breadcrumbArr(loc.x)(loc.y) = Coordinate()
     }
 
 }
@@ -103,7 +103,7 @@ object BiDirStepData extends StepDataSingleton[BiDirStepData] with FactoryThatTa
 
     override protected def generateExtras(stepData: AStarStepData) : Extras = {
         import stepData.pathingMap._
-        val otherBreadcrumbs = initialize2DArr(colCount, rowCount, new Coordinate())
+        val otherBreadcrumbs = initialize2DArr(colCount, rowCount, Coordinate())
         otherBreadcrumbs :: HNil
     }
 

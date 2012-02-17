@@ -80,10 +80,10 @@ object PathingMap {
 
     def findNeighborCoord(loc: Coordinate, dir: Direction) : Coordinate = {
         dir match {
-            case North => new Coordinate(loc.x, loc.y + 1)
-            case South => new Coordinate(loc.x, loc.y - 1)
-            case East  => new Coordinate(loc.x + 1, loc.y)
-            case West  => new Coordinate(loc.x - 1, loc.y)
+            case North => Coordinate(loc.x, loc.y + 1)
+            case South => Coordinate(loc.x, loc.y - 1)
+            case East  => Coordinate(loc.x + 1, loc.y)
+            case West  => Coordinate(loc.x - 1, loc.y)
             case _     => throw new UnknownSubclassException("" + dir)
         }
     }

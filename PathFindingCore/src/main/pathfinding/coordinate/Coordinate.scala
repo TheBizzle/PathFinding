@@ -14,7 +14,7 @@ case class Coordinate(x: Int = Coordinate.InvalidValue, y: Int = Coordinate.Inva
     }
 
     override def clone() : Coordinate = {
-        new Coordinate(x, y)
+        Coordinate(x, y)
     }
 
     /**

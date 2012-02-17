@@ -26,22 +26,19 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
 
         if (!queue.isEmpty && (iters < maxIters)) {
 
-            val freshOption = getFreshLoc(queue, beenThereArr)
-            if (freshOption == None) return Failure(stepData)         // Exit point (failure)
-
-            val freshLoc = freshOption.get
+            val freshLoc = getFreshLoc(queue, beenThereArr).getOrElse(return Failure(stepData))   // Exit point (failure)
             pathingMap.step(loc, freshLoc)
 
             if (goalIsFound(stepData, freshLoc))
-                return Success(makeNewStepData(stepData, freshLoc))     // Exit point (success)
+                return Success(makeNewStepData(stepData, freshLoc))                               // Exit point (success)
 
             stepData.incIters()
             beenThereArr(freshLoc.x)(freshLoc.y) = true
-            Continue(makeNewStepData(stepData, freshLoc))               // Exit point (only to return again soon)
+            Continue(makeNewStepData(stepData, freshLoc))                                         // Exit point (only to return again soon)
 
         }
         else
-            Failure(makeNewStepData(stepData, new Coordinate()))  // Exit point (failure)
+            Failure(makeNewStepData(stepData, Coordinate()))                                      // Exit point (failure)
 
     }
 
@@ -64,10 +61,10 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
                 if (!doesContainNeighbor || (newCost < costArr(x)(y))) {
 
                     costArr(x)(y) = newCost
-                    heuristicArr(x)(y) = heuristic(new HeuristicBundle(neighbor, goal))
+                    heuristicArr(x)(y) = heuristic(HeuristicBundle(neighbor, goal))
                     totalArr(x)(y) = costArr(x)(y) + heuristicArr(x)(y)
 
-                    val crumb = new Coordinate(loc.x, loc.y)
+                    val crumb = Coordinate(loc.x, loc.y)
                     breadcrumbArr(x)(y) = crumb
                     outList += Breadcrumb(neighbor, crumb)
                     
@@ -87,7 +84,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
     override protected def primeStepData(stepData: T) : T = {
         import stepData._
         costArr(loc.x)(loc.y) = 0
-        heuristicArr(loc.x)(loc.y) = heuristic(new HeuristicBundle(loc, goal))
+        heuristicArr(loc.x)(loc.y) = heuristic(HeuristicBundle(loc, goal))
         totalArr(loc.x)(loc.y) = costArr(loc.x)(loc.y) + heuristicArr(loc.x)(loc.y)
         stepData
     }

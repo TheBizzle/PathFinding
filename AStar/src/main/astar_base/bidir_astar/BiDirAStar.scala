@@ -20,7 +20,7 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
 
     override def apply(mapString: PathingMapString) : PathingStatus[BiDirStepData] = {
         val stepData = BiDirStepData(mapString)
-        execute(primeStepData(stepData), maxIters = calculateMaxIters(stepData.pathingMap.colCount, stepData.pathingMap.rowCount))
+        execute(primeStepData(stepData), calculateMaxIters(stepData.pathingMap.colCount, stepData.pathingMap.rowCount))
     }
 
     override protected def execute(stepData: BiDirStepData, maxIters: Int) : PathingStatus[BiDirStepData] = {

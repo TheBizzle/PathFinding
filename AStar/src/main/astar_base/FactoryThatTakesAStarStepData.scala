@@ -33,7 +33,7 @@ trait FactoryThatTakesAStarStepData[T] {
         val costArr = initialize2DArr(colCount, rowCount, BadVal)
         val heuristicArr = initialize2DArr(colCount, rowCount, BadVal)
         val totalArr = initialize2DArr(colCount, rowCount, BadVal)
-        val breadcrumbArr = initialize2DArr(colCount, rowCount, new Coordinate())
+        val breadcrumbArr = initialize2DArr(colCount, rowCount, Coordinate())
 
         val stepData = new AStarStepData(start, goal, beenThere, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr)
         val extras = generateExtras(stepData)

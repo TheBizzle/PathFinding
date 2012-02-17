@@ -26,7 +26,7 @@ object AStar extends AStarBase[AStarStepData](1.0, HeuristicLib.manhattanDistanc
 
     override def apply(mapString: PathingMapString) : PathingStatus[AStarStepData] = {
         val stepData = AStarStepData(mapString)
-        execute(primeStepData(stepData), maxIters = calculateMaxIters(stepData.pathingMap.colCount, stepData.pathingMap.rowCount))
+        execute(primeStepData(stepData), calculateMaxIters(stepData.pathingMap.colCount, stepData.pathingMap.rowCount))
     }
 
     override protected def execute(stepData: AStarStepData, maxIters: Int) : PathingStatus[AStarStepData] = {

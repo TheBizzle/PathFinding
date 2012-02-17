@@ -33,6 +33,8 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
 
     // The arrow in the parameter list is a dirty Scala trick for getting around the fact that
     // apply(A) and apply(B) have the same signatures to the JVM after type erasure
+    // (Many times, you'll see a by-name parameter of type A get stored into a variable right away;
+    //  that's so we don't accidentally keep reevaluating it each time that it is used)
     def apply(aKey: => A) : B = {
         val a = aKey
         abMap(a)

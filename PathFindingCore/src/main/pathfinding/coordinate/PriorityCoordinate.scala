@@ -7,16 +7,14 @@ package pathfinding.coordinate
  * Time: 1:52 AM
  */
 
-class PriorityCoordinate(xLoc: Int, yLoc: Int, priorityVal: Int) extends Coordinate(xLoc, yLoc) {
-
-    val priority = priorityVal
+case class PriorityCoordinate(private val xLoc: Int, private val yLoc: Int, priority: Int) extends Coordinate(xLoc, yLoc) {
 
     def this(coord: Coordinate, priorityVal: Int) {
         this(coord.x, coord.y, priorityVal)
     }
 
     def asCoordinate : Coordinate = {
-        new Coordinate(x, y)
+        Coordinate(x, y)
     }
 
     override def toString : String = {
@@ -24,7 +22,7 @@ class PriorityCoordinate(xLoc: Int, yLoc: Int, priorityVal: Int) extends Coordin
     }
 
     override def clone() : PriorityCoordinate = {
-        new PriorityCoordinate(x, y, priority)
+        PriorityCoordinate(x, y, priority)
     }
 
     override def equals(that: Any) : Boolean = {
