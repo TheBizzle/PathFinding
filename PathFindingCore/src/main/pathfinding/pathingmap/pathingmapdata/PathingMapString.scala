@@ -10,10 +10,7 @@ import tester.testcluster.TestSubject
  */
 
 /**
- * @param s          The string that represents the pathing map
- * @param lineDelim  The line delimiter sequence for s.  Must take on a regex-matchable form (the same as what String.split() takes)
+ * @param str        The string that represents the pathing map
+ * @param delim      The line delimiter sequence for 'str'.  Must take on a regex-matchable form (the same as what String.split() takes)
  */
-class PathingMapString(private val s: String, private val lineDelim: String) extends TestSubject {
-    def str = s
-    def delim = lineDelim
-}
+case class PathingMapString(str: String, delim: String) extends TestSubject

@@ -148,19 +148,15 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
         size == 0
     }
 
-    def foreach[U](f: (T => U)) {
-        val tempArr = heapArr collect { case Some(x) => x }
-        tempArr foreach(f)
-    }
-
-    protected def initializeArr() {
-        initializeArr(heapArr, None)
-    }
-
-    private def initializeArr(arr: Array[Option[T]], initVal: Option[T]) {
+    protected def initializeArr(arr: Array[Option[T]] = heapArr, initVal: Option[T] = None) {
         for (i <- 0 until arr.size) {
             arr(i) = initVal
         }
+    }
+
+    def foreach[U](f: (T => U)) {
+        val tempArr = heapArr collect { case Some(x) => x }
+        tempArr foreach(f)
     }
 
     def toList : List[T] = {

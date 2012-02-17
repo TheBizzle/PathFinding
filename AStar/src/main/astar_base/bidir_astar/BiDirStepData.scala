@@ -17,7 +17,6 @@ import astar_base.exceptions.UnexpectedDataException
  * Time: 10:41 PM
  */
 
-// Ugly!
 class BiDirStepData(currentLocation: Coordinate,
                     goalLocation: Coordinate,
                     beenThere: Array[Array[Boolean]],
@@ -55,6 +54,7 @@ class BiDirStepData(currentLocation: Coordinate,
 
     @tailrec
     final def assimilateBreadcrumbs(crumbList: List[Breadcrumb]) {
+        // For some reason, pattern matching on this code doesn't work...
         if (crumbList != Nil) {
             val h = crumbList.head
             val t = crumbList.tail
