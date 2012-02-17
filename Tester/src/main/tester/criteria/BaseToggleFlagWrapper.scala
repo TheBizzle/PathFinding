@@ -20,7 +20,7 @@ class BaseToggleFlagWrapper(toggles: List[TestToggleFlag], supportedToggles: Lis
     }
 
     def getAll : List[TestToggleFlag] = {
-        flagMap.filter( _._2 == true ).keySet.toList
+        flagMap.filter(_._2 == true).keySet.toList
     }
 
 }

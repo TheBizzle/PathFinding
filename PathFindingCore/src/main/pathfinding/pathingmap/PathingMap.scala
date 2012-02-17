@@ -50,9 +50,7 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
 
         for (j <- (rowCount - 1 to 0 by -1)) {
             val buffer = new ListBuffer[Char]()
-            for (i <- (0 until colCount)) {
-                buffer += PathingMap.terrainToChar(pathingMap(i)(j))
-            }
+            pathingMap foreach { case arr => buffer += PathingMap.terrainToChar(arr(j)) }
             buffer += '\n'
             acc += buffer.mkString  // Append to the accumulator the string form of row "j" of this PathingMap
         }

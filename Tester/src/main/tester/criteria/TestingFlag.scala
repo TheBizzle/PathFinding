@@ -20,9 +20,9 @@ sealed trait TestToggleFlag extends TestingFlag {     // Everytime something is 
 case object RunTest extends TestRunningnessFlag
 case object SkipTest extends TestRunningnessFlag
 
-case object Talkative extends TestToggleFlag             // Enables the "Here, let me draw that for you on the map!" thing
+case object Talkative extends TestToggleFlag             // Enables the "Here, let me draw that for you on the map!" thing in PathFindingCore tests; overall, gives tests permission to println
 case object RunBaseTests extends TestToggleFlag          // Enables running the ScalaTest tests on the core data structures and such
-case object SkipExternalTests extends TestToggleFlag      // Skips the running of any of the actual pathfinding tests
+case object SkipExternalTests extends TestToggleFlag     // Skips the running of any of the actual pathfinding tests
 case object StackTrace extends TestToggleFlag            // Signifies the desire to see stacktraces when tests fail as a result of throwing exceptions
 
 object TestingFlag {

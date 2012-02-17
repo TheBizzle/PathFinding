@@ -7,7 +7,7 @@ package pathfinding.pathingmap.terrain
  * Time: 12:22 AM
  */
 
-sealed abstract case class Terrain(isPassable: Boolean)
+sealed abstract class Terrain(val isPassable: Boolean)
 
 object Ant extends Terrain(true)
 object Empty extends Terrain(true)

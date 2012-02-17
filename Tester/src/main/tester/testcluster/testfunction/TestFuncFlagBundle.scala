@@ -9,6 +9,6 @@ import tester.criteria.{BaseToggleFlagWrapper, Talkative, TestToggleFlag}
  * Time: 10:26 PM
  */
 
-class TestFuncFlagBundle(inToggles: List[TestToggleFlag], listExpansion: List[TestToggleFlag] = List())
-                        (implicit passItOn: List[TestToggleFlag] = listExpansion ::: List(Talkative))
+class TestFuncFlagBundle(inToggles: List[TestToggleFlag], expandedSupportList: List[TestToggleFlag] = List())
+                        (implicit passItOn: List[TestToggleFlag] = expandedSupportList ::: List(Talkative))
                          extends BaseToggleFlagWrapper(inToggles, passItOn)

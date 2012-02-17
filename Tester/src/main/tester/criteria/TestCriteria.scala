@@ -119,10 +119,10 @@ object TestCriteriaRangeTuple {
         new TestCriteriaRangeTuple(new TestTuple((guideStart, guideEnd), flag))
     }
     implicit def rangeTupleListToValueTupleListList(that: List[TestCriteriaRangeTuple]) : List[List[TestCriteriaValueTuple]] = {
-        that map ( rangeTupleToValueTupleList(_) )
+        that map (rangeTupleToValueTupleList(_))
     }
     implicit def rangeTupleToValueTupleList(that: TestCriteriaRangeTuple) : List[TestCriteriaValueTuple] = {
-        Range(that.criteria.guide._1, that.criteria.guide._2).inclusive map ( TestCriteriaValueTuple(_, that.criteria.flag) ) toList
+        Range(that.criteria.guide._1, that.criteria.guide._2).inclusive map (TestCriteriaValueTuple(_, that.criteria.flag)) toList
     }
 }
 

@@ -22,7 +22,7 @@ object PathingMapStringInterpreter {
         val outArr = convertArray(cols, rows, splitArr)
         val (start, goal) = findStartAndGoal(outArr, cols, rows)
 
-        new PathingMapData(start, goal, cols, rows, outArr)
+        PathingMapData(start, goal, cols, rows, outArr)
 
     }
 
@@ -58,9 +58,9 @@ object PathingMapStringInterpreter {
         for (x <- (0 until cols)) {
             for (y <- (0 until rows)) {
                 if (arr(x)(y) == Self)
-                    selfList += new Coordinate(x, y)
+                    selfList += Coordinate(x, y)
                 else if (arr(x)(y) == Goal)
-                    goalList += new Coordinate(x, y)
+                    goalList += Coordinate(x, y)
             }
         }
 
