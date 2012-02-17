@@ -268,7 +268,7 @@ object TestingCore {
                     else if (flag == SkipTest)
                         siftHelper(t, testList, h :: skipList)
                     else
-                        throw new UnexpectedTypeException("Unexpected type of TestRunningnessFlag!")   // EXPLODE!
+                        throw new MysteriousDataException("Unexpected type of TestRunningnessFlag!")   // EXPLODE!
             }
         }
         siftHelper(list, List[T](), List[T]())
