@@ -2,7 +2,7 @@ package pathfinding.pathingmap.pathingmapdata
 
 import pathfinding.pathingmap.terrain._
 import pathfinding.coordinate.Coordinate
-import pathfinding.pathingmap.exceptions.{InvalidMapStringException, InvalidParameterException}
+import pathfinding.pathingmap.exceptions.{InvalidMapStringException}
 import collection.mutable.ListBuffer
 
 /**

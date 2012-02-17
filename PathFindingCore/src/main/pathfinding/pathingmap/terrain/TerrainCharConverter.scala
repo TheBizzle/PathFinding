@@ -11,7 +11,7 @@ import datastructure.bihashmap.BiHashMap
 
 object TerrainCharConverter {
 
-    private val conversionMap = BiHashMap(
+    private val ConversionMap = BiHashMap(
         Ant -> 'a',
         Goal -> 'G',
         Empty -> '_',
@@ -25,11 +25,11 @@ object TerrainCharConverter {
     )
 
     def apply(c: Char) : Option[Terrain] = {
-        conversionMap.get(c)
+        ConversionMap.get(c)
     }
 
     def apply(t: Terrain) : Option[Char] = {
-        conversionMap.get(t)
+        ConversionMap.get(t)
     }
 
 }

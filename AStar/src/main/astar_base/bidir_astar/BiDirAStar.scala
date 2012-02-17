@@ -3,7 +3,6 @@ package astar_base.bidir_astar
 import concurrency.BiDirDirector
 import pathfinding.pathingmap.pathingmapdata.PathingMapString
 import astar_base._
-import exceptions.UnexpectedDataException
 import heuristics.HeuristicLib
 import pathfinding.coordinate._
 import pathfinding.statuses._

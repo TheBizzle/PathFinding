@@ -10,10 +10,8 @@ import tester.testanalyzer.ExecutionStatus
  * Time: 4:37 PM
  */
 
-sealed abstract class PathingStatus[+T <: StepData](data: T) extends ExecutionStatus {
-    val stepData = data
-}
+sealed abstract case class PathingStatus[+T <: StepData](stepData: T) extends ExecutionStatus
 
-case class Continue[+T <: StepData](sd: T) extends PathingStatus[T](sd)
-case class Success[+T <: StepData](sd: T) extends PathingStatus[T](sd)
-case class Failure[+T <: StepData](sd: T) extends PathingStatus[T](sd)
+case class Continue[+T <: StepData](stepData: T) extends PathingStatus[T](stepData)
+case class Success[+T <: StepData](stepData: T) extends PathingStatus[T](stepData)
+case class Failure[+T <: StepData](stepData: T) extends PathingStatus[T](stepData)

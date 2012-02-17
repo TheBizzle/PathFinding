@@ -10,10 +10,4 @@ import pathfinding.pathingmap.terrain.Terrain
  * Time: 10:51 PM
  */
 
-class PathingMapData(startCoord: Coordinate, goalCoord: Coordinate, colCount: Int, rowCount: Int, terrainArr: Array[Array[Terrain]]) {
-    val start = startCoord
-    val goal = goalCoord
-    val cols = colCount
-    val rows = rowCount
-    val arr = terrainArr
-}
+case class PathingMapData(start: Coordinate, goal: Coordinate, cols: Int, rows: Int, arr: Array[Array[Terrain]])

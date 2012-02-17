@@ -7,20 +7,11 @@ package pathfinding.pathingmap.direction
  * Time: 1:41 AM
  */
 
-sealed abstract class Direction
-
-object North extends Direction {
-    override def toString : String = "North"
+sealed abstract class Direction {
+    override def toString : String = this.getClass.getName.dropRight(1)
 }
 
-object East extends Direction {
-    override def toString : String = "East"
-}
-
-object South extends Direction {
-    override def toString : String = "South"
-}
-
-object West extends Direction {
-    override def toString : String = "West"
-}
+object North extends Direction
+object East extends Direction
+object South extends Direction
+object West extends Direction

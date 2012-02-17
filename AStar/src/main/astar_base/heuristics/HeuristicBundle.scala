@@ -9,7 +9,4 @@ import pathfinding.coordinate.Coordinate
  * Time: 1:30 PM
  */
 
-class HeuristicBundle(startLoc: Coordinate, endLoc: Coordinate) {
-    val start = startLoc
-    val end = endLoc
-}
+case class HeuristicBundle(start: Coordinate, end: Coordinate)

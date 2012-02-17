@@ -9,16 +9,6 @@ package pathfinding.coordinate
 
 object PriorityCoordinateOrdering extends Ordering[PriorityCoordinate] {
     def compare(a: PriorityCoordinate, b: PriorityCoordinate) = {
-
-        val ap = a.priority
-        val bp = b.priority
-
-        if (ap == bp)
-            0
-        else if (ap < bp)
-            1
-        else
-            -1
-
+        b.priority.compare(a.priority)
     }
 }

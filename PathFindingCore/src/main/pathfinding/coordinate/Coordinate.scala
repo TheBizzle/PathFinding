@@ -7,10 +7,7 @@ package pathfinding.coordinate
  * Time: 12:25 AM
  */
 
-case class Coordinate(xLoc: Int = Coordinate.InvalidValue, yLoc: Int = Coordinate.InvalidValue) {
-
-    val x = xLoc
-    val y = yLoc
+case class Coordinate(x: Int = Coordinate.InvalidValue, y: Int = Coordinate.InvalidValue) {
 
     override def toString : String = {
         "(" + x + "," + y + ")"
