@@ -111,7 +111,7 @@ object TestingCore {
     private[tester] def applyValuesToArr(values: List[TestCriteriaValueTuple], arr: Array[Boolean]) : Array[Boolean] = {
         values foreach {
             case x =>
-                val isTesting = (x.criteria.flag == RunTest)
+                val isTesting = isIncludingTest(x)
                 if (arr(x.criteria.guide) != isTesting)
                     arr(x.criteria.guide) = isTesting
                 else
@@ -145,7 +145,7 @@ object TestingCore {
 
         if (!ranges.isEmpty) {
 
-            val (testList, skipList) = separateTestsAndSkips(ranges)
+            val (testList, skipList) = ranges.partition(isIncludingTest)
 
             val (testsHaveOverlap, firstTest, secondTest) = containsOverlaps(testList)
             if (testsHaveOverlap) throw new RedundancyException("Test list has an overlap between " + firstTest.get.toString + " and " + secondTest.get.toString)
@@ -177,7 +177,7 @@ object TestingCore {
     // Expects values to be sorted
     private[tester] def handleValues(values: List[TestCriteriaValueTuple], testCount: Int) : (List[TestCriteriaValueTuple], List[TestCriteriaValueTuple], Int) = {
         if (!values.isEmpty) {
-            val (testList, skipList) = separateTestsAndSkips(values)
+            val (testList, skipList) = values.partition(isIncludingTest)
             val value = if (!testList.isEmpty) testList.last.criteria.guide else 0
             if (value <= testCount)
                 (testList, skipList, value)
@@ -193,10 +193,7 @@ object TestingCore {
     }
 
     private[tester] def assessExternalityDesire(argMap:  Map[String, List[TestCriteria[_]]]) : Boolean = {
-        def hasExternalityDesire(h: TestCriteria[_]) : Boolean = {
-            h.asInstanceOf[TestCriteria[TestTuple[_,_]]].criteria.flag == RunTest
-        }
-        argMap(ArgKeyValue).exists(hasExternalityDesire) || argMap(ArgKeyRange).exists(hasExternalityDesire)
+        argMap(ArgKeyValue).asInstanceOf[List[TestCriteriaValueTuple]].exists(isIncludingTest) || argMap(ArgKeyRange).asInstanceOf[List[TestCriteriaRangeTuple]].exists(isIncludingTest)
     }
 
     private[tester] def sortArgLists(args: List[TestCriteria[_]]) : Map[String, List[TestCriteria[_]]] = {
@@ -253,21 +250,8 @@ object TestingCore {
         }
     }
 
-    private[tester] def separateTestsAndSkips[T <: TestCriteriaTuple[_, _] : Manifest](list: List[T]) : (List[T], List[T]) = {
-        @tailrec def siftHelper(inList: List[T], testList: List[T], skipList: List[T]) : (List[T], List[T]) = {
-            inList match {
-                case Nil                  => (testList.reverse, skipList.reverse)
-                case h::t                 =>
-                    val flag = h.criteria.flag
-                    if (flag == RunTest)
-                        siftHelper(t, h :: testList, skipList)
-                    else if (flag == SkipTest)
-                        siftHelper(t, testList, h :: skipList)
-                    else
-                        throw new MysteriousDataException("Unexpected type of TestRunningnessFlag!")   // EXPLODE!
-            }
-        }
-        siftHelper(list, List[T](), List[T]())
+    private def isIncludingTest(tuple: TestCriteriaTuple[_,_]) : Boolean = {
+        tuple.criteria.flag == RunTest
     }
 
 }
