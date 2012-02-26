@@ -2,6 +2,7 @@ package datastructure.heap
 
 import annotation.tailrec
 import java.lang.IllegalStateException
+import Heap._
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,13 +16,11 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     var heapArr = elemArr     // Need to fix this var-age somehow (maybe) (nope)
 
     def this(ordering: (T, T) => Int) {
-        this(ordering, new Array[Option[T]](Heap.BaseArrSize))
-        initializeArr()
+        this(ordering, Array.fill[Option[T]](BaseArrSize)(Default))
     }
 
     def clear() {
-        heapArr = new Array[Option[T]](heapArr.size)
-        initializeArr()
+        heapArr = Array.fill[Option[T]](heapArr.size)(Default)
     }
 
     def insert(elem: T) {
@@ -36,8 +35,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     }
 
     private def increaseArrSize() {
-        val newArr = new Array[Option[T]](heapArr.size * Heap.LoadDiminishFactor)
-        initializeArr(newArr, None)
+        val newArr = Array.fill[Option[T]](heapArr.size * LoadDiminishFactor)(Default)
         heapArr = arrTransfer(newArr, heapArr)
     }
 
@@ -75,7 +73,7 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
         val retVal = heapArr(0).get
         val lastIndex = size - 1
         heapArr(0) = heapArr(lastIndex)
-        heapArr(lastIndex) = None
+        heapArr(lastIndex) = Default
         heapDown(0)
         retVal
     }
@@ -148,12 +146,6 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
         size == 0
     }
 
-    protected def initializeArr(arr: Array[Option[T]] = heapArr, initVal: Option[T] = None) {
-        for (i <- 0 until arr.size) {
-            arr(i) = initVal
-        }
-    }
-
     def foreach[U](f: (T => U)) {
         val tempArr = heapArr collect { case Some(x) => x }
         tempArr foreach(f)
@@ -171,5 +163,6 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
 
 object Heap {
     protected[datastructure] val BaseArrSize = 10
+    protected[datastructure] val Default = None
     private val LoadDiminishFactor = 2
 }

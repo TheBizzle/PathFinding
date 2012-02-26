@@ -103,7 +103,7 @@ object BiDirStepData extends StepDataSingleton[BiDirStepData] with FactoryThatTa
 
     override protected def generateExtras(stepData: AStarStepData) : Extras = {
         import stepData.pathingMap._
-        val otherBreadcrumbs = initialize2DArr(colCount, rowCount, Coordinate())
+        val otherBreadcrumbs = Array.fill(colCount, rowCount)(Coordinate())
         otherBreadcrumbs :: HNil
     }
 

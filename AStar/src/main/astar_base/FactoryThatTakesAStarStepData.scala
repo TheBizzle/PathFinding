@@ -27,22 +27,18 @@ trait FactoryThatTakesAStarStepData[T] {
         val colCount = pathingMap.colCount
         val rowCount = pathingMap.rowCount
 
-        val beenThere = initialize2DArr(colCount, rowCount, false)
+        val beenThere = Array.fill(colCount, rowCount)(false)
         val queue = new PriorityQueue[PriorityCoordinate](PriorityCoordinateOrdering.compare)
 
-        val costArr = initialize2DArr(colCount, rowCount, BadVal)
-        val heuristicArr = initialize2DArr(colCount, rowCount, BadVal)
-        val totalArr = initialize2DArr(colCount, rowCount, BadVal)
-        val breadcrumbArr = initialize2DArr(colCount, rowCount, Coordinate())
+        val costArr = Array.fill(colCount, rowCount)(BadVal)
+        val heuristicArr = Array.fill(colCount, rowCount)(BadVal)
+        val totalArr = Array.fill(colCount, rowCount)(BadVal)
+        val breadcrumbArr = Array.fill(colCount, rowCount)(Coordinate())
 
         val stepData = new AStarStepData(start, goal, beenThere, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr)
         val extras = generateExtras(stepData)
         mixinExtras(stepData, extras)
 
-    }
-
-    protected def initialize2DArr[T: Manifest](cols: Int, rows: Int, defaultVal: T) : Array[Array[T]] = {
-        new Array[Array[T]](cols) map { case x => new Array[T](rows) map (y => defaultVal) }
     }
 
     protected def generateExtras(stepData: AStarStepData) : Extras

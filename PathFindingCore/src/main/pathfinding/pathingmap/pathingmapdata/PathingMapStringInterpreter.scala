@@ -33,7 +33,7 @@ object PathingMapStringInterpreter {
      */
     private def convertArray(cols: Int, rows: Int, inArr: Array[String]) :  Array[Array[Terrain]] = {
 
-        val outArr = PathingMapStringInterpreter.initialize2DTerrainArr(cols, rows, Invalid)
+        val outArr = Array.fill[Terrain](cols, rows)(Invalid)
 
         for (y <- (0 until rows)) {
 
@@ -76,10 +76,6 @@ object PathingMapStringInterpreter {
 
     private def charToTerrain(c: Char) : Terrain = {
         TerrainCharConverter(c).get
-    }
-
-    private def initialize2DTerrainArr(cols: Int, rows: Int, defaultVal: Terrain) : Array[Array[Terrain]] = {
-        new Array[Array[Terrain]](cols) map { case x => new Array[Terrain](rows) map {case y => defaultVal} }
     }
 
 }

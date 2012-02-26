@@ -1,6 +1,7 @@
 package datastructure.priorityqueue
 
 import datastructure.heap.Heap
+import Heap._
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,8 +14,7 @@ class PriorityQueue[T : Manifest] protected (ordering: (T, T) => Int, elemArr: A
 
     // Sloppy.  Is there a better way to do this?
     def this(ordering: (T, T) => Int) {
-        this(ordering, new Array[Option[T]](Heap.BaseArrSize))
-        initializeArr()
+        this(ordering, Array.fill[Option[T]](BaseArrSize)(Default))
     }
 
     def enqueue(elem: T) {
