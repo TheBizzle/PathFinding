@@ -101,14 +101,11 @@ object TestingCore {
 
     // Basically, takes advantage of bucketing to quickly deal with test numbers and their test-ness/skip-ness
     // Calls an implicit conversion of List[RangeTuples] into List[List[ValueTuple]]s where it is called
-    // To curry, or not to curry—that is the question
     private[tester] def generateResultArray(runRanges: List[TestCriteriaRangeTuple], runValues: List[TestCriteriaValueTuple],
                                             skipRanges: List[TestCriteriaRangeTuple], skipValues: List[TestCriteriaValueTuple], maxNum: Int) : Array[Boolean] = {
-        val protoArr  = new Array[Boolean](maxNum + 1)
-        val hemiArr   = applyValuesToArr(runRanges.flatten, protoArr)
-        val modernArr = applyValuesToArr(runValues, hemiArr)
-        val neoArr    = applyValuesToArr(skipRanges.flatten, modernArr)
-        applyValuesToArr(skipValues, neoArr)
+        val arr  = new Array[Boolean](maxNum + 1)
+        List(runRanges.flatten, runValues, skipRanges.flatten, skipValues) foreach (applyValuesToArr(_, arr))
+        arr
     }
 
     private[tester] def applyValuesToArr(values: List[TestCriteriaValueTuple], arr: Array[Boolean]) : Array[Boolean] = {
@@ -118,7 +115,7 @@ object TestingCore {
                 if (arr(x.criteria.guide) != isTesting)
                     arr(x.criteria.guide) = isTesting
                 else
-                    throw new RedundancyException("Setting " + x.toString + " to" + {if (isTesting) " run " else " skip "} + "is unnecessary.")
+                    throw new RedundancyException("Setting " + x.toString + " to" + ( if (isTesting) " run " else " skip " ) + "is unnecessary.")
         }
         arr
     }
@@ -134,8 +131,7 @@ object TestingCore {
             throw new NotRunningTestsException("All runnable tests were excluded!  Use the SkipExternalTests flag, instead!")
 
         val resultArr = generateResultArray(testRanges, testValues, skipRanges, skipValues, overallMax)
-        val outList = { for ( i <- 0 until resultArr.size;
-                              if (resultArr(i)) ) yield i } toList
+        val outList = resultArr.zipWithIndex collect { case (true, x) => x } toList
 
         if (!outList.isEmpty)
             outList
@@ -224,11 +220,11 @@ object TestingCore {
         inList match {
             case Nil    => Nil
             case _      =>
-                // Alternatively, I could probably just do "inList sortWith (_.getKey < _.getKey)", but... I find this much more clever
+                // Alternatively, I could probably just do "inList sortBy (_.getKey)", but... I find this much more clever
 
                 val zippedList = inList.zipWithIndex                                           // Make (Tuple, Index) pairs
                 val mediaryList = zippedList map { case x => (x._1.getKey, x._2) }             // Make (TupleKey, Index) pairs
-                val sortedList = mediaryList sortWith (_._1 < _._1)                            // Sort on TupleKey
+                val sortedList = mediaryList sortBy (_._1)                                     // Sort on TupleKey
                 val sortedIndexes = sortedList map (_._2)                                      // Just keep the sorted list of Indexes
                 val bucketedArr = bucketAListOn_2(zippedList)                                  // Make an array that maps Index->Tuple
                 sortedIndexes map (bucketedArr(_))                                             // Map the Indexes to generate an ordered list of Tuples
