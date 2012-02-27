@@ -29,9 +29,9 @@ sealed abstract class BiDirActor[T <: BiDirStepData](es: PathingStatus[T],
     def act() {
         loop {
             react {
-                case (BiDirActor.assimilateMessageStr, crumbList: List[Breadcrumb]) => status.stepData.assimilateBreadcrumbs(crumbList)
-                case  BiDirActor.startMessageStr                                    => reply(moveAndMutate())
-                case  BiDirActor.stopMessageStr                                     => exit()
+                case (BiDirActor.AssimilateMessageStr, crumbList: List[Breadcrumb]) => status.stepData.assimilateBreadcrumbs(crumbList)
+                case  BiDirActor.StartMessageStr                                    => reply(moveAndMutate())
+                case  BiDirActor.StopMessageStr                                     => exit()
             }
         }
     }
@@ -39,9 +39,9 @@ sealed abstract class BiDirActor[T <: BiDirStepData](es: PathingStatus[T],
 }
 
 private[concurrency] object BiDirActor {
-    val startMessageStr = "start"
-    val assimilateMessageStr = "assimilate"
-    val stopMessageStr = "stop"
+    val StartMessageStr = "start"
+    val AssimilateMessageStr = "assimilate"
+    val StopMessageStr = "stop"
 }
 
 case class StartToGoal[T <: BiDirStepData](exeStatus: PathingStatus[T],

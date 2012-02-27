@@ -40,8 +40,8 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
                     case (result @ Failure(_)) => result
                     case Success(x) => mergeBreadcrumbsForBackwardsOnSuccess(x, stgStatus.stepData)
                     case Continue(_) =>
-                        stg ! (BiDirActor.assimilateMessageStr, gtsCrumbs)
-                        gts ! (BiDirActor.assimilateMessageStr, stgCrumbs)
+                        stg ! (BiDirActor.AssimilateMessageStr, gtsCrumbs)
+                        gts ! (BiDirActor.AssimilateMessageStr, stgCrumbs)
                         evaluateActions(stg, gts)
                 }
         }
@@ -73,16 +73,16 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
     }
 
     def terminateActors(actorArgs: BiDirActor[T]*) {
-        actorArgs foreach ( _ ! BiDirActor.stopMessageStr )
+        actorArgs foreach ( _ ! BiDirActor.StopMessageStr )
     }
 
     def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : ((PathingStatus[T], List[Breadcrumb]), (PathingStatus[T], List[Breadcrumb])) = {
 
         stg.start()
-        val stgFuture = (stg !! BiDirActor.startMessageStr)
+        val stgFuture = (stg !! BiDirActor.StartMessageStr)
 
         gts.start()
-        val gtsFuture = (gts !! BiDirActor.startMessageStr)
+        val gtsFuture = (gts !! BiDirActor.StartMessageStr)
 
         val stgTuple = stgFuture().asInstanceOf[(PathingStatus[T], List[Breadcrumb])]
         val gtsTuple = gtsFuture().asInstanceOf[(PathingStatus[T], List[Breadcrumb])]
