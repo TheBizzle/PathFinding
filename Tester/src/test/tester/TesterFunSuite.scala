@@ -137,27 +137,6 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
         resultList should equal (expected)
     }
 
-    test("bucketAListOn_2 - Empty") {
-        val inList = Nil
-        val resultList = TestingCore.bucketAListOn_2(inList)
-        val expected = Array()
-        resultList should equal (expected)
-    }
-
-    test("bucketAListOn_2 - One Char") {
-        val inList = List(('a', 0))
-        val resultList = TestingCore.bucketAListOn_2(inList)
-        val expected = Array('a')
-        resultList should equal (expected)
-    }
-
-    test("bucketAListOn_2 - Many chars") {
-        val inList = List(('a', 0), ('s', 3), ('e', 2), ('o', 4), ('e', 6), ('w', 1), ('m', 5))
-        val resultList = TestingCore.bucketAListOn_2(inList)
-        val expected = "awesome"
-        resultList.toList.mkString should equal (expected)
-    }
-
     test("handleRanges - Empty") {
         val inList = Nil
         val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList, 6)

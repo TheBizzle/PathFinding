@@ -214,27 +214,7 @@ object TestingCore {
     }
 
     private[tester] def sortCriteria[T <: TestCriteriaTuple[_, _] : Manifest](inList: List[T]) : List[T] = {
-        inList match {
-            case Nil    => Nil
-            case _      =>
-                // Alternatively, I could probably just do "inList sortBy (_.getKey)", but... I find this much more clever
-
-                val zippedList = inList.zipWithIndex                                           // Make (Tuple, Index) pairs
-                val mediaryList = zippedList map { case x => (x._1.getKey, x._2) }             // Make (TupleKey, Index) pairs
-                val sortedList = mediaryList sortBy (_._1)                                     // Sort on TupleKey
-                val sortedIndexes = sortedList map (_._2)                                      // Just keep the sorted list of Indexes
-                val bucketedArr = bucketAListOn_2(zippedList)                                  // Make an array that maps Index->Tuple
-                sortedIndexes map (bucketedArr(_))                                             // Map the Indexes to generate an ordered list of Tuples
-        }
-    }
-
-    // This will break terribly if the ordered version of the set of all inList._2 values isn't equivalent to the set of all numbers 0 -> (inList.size - 1)
-    // If you don't know what that means... you'll figure it out in due time.  Don't say that I didn't warn you, though.
-    // (P.S. It means that ((inList map (_._2)) == (0 until inList.size)) MUST be true)
-    private[tester] def bucketAListOn_2[T : Manifest](inList: List[(T, Int)]) : Array[T] = {
-        val buckets = new Array[T](inList.size)
-        inList.foreach { case x => buckets(x._2) = x._1 }
-        buckets
+        inList sortBy (_.getKey)
     }
 
     // Assumes the passed-in list to be sorted
