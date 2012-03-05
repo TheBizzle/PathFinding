@@ -114,13 +114,13 @@ class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bTo
         val a = aKey
         val hold = abMap.get(a)
         abMap.update(a, bVal)
-        hold foreach { case b => baMap.remove(b); baMap.put(bVal, a) }
+        hold foreach { b => baMap.remove(b); baMap.put(bVal, a) }
     }
 
     def update(bKey: B, aVal: A) {
         val hold = baMap.get(bKey)
         baMap.update(bKey, aVal)
-        hold foreach { case a => abMap.remove(a); abMap.put(aVal, bKey) }
+        hold foreach { a => abMap.remove(a); abMap.put(aVal, bKey) }
     }
 
     def clear() {

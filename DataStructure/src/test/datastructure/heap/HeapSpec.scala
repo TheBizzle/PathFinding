@@ -274,17 +274,10 @@ class HeapSpec extends FlatSpec with GivenWhenThen with BeforeAndAfterEach with 
 
         when("foreach()ed about the even/odd arity of its content")
         val (evens, odds) = {
-
             var evenCount = 0
             var oddCount = 0
-
-            heap foreach { case x =>
-                if ((x % 2) == 0) evenCount += 1
-                else oddCount += 1
-            }
-
+            heap foreach ( x => if ((x % 2) == 0) evenCount += 1 else oddCount += 1)
             (evenCount, oddCount)
-
         }
 
         then("it should reply with the correct number of evens")

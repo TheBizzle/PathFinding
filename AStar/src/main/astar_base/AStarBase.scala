@@ -47,33 +47,34 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
         import stepData._
         val outList = new ListBuffer[Breadcrumb]()
 
-        pathingMap.neighborsOf(loc) foreach { case(n) =>
+        pathingMap.neighborsOf(loc) foreach {
+            n =>
 
-            val neighbor = PathingMap.findNeighborCoord(loc, n)
-            val x = neighbor.x
-            val y = neighbor.y
+                val neighbor = PathingMap.findNeighborCoord(loc, n)
+                val x = neighbor.x
+                val y = neighbor.y
 
-            if (!beenThereArr(x)(y)) {
+                if (!beenThereArr(x)(y)) {
 
-                val newCost = costArr(loc.x)(loc.y) + 1
-                val doesContainNeighbor = queueDoesContain(neighbor, queue)
+                    val newCost = costArr(loc.x)(loc.y) + 1
+                    val doesContainNeighbor = queueDoesContain(neighbor, queue)
 
-                if (!doesContainNeighbor || (newCost < costArr(x)(y))) {
+                    if (!doesContainNeighbor || (newCost < costArr(x)(y))) {
 
-                    costArr(x)(y) = newCost
-                    heuristicArr(x)(y) = heuristic(HeuristicBundle(neighbor, goal))
-                    totalArr(x)(y) = costArr(x)(y) + heuristicArr(x)(y)
+                        costArr(x)(y) = newCost
+                        heuristicArr(x)(y) = heuristic(HeuristicBundle(neighbor, goal))
+                        totalArr(x)(y) = costArr(x)(y) + heuristicArr(x)(y)
 
-                    val crumb = Coordinate(loc.x, loc.y)
-                    breadcrumbArr(x)(y) = crumb
-                    outList += Breadcrumb(neighbor, crumb)
-                    
+                        val crumb = Coordinate(loc.x, loc.y)
+                        breadcrumbArr(x)(y) = crumb
+                        outList += Breadcrumb(neighbor, crumb)
+
+                    }
+
+                    if (!doesContainNeighbor)
+                        queue.enqueue(new PriorityCoordinate(neighbor, totalArr(x)(y)))
+
                 }
-
-                if (!doesContainNeighbor)
-                    queue.enqueue(new PriorityCoordinate(neighbor, totalArr(x)(y)))
-
-            }
 
         }
 

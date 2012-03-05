@@ -13,7 +13,7 @@ class BaseToggleFlagWrapper(toggles: List[TestToggleFlag], supportedToggles: Lis
     require(!toggles.map(flagList.contains(_)).contains(false))     // FlagList must contain everything in 'toggles'
                                                                     // If this triggers, you likely created a new flag and forgot to add it to the implementing class's FlagList
 
-    private val flagMap = flagList map { case x => (x, toggles.contains(x)) } toMap
+    private val flagMap = flagList map (x => (x, toggles.contains(x))) toMap
 
     def get(flag: TestToggleFlag) : Boolean = {
         flagMap(flag)

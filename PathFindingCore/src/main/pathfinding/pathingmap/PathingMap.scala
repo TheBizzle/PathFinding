@@ -32,7 +32,7 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
     }
 
     def neighborsOf(loc: Coordinate) : List[Direction] = {
-        PathingMap.DirList.filter { case x => getTerrain(PathingMap.findNeighborCoord(loc, x)).isPassable }
+        PathingMap.DirList.filter (x => getTerrain(PathingMap.findNeighborCoord(loc, x)).isPassable)
     }
 
     def step(start: Coordinate, end: Coordinate) {
@@ -50,7 +50,7 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
 
         for (j <- (rowCount - 1 to 0 by -1)) {
             val buffer = new ListBuffer[Char]()
-            pathingMap foreach { case arr => buffer += PathingMap.terrainToChar(arr(j)) }
+            pathingMap foreach (arr => buffer += PathingMap.terrainToChar(arr(j)))
             buffer += '\n'
             acc += buffer.mkString  // Append to the accumulator the string form of row "j" of this PathingMap
         }
@@ -98,7 +98,7 @@ object PathingMap {
 
     def generateCloneWithPath(path: List[Coordinate], inMap: PathingMap) : PathingMap = {
         val outMap = inMap.clone()
-        path foreach { case coord => outMap.pathingMap(coord.x)(coord.y) = Path }
+        path foreach (coord => outMap.pathingMap(coord.x)(coord.y) = Path)
         outMap
     }
 

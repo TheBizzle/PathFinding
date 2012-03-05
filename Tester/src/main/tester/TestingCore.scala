@@ -110,7 +110,7 @@ object TestingCore {
 
     private[tester] def applyValuesToArr(values: List[TestCriteriaValueTuple], arr: Array[Boolean]) : Array[Boolean] = {
         values foreach {
-            case x =>
+            x =>
                 val isTesting = isIncludingTest(x)
                 if (arr(x.criteria.guide) != isTesting)
                     arr(x.criteria.guide) = isTesting
@@ -189,7 +189,7 @@ object TestingCore {
     }
 
     private def runBaseTests(baseTests: Seq[Suite]) {
-        baseTests foreach { case x => print("\n"); x.execute(stats = true) }
+        baseTests foreach { x => print("\n"); x.execute(stats = true) }
     }
 
     private[tester] def assessExternalityDesire(argMap:  Map[String, List[TestCriteria[_]]]) : Boolean = {

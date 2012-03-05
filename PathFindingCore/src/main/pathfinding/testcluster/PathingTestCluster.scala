@@ -55,7 +55,7 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
 
     private def retracePath(breadcrumbs: Array[Array[Coordinate]], goal: Coordinate, pathingMap: PathingMap, isTalkative: Boolean) : List[Coordinate] = {
 
-        val pathTaken = eatBreadcrumbsForPath(breadcrumbs, goal) collect { case x => x }
+        val pathTaken = eatBreadcrumbsForPath(breadcrumbs, goal)
 
         if (isTalkative)
             println("The path taken was: " + pathTaken + "\nHere, let me draw that for you on the map!\n")
