@@ -14,5 +14,5 @@ import tester.TestingCore
  */
 
 object BiDirAStarTest extends TestScript {
-    TestingCore(List[TestCriteria[_]]((1, 39, RunTest), Talkative), BiDirAStar.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
+  TestingCore(List[TestCriteria[_]]((1, 39, RunTest), Talkative), BiDirAStar.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
 }

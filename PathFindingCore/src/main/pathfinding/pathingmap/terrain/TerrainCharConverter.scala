@@ -11,25 +11,25 @@ import datastructure.bihashmap.BiHashMap
 
 object TerrainCharConverter {
 
-    private val ConversionMap = BiHashMap(
-        Ant -> 'a',
-        Goal -> 'G',
-        Empty -> '_',
-        Food -> 'f',
-        Mound -> 'O',
-        Wall -> 'D',
-        Water -> '%',
-        Path -> 'x',
-        Query -> '.',
-        Self -> '*'
-    )
+  private val ConversionMap = BiHashMap(
+    Ant -> 'a',
+    Goal -> 'G',
+    Empty -> '_',
+    Food -> 'f',
+    Mound -> 'O',
+    Wall -> 'D',
+    Water -> '%',
+    Path -> 'x',
+    Query -> '.',
+    Self -> '*'
+  )
 
-    def apply(c: Char) : Option[Terrain] = {
-        ConversionMap.get(c)
-    }
+  def apply(c: Char) : Option[Terrain] = {
+    ConversionMap.get(c)
+  }
 
-    def apply(t: Terrain) : Option[Char] = {
-        ConversionMap.get(t)
-    }
+  def apply(t: Terrain) : Option[Char] = {
+    ConversionMap.get(t)
+  }
 
 }

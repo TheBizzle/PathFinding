@@ -16,79 +16,79 @@ import pathfinding.breadcrumb.Breadcrumb
 
 class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], stepFunc: T => (T, List[Breadcrumb])) {
 
-    val decide = decisionFunc
-    val step = stepFunc
+  val decide = decisionFunc
+  val step = stepFunc
 
-    def direct(forwardStepData: T, backwardsStepData: T) : PathingStatus[T] = {
-        val stg = new StartToGoal[T](Continue(forwardStepData), decide, step)
-        val gts = new GoalToStart[T](Continue(backwardsStepData), decide, step)
-        val outVal = evaluateActions(stg, gts)
-        terminateActors(stg, gts)
-        outVal
-    }
+  def direct(forwardStepData: T, backwardsStepData: T) : PathingStatus[T] = {
+    val stg = new StartToGoal[T](Continue(forwardStepData), decide, step)
+    val gts = new GoalToStart[T](Continue(backwardsStepData), decide, step)
+    val outVal = evaluateActions(stg, gts)
+    terminateActors(stg, gts)
+    outVal
+  }
 
-    @tailrec
-    private def evaluateActions(stg: StartToGoal[T], gts: GoalToStart[T]) : PathingStatus[T] = {
+  @tailrec
+  private def evaluateActions(stg: StartToGoal[T], gts: GoalToStart[T]) : PathingStatus[T] = {
 
-        val ((stgStatus, stgCrumbs), (gtsStatus, gtsCrumbs)) = runActionsForResult(stg, gts)
+    val ((stgStatus, stgCrumbs), (gtsStatus, gtsCrumbs)) = runActionsForResult(stg, gts)
 
-        stgStatus match {
-            case (result @ Failure(_)) => result
-            case Success(x) => mergeBreadcrumbsForForwardOnSuccess(x, gtsStatus.stepData)
-            case Continue(_) =>
-                gtsStatus match {
-                    case (result @ Failure(_)) => result
-                    case Success(x) => mergeBreadcrumbsForBackwardsOnSuccess(x, stgStatus.stepData)
-                    case Continue(_) =>
-                        stg ! (BiDirActor.AssimilateMessageStr, gtsCrumbs)
-                        gts ! (BiDirActor.AssimilateMessageStr, stgCrumbs)
-                        evaluateActions(stg, gts)
-                }
+    stgStatus match {
+      case (result @ Failure(_)) => result
+      case Success(x) => mergeBreadcrumbsForForwardOnSuccess(x, gtsStatus.stepData)
+      case Continue(_) =>
+        gtsStatus match {
+          case (result @ Failure(_)) => result
+          case Success(x) => mergeBreadcrumbsForBackwardsOnSuccess(x, stgStatus.stepData)
+          case Continue(_) =>
+            stg ! (BiDirActor.AssimilateMessageStr, gtsCrumbs)
+            gts ! (BiDirActor.AssimilateMessageStr, stgCrumbs)
+            evaluateActions(stg, gts)
         }
-
     }
 
-    def mergeBreadcrumbsForForwardOnSuccess(forwardData: T, backwardsData: T) : Success[T] = {
-        Success(mergeBreadcrumbs(forwardData, backwardsData, forwardData.loc, forwardData.goal, true))
+  }
+
+  def mergeBreadcrumbsForForwardOnSuccess(forwardData: T, backwardsData: T) : Success[T] = {
+    Success(mergeBreadcrumbs(forwardData, backwardsData, forwardData.loc, forwardData.goal, true))
+  }
+
+  def mergeBreadcrumbsForBackwardsOnSuccess(backwardsData: T, forwardData : T) : Success[T] = {
+    backwardsData.reverseBreadcrumbs()
+    Success(mergeBreadcrumbs(backwardsData, forwardData, backwardsData.loc, backwardsData.goal, false))
+  }
+
+  def mergeBreadcrumbs(myData: T, thatData: T, startLoc: Coordinate, endLoc: Coordinate, isForwards: Boolean) : T = {
+    @tailrec def mergeHelper(holder: Coordinate, myCrumbs: Array[Array[Coordinate]], thoseCrumbs: Array[Array[Coordinate]]) {
+      holder match {
+        case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => throw new UnexpectedDataException(holder.toString)
+        case _ =>
+          val crumb = thoseCrumbs(holder.x)(holder.y)
+          val (indexer, updater) = if (isForwards) (crumb, holder) else (holder, crumb)
+          myCrumbs(indexer.x)(indexer.y) = updater
+          if (!(crumb overlaps endLoc)) mergeHelper(crumb, myCrumbs, thoseCrumbs)
+      }
     }
+    mergeHelper(startLoc, myData.breadcrumbArr, thatData.breadcrumbArr)
+    myData
+  }
 
-    def mergeBreadcrumbsForBackwardsOnSuccess(backwardsData: T, forwardData : T) : Success[T] = {
-        backwardsData.reverseBreadcrumbs()
-        Success(mergeBreadcrumbs(backwardsData, forwardData, backwardsData.loc, backwardsData.goal, false))
-    }
+  def terminateActors(actorArgs: BiDirActor[T]*) {
+    actorArgs foreach ( _ ! BiDirActor.StopMessageStr )
+  }
 
-    def mergeBreadcrumbs(myData: T, thatData: T, startLoc: Coordinate, endLoc: Coordinate, isForwards: Boolean) : T = {
-        @tailrec def mergeHelper(holder: Coordinate, myCrumbs: Array[Array[Coordinate]], thoseCrumbs: Array[Array[Coordinate]]) {
-            holder match {
-                case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => throw new UnexpectedDataException(holder.toString)
-                case _ =>
-                    val crumb = thoseCrumbs(holder.x)(holder.y)
-                    val (indexer, updater) = if (isForwards) (crumb, holder) else (holder, crumb)
-                    myCrumbs(indexer.x)(indexer.y) = updater
-                    if (!(crumb overlaps endLoc)) mergeHelper(crumb, myCrumbs, thoseCrumbs)
-            }
-        }
-        mergeHelper(startLoc, myData.breadcrumbArr, thatData.breadcrumbArr)
-        myData
-    }
+  def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : ((PathingStatus[T], List[Breadcrumb]), (PathingStatus[T], List[Breadcrumb])) = {
 
-    def terminateActors(actorArgs: BiDirActor[T]*) {
-        actorArgs foreach ( _ ! BiDirActor.StopMessageStr )
-    }
+    stg.start()
+    val stgFuture = (stg !! BiDirActor.StartMessageStr)
 
-    def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : ((PathingStatus[T], List[Breadcrumb]), (PathingStatus[T], List[Breadcrumb])) = {
+    gts.start()
+    val gtsFuture = (gts !! BiDirActor.StartMessageStr)
 
-        stg.start()
-        val stgFuture = (stg !! BiDirActor.StartMessageStr)
+    val stgTuple = stgFuture().asInstanceOf[(PathingStatus[T], List[Breadcrumb])]
+    val gtsTuple = gtsFuture().asInstanceOf[(PathingStatus[T], List[Breadcrumb])]
 
-        gts.start()
-        val gtsFuture = (gts !! BiDirActor.StartMessageStr)
+    (stgTuple, gtsTuple)
 
-        val stgTuple = stgFuture().asInstanceOf[(PathingStatus[T], List[Breadcrumb])]
-        val gtsTuple = gtsFuture().asInstanceOf[(PathingStatus[T], List[Breadcrumb])]
-
-        (stgTuple, gtsTuple)
-
-    }
+  }
 
 }

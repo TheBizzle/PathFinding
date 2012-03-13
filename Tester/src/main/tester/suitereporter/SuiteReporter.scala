@@ -10,14 +10,14 @@ import org.scalatest.Suite
  */
 
 abstract class SuiteReporter(suites: Seq[Suite]) {
-    def report : Seq[Suite] = suites
+  def report : Seq[Suite] = suites
 }
 
 object SuiteReporter {
-    def coalesce(seqs: Seq[Seq[Suite]]) : Seq[Suite] = {
-        seqs.flatten
-    }
-    implicit def reporterSeqToSuiteSeqSeq(reporters: Seq[SuiteReporter]) : Seq[Seq[Suite]] = {
-        reporters map ( _.report )
-    }
+  def coalesce(seqs: Seq[Seq[Suite]]) : Seq[Suite] = {
+    seqs.flatten
+  }
+  implicit def reporterSeqToSuiteSeqSeq(reporters: Seq[SuiteReporter]) : Seq[Seq[Suite]] = {
+    reporters map ( _.report )
+  }
 }

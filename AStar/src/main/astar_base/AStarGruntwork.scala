@@ -12,31 +12,31 @@ import pathfinding.coordinate.{Coordinate, PriorityCoordinate}
 
 trait AStarGruntwork[T <: AStarStepData] {
 
-    self: AStarBase[T] =>
+  self: AStarBase[T] =>
 
-    protected def calculateMaxIters(colCount: Int, rowCount: Int) : Int = {
-        (colCount * rowCount * scalingFactor).floor.toInt
-    }
+  protected def calculateMaxIters(colCount: Int, rowCount: Int) : Int = {
+    (colCount * rowCount * scalingFactor).floor.toInt
+  }
 
-    /**
-     * Some serious spaghetti!
-     * Returns the first location in "queue" that hasn't already been examined (as determined by checking "beenThere").
-     */
-    protected def getFreshLoc(queue: PriorityQueue[PriorityCoordinate], beenThere: Array[Array[Boolean]]) : Option[PriorityCoordinate] = {
-        val loc = queue.dequeue()
-        if (beenThere(loc.x)(loc.y)) {
-            if (!queue.isEmpty)
-                getFreshLoc(queue, beenThere)
-            else
-                None        // Exit point (failure)
-        }
-        else
-            Option(loc)     // Exit point (success)
+  /**
+   * Some serious spaghetti!
+   * Returns the first location in "queue" that hasn't already been examined (as determined by checking "beenThere").
+   */
+  protected def getFreshLoc(queue: PriorityQueue[PriorityCoordinate], beenThere: Array[Array[Boolean]]) : Option[PriorityCoordinate] = {
+    val loc = queue.dequeue()
+    if (beenThere(loc.x)(loc.y)) {
+      if (!queue.isEmpty)
+        getFreshLoc(queue, beenThere)
+      else
+        None        // Exit point (failure)
     }
+    else
+      Option(loc)     // Exit point (success)
+  }
 
-    protected def queueDoesContain(coord: Coordinate, queue: PriorityQueue[PriorityCoordinate]) : Boolean = {
-        queue foreach (x => if (coord overlaps x) return true)
-        false
-    }
+  protected def queueDoesContain(coord: Coordinate, queue: PriorityQueue[PriorityCoordinate]) : Boolean = {
+    queue foreach (x => if (coord overlaps x) return true)
+    false
+  }
 
 }

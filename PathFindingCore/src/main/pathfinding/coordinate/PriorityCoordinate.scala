@@ -9,35 +9,35 @@ package pathfinding.coordinate
 
 case class PriorityCoordinate(private val xLoc: Int, private val yLoc: Int, priority: Int) extends Coordinate(xLoc, yLoc) {
 
-    def this(coord: Coordinate, priorityVal: Int) {
-        this(coord.x, coord.y, priorityVal)
-    }
+  def this(coord: Coordinate, priorityVal: Int) {
+    this(coord.x, coord.y, priorityVal)
+  }
 
-    def asCoordinate : Coordinate = {
-        Coordinate(x, y)
-    }
+  def asCoordinate : Coordinate = {
+    Coordinate(x, y)
+  }
 
-    override def toString : String = {
-         super.toString + ":" + priority
-    }
+  override def toString : String = {
+    super.toString + ":" + priority
+  }
 
-    override def clone() : PriorityCoordinate = {
-        PriorityCoordinate(x, y, priority)
-    }
+  override def clone() : PriorityCoordinate = {
+    PriorityCoordinate(x, y, priority)
+  }
 
-    override def equals(that: Any) : Boolean = {
-        that match {
-            case thatCoord: PriorityCoordinate => super.equals(that) && (priority == thatCoord.priority)
-            case _                             => false
-        }
+  override def equals(that: Any) : Boolean = {
+    that match {
+      case thatCoord: PriorityCoordinate => super.equals(that) && (priority == thatCoord.priority)
+      case _                             => false
     }
+  }
 
-    override def hashCode : Int = {
-        41 * super.hashCode + priority
-    }
+  override def hashCode : Int = {
+    41 * super.hashCode + priority
+  }
 
-    override def canEqual(other: Any) : Boolean = {
-        other.isInstanceOf[PriorityCoordinate]
-    }
+  override def canEqual(other: Any) : Boolean = {
+    other.isInstanceOf[PriorityCoordinate]
+  }
 
 }

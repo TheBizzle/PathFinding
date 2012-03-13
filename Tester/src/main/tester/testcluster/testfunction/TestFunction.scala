@@ -16,12 +16,12 @@ import tester.testanalyzer.{TestAnalysisResultBundle, ExecutionStatus, TestAnaly
 abstract class TestFunction[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle, AnalysisResult <: TestAnalysisResultBundle]
                            (subject: Subject, analysisFunction: (Status, AnalysisFlags) => AnalysisResult, testNumber: Int, shouldPass: Boolean) extends ((T, TestFuncFlagBundle) => Boolean) {
 
-    val testNum = testNumber
-    val shouldSucceed = shouldPass
-    protected val testSubject = subject
-    protected val analysisFunc = analysisFunction
+  val testNum = testNumber
+  val shouldSucceed = shouldPass
+  protected val testSubject = subject
+  protected val analysisFunc = analysisFunction
 
-    def apply(testable: T, testFlags: TestFuncFlagBundle) : Boolean
-    protected def extractAnalysisFlags(testFlags: TestFuncFlagBundle) : AnalysisFlags
+  def apply(testable: T, testFlags: TestFuncFlagBundle) : Boolean
+  protected def extractAnalysisFlags(testFlags: TestFuncFlagBundle) : AnalysisFlags
 
 }

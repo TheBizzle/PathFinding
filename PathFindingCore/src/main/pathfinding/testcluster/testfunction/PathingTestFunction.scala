@@ -21,19 +21,19 @@ class PathingTestFunction(testString: PathingMapString,
                           extends TestFunction[PathFinder[StepData], PathingMapString, PathingStatus[StepData],
                                                PathingAnalysisFlagBundle, PathingAnalysisResultBundle](testString, analysisFunction, testNumber, shouldPass) {
 
-    val expectedPathLength = expectedLength
+  val expectedPathLength = expectedLength
 
-    def apply(pathFinder: PathFinder[StepData], flags: TestFuncFlagBundle) : Boolean = {
-        val analysisFlags = extractAnalysisFlags(flags)
-        val bundle = analysisFunc(pathFinder(testSubject), analysisFlags)
-        if (!bundle.wasSuccess)
-            false
-        else
-            (bundle.path.length - 1) == expectedPathLength
-    }
+  def apply(pathFinder: PathFinder[StepData], flags: TestFuncFlagBundle) : Boolean = {
+    val analysisFlags = extractAnalysisFlags(flags)
+    val bundle = analysisFunc(pathFinder(testSubject), analysisFlags)
+    if (!bundle.wasSuccess)
+      false
+    else
+      (bundle.path.length - 1) == expectedPathLength
+  }
 
-    protected def extractAnalysisFlags(flags: TestFuncFlagBundle) : PathingAnalysisFlagBundle = {
-        new PathingAnalysisFlagBundle(flags.getAll)
-    }
-    
+  protected def extractAnalysisFlags(flags: TestFuncFlagBundle) : PathingAnalysisFlagBundle = {
+    new PathingAnalysisFlagBundle(flags.getAll)
+  }
+
 }

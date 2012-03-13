@@ -14,9 +14,6 @@ import astar_base.omni.OmniTestBase
  */
 
 object OmniTest extends OmniTestBase {
-    
-    run()
-
-    protected def tests = List((AStarDependencyTest, "dependency"), (AStarTest, "AStar"), (BiDirAStarTest, "BiDir"))
-
+  run()
+  protected def tests = List((AStarDependencyTest, "dependency"), (AStarTest, "AStar"), (BiDirAStarTest, "BiDir"))
 }

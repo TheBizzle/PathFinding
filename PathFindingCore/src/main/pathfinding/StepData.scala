@@ -16,16 +16,16 @@ abstract class StepData(currentLocation: Coordinate,
                         breadcrumbs: Array[Array[Coordinate]],
                         endGoalLocation: Coordinate = null) {
 
-    val loc = currentLocation
-    val goal = goalLocation
-    val pathingMap = pMap
-    val breadcrumbArr = breadcrumbs
-    val endGoal = if (null == endGoalLocation) goalLocation else endGoalLocation    // This is a variable that is useful for pathing algorithms that
-                                                                                    // might have multiple intermediary goals,
-                                                                                    // or for the backwards-moving track of bidirectional A*
+  val loc = currentLocation
+  val goal = goalLocation
+  val pathingMap = pMap
+  val breadcrumbArr = breadcrumbs
+  val endGoal = if (null == endGoalLocation) goalLocation else endGoalLocation    // This is a variable that is useful for pathing algorithms that
+                                                                                  // might have multiple intermediary goals,
+                                                                                  // or for the backwards-moving track of bidirectional A*
 
 }
 
 trait StepDataSingleton[T] {
-    def apply(freshLoc: Coordinate, stepData: T) : T
+  def apply(freshLoc: Coordinate, stepData: T) : T
 }

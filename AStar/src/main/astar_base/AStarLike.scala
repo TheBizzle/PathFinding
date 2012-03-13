@@ -13,13 +13,11 @@ import pathfinding.breadcrumb.Breadcrumb
  */
 
 trait AStarLike[T <: AStarStepData] {
-
-    def apply(mapString: PathingMapString) : PathingStatus[T]
-    protected def execute(stepData: T,  maxIters: Int) : PathingStatus[T]
-    protected def goalIsFound(stepData: T, freshLoc: Coordinate) : Boolean
-    protected def makeNewStepData(stepData: T, freshLoc: Coordinate) : T
-    protected def decide(stepData: T, maxIters: Int) : PathingStatus[T]
-    protected def step(stepData: T) : (T, List[Breadcrumb])
-    protected def primeStepData(stepData: T) : T
-
+  def apply(mapString: PathingMapString) : PathingStatus[T]
+  protected def execute(stepData: T,  maxIters: Int) : PathingStatus[T]
+  protected def goalIsFound(stepData: T, freshLoc: Coordinate) : Boolean
+  protected def makeNewStepData(stepData: T, freshLoc: Coordinate) : T
+  protected def decide(stepData: T, maxIters: Int) : PathingStatus[T]
+  protected def step(stepData: T) : (T, List[Breadcrumb])
+  protected def primeStepData(stepData: T) : T
 }

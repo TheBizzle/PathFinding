@@ -16,32 +16,32 @@ sealed abstract class BiDirActor[T <: BiDirStepData](es: PathingStatus[T],
                                                      dFunc: T => PathingStatus[T],
                                                      sFunc: T => (T, List[Breadcrumb])) extends Actor {
 
-    var status = es           // 6... 6, 6: The Number of the Bug
-    val decide = dFunc
-    val step = sFunc
+  var status = es           // 6... 6, 6: The Number of the Bug
+  val decide = dFunc
+  val step = sFunc
 
-    protected def moveAndMutate() : (PathingStatus[T], List[Breadcrumb]) = {
-        val (neoStepData, neoCrumbs) = step(status.stepData)
-        status = decide(neoStepData)
-        (status, neoCrumbs)
-    }
+  protected def moveAndMutate() : (PathingStatus[T], List[Breadcrumb]) = {
+    val (neoStepData, neoCrumbs) = step(status.stepData)
+    status = decide(neoStepData)
+    (status, neoCrumbs)
+  }
 
-    def act() {
-        loop {
-            react {
-                case (BiDirActor.AssimilateMessageStr, crumbList: List[Breadcrumb]) => status.stepData.assimilateBreadcrumbs(crumbList)
-                case  BiDirActor.StartMessageStr                                    => reply(moveAndMutate())
-                case  BiDirActor.StopMessageStr                                     => exit()
-            }
-        }
+  def act() {
+    loop {
+      react {
+        case (BiDirActor.AssimilateMessageStr, crumbList: List[Breadcrumb]) => status.stepData.assimilateBreadcrumbs(crumbList)
+        case  BiDirActor.StartMessageStr                                    => reply(moveAndMutate())
+        case  BiDirActor.StopMessageStr                                     => exit()
+      }
     }
+  }
 
 }
 
 private[concurrency] object BiDirActor {
-    val StartMessageStr = "start"
-    val AssimilateMessageStr = "assimilate"
-    val StopMessageStr = "stop"
+  val StartMessageStr = "start"
+  val AssimilateMessageStr = "assimilate"
+  val StopMessageStr = "stop"
 }
 
 case class StartToGoal[T <: BiDirStepData](exeStatus: PathingStatus[T],

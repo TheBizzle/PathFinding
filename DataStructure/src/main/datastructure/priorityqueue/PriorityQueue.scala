@@ -12,21 +12,21 @@ import Heap._
 
 class PriorityQueue[T : Manifest] protected (ordering: (T, T) => Int, elemArr: Array[Option[T]]) extends Heap[T](ordering, elemArr) {
 
-    // Sloppy.  Is there a better way to do this?
-    def this(ordering: (T, T) => Int) {
-        this(ordering, Array.fill[Option[T]](BaseArrSize)(Default))
-    }
+  // Sloppy.  Is there a better way to do this?
+  def this(ordering: (T, T) => Int) {
+    this(ordering, Array.fill[Option[T]](BaseArrSize)(Default))
+  }
 
-    def enqueue(elem: T) {
-        insert(elem)
-    }
+  def enqueue(elem: T) {
+    insert(elem)
+  }
 
-    def dequeue() : T = {
-        remove()
-    }
+  def dequeue() : T = {
+    remove()
+  }
 
-    override def clone() : PriorityQueue[T] = {
-        new PriorityQueue[T](orderProp, heapArr.clone())
-    }
+  override def clone() : PriorityQueue[T] = {
+    new PriorityQueue[T](orderProp, heapArr.clone())
+  }
 
 }

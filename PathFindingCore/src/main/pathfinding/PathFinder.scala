@@ -12,5 +12,5 @@ import tester.testcluster.Testable
  */
 
 trait PathFinder[T <: StepData] extends Testable {
-    def apply(mapString: PathingMapString) : PathingStatus[T]
+  def apply(mapString: PathingMapString) : PathingStatus[T]
 }

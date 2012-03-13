@@ -25,36 +25,36 @@ class AStarStepData(currentLocation: Coordinate,
                     iterationCount: Int = 0,
                     endGoalLocation: Coordinate = null) extends StepData(currentLocation, goalLocation, pMap, breadcrumbs, endGoalLocation) {
 
-    val beenThereArr = beenThere
-    val queue = pQueue
-    val costArr = costArray
-    val heuristicArr = heuristicArray
-    val totalArr = totalArray
-    private var ic = iterationCount     // Satan's var
+  val beenThereArr = beenThere
+  val queue = pQueue
+  val costArr = costArray
+  val heuristicArr = heuristicArray
+  val totalArr = totalArray
+  private var ic = iterationCount     // Satan's var
 
-    def iters : Int = ic
+  def iters : Int = ic
 
-    def incIters() {
-        ic = ic + 1
-    }
+  def incIters() {
+    ic = ic + 1
+  }
 
 }
 
 object AStarStepData extends StepDataSingleton[AStarStepData] with FactoryThatTakesAStarStepData[AStarStepData] {
 
-    type Extras = HNil
+  type Extras = HNil
 
-    def apply(freshLoc: Coordinate, stepData: AStarStepData) : AStarStepData = {
-        import stepData._
-        new AStarStepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, iters)
-    }
+  def apply(freshLoc: Coordinate, stepData: AStarStepData) : AStarStepData = {
+    import stepData._
+    new AStarStepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, iters)
+  }
 
-    override protected def generateExtras(stepData: AStarStepData) : Extras = {
-        HNil
-    }
+  override protected def generateExtras(stepData: AStarStepData) : Extras = {
+    HNil
+  }
 
-    override protected def mixinExtras(stepData: AStarStepData, extras: Extras) : AStarStepData = {
-        stepData
-    }
+  override protected def mixinExtras(stepData: AStarStepData, extras: Extras) : AStarStepData = {
+    stepData
+  }
 
 }

@@ -8,7 +8,7 @@ package pathfinding.coordinate
  */
 
 object PriorityCoordinateOrdering extends Ordering[PriorityCoordinate] {
-    def compare(a: PriorityCoordinate, b: PriorityCoordinate) = {
-        b.priority.compare(a.priority)
-    }
+  def compare(a: PriorityCoordinate, b: PriorityCoordinate) = {
+    b.priority.compare(a.priority)
+  }
 }

@@ -24,29 +24,29 @@ import astar_base.{AStarStepData, AStarBase}
 
 object AStar extends AStarBase[AStarStepData](1.0, HeuristicLib.manhattanDistance) {
 
-    override def apply(mapString: PathingMapString) : PathingStatus[AStarStepData] = {
-        val stepData = AStarStepData(mapString)
-        execute(primeStepData(stepData), calculateMaxIters(stepData.pathingMap.colCount, stepData.pathingMap.rowCount))
-    }
+  override def apply(mapString: PathingMapString) : PathingStatus[AStarStepData] = {
+    val stepData = AStarStepData(mapString)
+    execute(primeStepData(stepData), calculateMaxIters(stepData.pathingMap.colCount, stepData.pathingMap.rowCount))
+  }
 
-    override protected def execute(stepData: AStarStepData, maxIters: Int) : PathingStatus[AStarStepData] = {
-        @tailrec def executeHelper(stepData: AStarStepData, maxIters: Int) : PathingStatus[AStarStepData] = {
-            val decision = decide(stepData, maxIters)
-            decision match {
-                case Continue(x: AStarStepData) => executeHelper(step(x)._1, maxIters)
-                case Success(_)                 => decision
-                case Failure(_)                 => decision
-            }
-        }
-        executeHelper(step(stepData)._1, maxIters)
+  override protected def execute(stepData: AStarStepData, maxIters: Int) : PathingStatus[AStarStepData] = {
+    @tailrec def executeHelper(stepData: AStarStepData, maxIters: Int) : PathingStatus[AStarStepData] = {
+      val decision = decide(stepData, maxIters)
+      decision match {
+        case Continue(x: AStarStepData) => executeHelper(step(x)._1, maxIters)
+        case Success(_)                 => decision
+        case Failure(_)                 => decision
+      }
     }
-    
-    protected def goalIsFound(stepData: AStarStepData, freshLoc: Coordinate) : Boolean = {
-        freshLoc overlaps stepData.goal
-    }
+    executeHelper(step(stepData)._1, maxIters)
+  }
 
-    protected def makeNewStepData(stepData: AStarStepData, freshLoc: Coordinate) : AStarStepData = {
-        AStarStepData(freshLoc, stepData)
-    }
+  protected def goalIsFound(stepData: AStarStepData, freshLoc: Coordinate) : Boolean = {
+    freshLoc overlaps stepData.goal
+  }
+
+  protected def makeNewStepData(stepData: AStarStepData, freshLoc: Coordinate) : AStarStepData = {
+    AStarStepData(freshLoc, stepData)
+  }
 
 }

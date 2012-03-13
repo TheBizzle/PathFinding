@@ -10,16 +10,16 @@ import pathfinding.testscript.TestScript
  */
 
 abstract class OmniTestBase extends TestScript {
-    
-    protected def tests: List[(TestScript, String)]
 
-    def run() {
-        tests foreach {
-        case (test, name) =>
-            println("Start %s test:\n".format(name))
-            test.main(Array[String]())
-            println("\nEnd %s test.".format(name))
-        }
+  protected def tests: List[(TestScript, String)]
+
+  def run() {
+    tests foreach {
+      case (test, name) =>
+        println("Start %s test:\n".format(name))
+        test.main(Array[String]())
+        println("\nEnd %s test.".format(name))
     }
+  }
 
 }

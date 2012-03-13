@@ -8,5 +8,5 @@ package tester.testanalyzer
  */
 
 trait TestAnalyzer[T <: ExecutionStatus, U <: TestAnalysisFlagBundle, V <: TestAnalysisResultBundle] {
-    protected def analyze(status: T, flags: U) : V
+  protected def analyze(status: T, flags: U) : V
 }

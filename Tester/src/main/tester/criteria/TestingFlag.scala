@@ -12,9 +12,9 @@ import tester.exceptions.MysteriousDataException
 sealed trait TestingFlag                              // A marker trait
 sealed trait TestRunningnessFlag extends TestingFlag  // A trait whose possessors will represent signs of about whether or not a test(s) should be run
 sealed trait TestToggleFlag extends TestingFlag {     // Everytime something is made to inherit from this, it MUST be added to TestToggleFlagWrapper's FlagList
-    implicit def flagToCriteria(that: TestToggleFlag) : TestCriteriaToggleFlag = {
-        TestCriteriaToggleFlag(that)
-    }
+  implicit def flagToCriteria(that: TestToggleFlag) : TestCriteriaToggleFlag = {
+    TestCriteriaToggleFlag(that)
+  }
 }
 
 case object RunTest extends TestRunningnessFlag
@@ -26,11 +26,11 @@ case object SkipExternalTests extends TestToggleFlag     // Skips the running of
 case object StackTrace extends TestToggleFlag            // Signifies the desire to see stacktraces when tests fail as a result of throwing exceptions
 
 object TestingFlag {
-    def flipRunningness(flag: TestRunningnessFlag) : TestRunningnessFlag = {
-        flag match {
-            case RunTest  => SkipTest
-            case SkipTest => RunTest
-            case _        => throw new MysteriousDataException("Unknown TestRunningnessFlag for runningness flip!")
-        }
+  def flipRunningness(flag: TestRunningnessFlag) : TestRunningnessFlag = {
+    flag match {
+      case RunTest  => SkipTest
+      case SkipTest => RunTest
+      case _        => throw new MysteriousDataException("Unknown TestRunningnessFlag for runningness flip!")
     }
+  }
 }

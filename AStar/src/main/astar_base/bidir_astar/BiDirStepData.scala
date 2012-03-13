@@ -31,88 +31,88 @@ class BiDirStepData(currentLocation: Coordinate,
                     endGoalLocation: Coordinate = null)
                     extends AStarStepData(currentLocation, goalLocation, beenThere, pQueue, pMap, costArray, heuristicArray, totalArray, breadcrumbs, iterationCount, endGoalLocation) {
 
-    private val othersBreadcrumbArr = othersBreadcrumbs
+  private val othersBreadcrumbArr = othersBreadcrumbs
 
-    override def clone() : BiDirStepData = {
-        cloneBase()
-    }
+  override def clone() : BiDirStepData = {
+    cloneBase()
+  }
 
-    def cloneForBiBackwards() : BiDirStepData = {
-        cloneBase(l = goal, g = loc, eg = goal)
-    }
+  def cloneForBiBackwards() : BiDirStepData = {
+    cloneBase(l = goal, g = loc, eg = goal)
+  }
 
-    // HIDEOUS!  ...But useful.
-    private def cloneBase(l: Coordinate = loc, g: Coordinate = goal, bThere: Array[Array[Boolean]] = beenThereArr,
-                          q: PriorityQueue[PriorityCoordinate] = queue, pm: PathingMap = pathingMap,
-                          cost: Array[Array[Int]] = costArr, h: Array[Array[Int]] = heuristicArr,
-                          total: Array[Array[Int]] = totalArr, crumbs: Array[Array[Coordinate]] = breadcrumbArr,
-                          otherCrumbs: Array[Array[Coordinate]] = othersBreadcrumbArr, itrs: Int = iters, eg: Coordinate = endGoal) : BiDirStepData = {
-        new BiDirStepData(l.clone(), g.clone(), bThere map (_.clone()), q.clone(), pm.clone(),
-                          cost map (_.clone()), h map (_.clone()), total map (_.clone()),
-                          crumbs map (_.clone()), otherCrumbs map (_.clone()), itrs, eg.clone())
-    }
+  // HIDEOUS!  ...But useful.
+  private def cloneBase(l: Coordinate = loc, g: Coordinate = goal, bThere: Array[Array[Boolean]] = beenThereArr,
+                        q: PriorityQueue[PriorityCoordinate] = queue, pm: PathingMap = pathingMap,
+                        cost: Array[Array[Int]] = costArr, h: Array[Array[Int]] = heuristicArr,
+                        total: Array[Array[Int]] = totalArr, crumbs: Array[Array[Coordinate]] = breadcrumbArr,
+                        otherCrumbs: Array[Array[Coordinate]] = othersBreadcrumbArr, itrs: Int = iters, eg: Coordinate = endGoal) : BiDirStepData = {
+    new BiDirStepData(l.clone(), g.clone(), bThere map (_.clone()), q.clone(), pm.clone(),
+                      cost map (_.clone()), h map (_.clone()), total map (_.clone()),
+                      crumbs map (_.clone()), otherCrumbs map (_.clone()), itrs, eg.clone())
+  }
 
-    @tailrec
-    final def assimilateBreadcrumbs(crumbList: List[Breadcrumb]) {
-        // For some reason, pattern matching on this code doesn't work...
-        if (crumbList != Nil) {
-            val h = crumbList.head
-            val t = crumbList.tail
-            othersBreadcrumbs(h.to.x)(h.to.y) = h.from
-            assimilateBreadcrumbs(t)
-        }
+  @tailrec
+  final def assimilateBreadcrumbs(crumbList: List[Breadcrumb]) {
+    // For some reason, pattern matching on this code doesn't work...
+    if (crumbList != Nil) {
+      val h = crumbList.head
+      val t = crumbList.tail
+      othersBreadcrumbs(h.to.x)(h.to.y) = h.from
+      assimilateBreadcrumbs(t)
     }
+  }
 
-    def transformGoalForClone(oGoal: Coordinate) : BiDirStepData = {
-        cloneBase(g = oGoal)
-    }
+  def transformGoalForClone(oGoal: Coordinate) : BiDirStepData = {
+    cloneBase(g = oGoal)
+  }
 
-    def hasInOthersBreadcrumbs(loc: Coordinate) : Boolean = {
-        othersBreadcrumbArr(loc.x)(loc.y) match {
-            case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => false
-            case _                                                            => true
-        }
+  def hasInOthersBreadcrumbs(loc: Coordinate) : Boolean = {
+    othersBreadcrumbArr(loc.x)(loc.y) match {
+      case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => false
+      case _                                                            => true
     }
+  }
 
-    def reverseBreadcrumbs() {
-        def reversalHelper(loc: Coordinate, crumbArr: Array[Array[Coordinate]]) {
-            val crumb = crumbArr(loc.x)(loc.y)
-            crumb match {
-                case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => // Let the recursion die on invalid Coordinates
-                case _ =>
-                    reversalHelper(crumb, crumbArr)
-                    crumbArr(crumb.x)(crumb.y) = loc
-            }
-        }
-        reversalHelper(loc, breadcrumbArr)
-        breadcrumbArr(loc.x)(loc.y) = Coordinate()
+  def reverseBreadcrumbs() {
+    def reversalHelper(loc: Coordinate, crumbArr: Array[Array[Coordinate]]) {
+      val crumb = crumbArr(loc.x)(loc.y)
+      crumb match {
+        case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => // Let the recursion die on invalid Coordinates
+        case _ =>
+          reversalHelper(crumb, crumbArr)
+          crumbArr(crumb.x)(crumb.y) = loc
+      }
     }
+    reversalHelper(loc, breadcrumbArr)
+    breadcrumbArr(loc.x)(loc.y) = Coordinate()
+  }
 
 }
 
 
 object BiDirStepData extends StepDataSingleton[BiDirStepData] with FactoryThatTakesAStarStepData[BiDirStepData] {
 
-    override type Extras = Array[Array[Coordinate]] :: HNil
+  override type Extras = Array[Array[Coordinate]] :: HNil
 
-    def apply(freshLoc: Coordinate, stepData: BiDirStepData) : BiDirStepData = {
-        import stepData._
-        new BiDirStepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr,
-                          totalArr, breadcrumbArr, othersBreadcrumbArr, iters, endGoal)
-    }
+  def apply(freshLoc: Coordinate, stepData: BiDirStepData) : BiDirStepData = {
+    import stepData._
+    new BiDirStepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr,
+                      totalArr, breadcrumbArr, othersBreadcrumbArr, iters, endGoal)
+  }
 
-    override protected def generateExtras(stepData: AStarStepData) : Extras = {
-        import stepData.pathingMap._
-        val otherBreadcrumbs = Array.fill(colCount, rowCount)(Coordinate())
-        otherBreadcrumbs :: HNil
-    }
+  override protected def generateExtras(stepData: AStarStepData) : Extras = {
+    import stepData.pathingMap._
+    val otherBreadcrumbs = Array.fill(colCount, rowCount)(Coordinate())
+    otherBreadcrumbs :: HNil
+  }
 
-    override protected def mixinExtras(stepData: AStarStepData, extras: Extras) : BiDirStepData = {
-        import stepData._
-        extras match {
-            case otherBreadcrumbs :: HNil => new BiDirStepData(loc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, otherBreadcrumbs, iters, endGoal)
-            case _                        => throw new UnexpectedDataException("Malformed HList!")
-        }
+  override protected def mixinExtras(stepData: AStarStepData, extras: Extras) : BiDirStepData = {
+    import stepData._
+    extras match {
+      case otherBreadcrumbs :: HNil => new BiDirStepData(loc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, otherBreadcrumbs, iters, endGoal)
+      case _                        => throw new UnexpectedDataException("Malformed HList!")
     }
+  }
 
 }

@@ -8,7 +8,7 @@ package astar_base.heuristics
  */
 
 object HeuristicLib {
-    def manhattanDistance(h: HeuristicBundle) : Int = {
-        (h.start.x - h.end.x).abs + (h.start.y - h.end.y).abs
-    }
+  def manhattanDistance(h: HeuristicBundle) : Int = {
+    (h.start.x - h.end.x).abs + (h.start.y - h.end.y).abs
+  }
 }

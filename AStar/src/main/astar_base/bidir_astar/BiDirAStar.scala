@@ -18,29 +18,29 @@ import pathfinding.statuses._
 // If one reaches a location that the other has reached, or if the current locations are next to each other, it returns.
 object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDistance) {
 
-    override def apply(mapString: PathingMapString) : PathingStatus[BiDirStepData] = {
-        val stepData = BiDirStepData(mapString)
-        execute(primeStepData(stepData), calculateMaxIters(stepData.pathingMap.colCount, stepData.pathingMap.rowCount))
-    }
+  override def apply(mapString: PathingMapString) : PathingStatus[BiDirStepData] = {
+    val stepData = BiDirStepData(mapString)
+    execute(primeStepData(stepData), calculateMaxIters(stepData.pathingMap.colCount, stepData.pathingMap.rowCount))
+  }
 
-    override protected def execute(stepData: BiDirStepData, maxIters: Int) : PathingStatus[BiDirStepData] = {
+  override protected def execute(stepData: BiDirStepData, maxIters: Int) : PathingStatus[BiDirStepData] = {
 
-        val (stgStepData, stgCrumbs) = step(stepData.clone())
-        val (gtsStepData, gtsCrumbs) = step(stepData.cloneForBiBackwards())
-        stgStepData.assimilateBreadcrumbs(gtsCrumbs)
-        gtsStepData.assimilateBreadcrumbs(stgCrumbs)
+    val (stgStepData, stgCrumbs) = step(stepData.clone())
+    val (gtsStepData, gtsCrumbs) = step(stepData.cloneForBiBackwards())
+    stgStepData.assimilateBreadcrumbs(gtsCrumbs)
+    gtsStepData.assimilateBreadcrumbs(stgCrumbs)
 
-        val director = new BiDirDirector(decide(_: BiDirStepData, maxIters), step)    // decide() gets partially applied
-        director.direct(stgStepData, gtsStepData)
-        
-    }
+    val director = new BiDirDirector(decide(_: BiDirStepData, maxIters), step)    // decide() gets partially applied
+    director.direct(stgStepData, gtsStepData)
 
-    override protected def goalIsFound(stepData: BiDirStepData, freshLoc: Coordinate) : Boolean = {
-        (freshLoc overlaps stepData.goal) || (stepData hasInOthersBreadcrumbs freshLoc)
-    }
+  }
 
-    override protected def makeNewStepData(stepData: BiDirStepData, freshLoc: Coordinate) : BiDirStepData = {
-        BiDirStepData(freshLoc, stepData)
-    }
+  override protected def goalIsFound(stepData: BiDirStepData, freshLoc: Coordinate) : Boolean = {
+    (freshLoc overlaps stepData.goal) || (stepData hasInOthersBreadcrumbs freshLoc)
+  }
+
+  override protected def makeNewStepData(stepData: BiDirStepData, freshLoc: Coordinate) : BiDirStepData = {
+    BiDirStepData(freshLoc, stepData)
+  }
 
 }

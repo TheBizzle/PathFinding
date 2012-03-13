@@ -10,7 +10,7 @@ import org.scalatest.Suite
  */
 
 abstract class SuiteCoagulator(reporters: SuiteReporter*) {
-    def coagulate : Seq[Suite] = {
-        SuiteReporter.coalesce(reporters)
-    }
+  def coagulate : Seq[Suite] = {
+    SuiteReporter.coalesce(reporters)
+  }
 }

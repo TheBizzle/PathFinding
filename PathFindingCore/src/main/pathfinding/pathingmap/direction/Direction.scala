@@ -8,7 +8,7 @@ package pathfinding.pathingmap.direction
  */
 
 sealed abstract class Direction {
-    override def toString : String = this.getClass.getName.dropRight(1)
+  override def toString : String = this.getClass.getName.dropRight(1)
 }
 
 object North extends Direction
