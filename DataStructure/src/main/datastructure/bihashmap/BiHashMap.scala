@@ -22,7 +22,7 @@ import collection.mutable.HashMap
  *              inconvenience of wrapping your data and possibly needing to unwrap it).
  */
 
-class BiHashMap[A: Manifest, B: Manifest] protected (aToBMap: HashMap[A, B], bToAMap: HashMap[B, A]) {
+class BiHashMap[A, B] protected (aToBMap: HashMap[A, B], bToAMap: HashMap[B, A]) {
 
     private val abMap = aToBMap
     private val baMap = bToAMap
