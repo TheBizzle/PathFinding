@@ -1,10 +1,6 @@
 package astar_base.bidir_astar
 
-import pathfinding.testcluster.PathingTestCluster
 import pathfinding.testscript.TestScript
-import pathfinding.{StepData, PathFinder}
-import tester.criteria._
-import tester.TestingCore
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,5 +10,5 @@ import tester.TestingCore
  */
 
 object BiDirAStarTest extends TestScript {
-  TestingCore(List[TestCriteria[_]]((1, 39, RunTest), Talkative), BiDirAStar.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
+  run("1->39 ; Talkative", BiDirAStar)
 }

@@ -1,6 +1,11 @@
 package pathfinding.testscript
 
-import tester.criteria.{TestCriteriaValueTuple, TestCriteriaRangeTuple, TestRunningnessFlag}
+import tester.criteria.{TestCriteria, TestCriteriaValueTuple, TestCriteriaRangeTuple, TestRunningnessFlag}
+import tester.criteria.parser.TestCriteriaParser
+import pathfinding.testcluster.PathingTestCluster
+import tester.TestingCore
+import pathfinding.{StepData, PathFinder}
+
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,12 +15,11 @@ import tester.criteria.{TestCriteriaValueTuple, TestCriteriaRangeTuple, TestRunn
  */
 
 abstract class TestScript extends App {
-  implicit def intIntFlagToRangeTuple(that: (Int, Int, TestRunningnessFlag)) : TestCriteriaRangeTuple = {
-    import that._
-    TestCriteriaRangeTuple(_1, _2, _3)
+  //@ This will need work
+  implicit def strToCriteriaList(s: String) : List[TestCriteria[_]] = {
+    TestCriteriaParser.parseAll(TestCriteriaParser.criteria, s).get
   }
-  implicit def intFlagToValueTuple(that: (Int, TestRunningnessFlag)) : TestCriteriaValueTuple = {
-    import that._
-    TestCriteriaValueTuple(_1, _2)
+  def run(criteria: List[TestCriteria[_]], pf: PathFinder[_ <: StepData]) {
+    TestingCore(criteria, pf.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
   }
 }

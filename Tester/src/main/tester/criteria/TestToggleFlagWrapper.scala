@@ -9,4 +9,4 @@ package tester.criteria
 
 class TestToggleFlagWrapper(toggles: List[TestCriteriaToggleFlag])
                            (implicit passItOn: List[TestToggleFlag] = toggles map ( _.criteria ))
-                            extends BaseToggleFlagWrapper(passItOn, List(Talkative, RunBaseTests, SkipExternalTests, StackTrace))
+                            extends BaseToggleFlagWrapper(passItOn, TestingFlag.flags collect { case x: TestToggleFlag => x })
