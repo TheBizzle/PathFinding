@@ -147,7 +147,7 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
 
   private def testingnessValueShouldPass(arg: String) {
     val ValueTuple(not, value) = arg
-    testShouldPass(testingnessValue, arg, TestCriteriaValueTuple(value.toInt, not))
+    testShouldPass(testingnessValue, arg, TestRunningnessValue(value.toInt, not))
   }
 
   private def testingnessValueShouldFail(arg: String) {
@@ -156,7 +156,7 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
 
   private def testingnessRangeShouldPass(arg: String) {
     val RangeTuple(not, start, end) = arg
-    testShouldPass(testingnessRange, arg, TestCriteriaRangeTuple(start.toInt, end.toInt, not))
+    testShouldPass(testingnessRange, arg, TestRunningnessRange(start.toInt, end.toInt, not))
   }
 
   private def testingnessRangeShouldFail(arg: String) {
@@ -215,18 +215,16 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
 
   private class CriteriaSeq(strings: Seq[String]) {
     
-    def toCriteria : Seq[TestCriteria[_]] = strings map string2TestCriteria
+    def toCriteria : Seq[TestCriteria] = strings map string2TestCriteria
 
-    private def upcast(p: TestCriteria[_]) = p
-
-    private def string2TestCriteria(s: String) : TestCriteria[_] = {
-      Some(s) collect { case x if (ValueTuple.matches(x)) => val ValueTuple(not, value) = s; TestCriteriaValueTuple(value.toInt, not) } map upcast getOrElse (
+    private def string2TestCriteria(s: String) : TestCriteria = {
+      Some(s) collect { case x if (ValueTuple.matches(x)) => val ValueTuple(not, value) = s; TestRunningnessValue(value.toInt, not) } getOrElse (
         Some(s) collect { case x if (RangeTuple.matches(x)) =>
-          val RangeTuple(not, start, end) = s; TestCriteriaRangeTuple(start.toInt, end.toInt, not) } map upcast getOrElse (
-          Some(s) collect { case x if (x == "Talkative") => TestCriteriaToggleFlag(Talkative) } map upcast getOrElse (
-            Some(s) collect { case x if (x == "StackTrace") => TestCriteriaToggleFlag(StackTrace) } map upcast getOrElse (
-              Some(s) collect { case x if (x == "SkipExternalTests") => TestCriteriaToggleFlag(SkipExternalTests) } map upcast getOrElse (
-                Some(s) collect { case x if (x == "RunBaseTests") => TestCriteriaToggleFlag(RunBaseTests) } map upcast get )))))
+          val RangeTuple(not, start, end) = s; TestRunningnessRange(start.toInt, end.toInt, not) } getOrElse (
+          Some(s) collect { case x if (x == "Talkative") => TestCriteriaToggleFlag(Talkative) } getOrElse (
+            Some(s) collect { case x if (x == "StackTrace") => TestCriteriaToggleFlag(StackTrace) } getOrElse (
+              Some(s) collect { case x if (x == "SkipExternalTests") => TestCriteriaToggleFlag(SkipExternalTests) } getOrElse (
+                Some(s) collect { case x if (x == "RunBaseTests") => TestCriteriaToggleFlag(RunBaseTests) } get ))))).asInstanceOf[TestCriteria]
     }
     
   }

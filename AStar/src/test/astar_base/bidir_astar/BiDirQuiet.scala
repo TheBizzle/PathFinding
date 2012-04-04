@@ -11,4 +11,5 @@ import pathfinding.testscript.TestScript
 
 object BiDirQuiet extends TestScript {
   run("1->39", BiDirAStar)
+  //run(/* 1 ^-> */ 37 ^& 39 ^^, BiDirAStar)
 }
