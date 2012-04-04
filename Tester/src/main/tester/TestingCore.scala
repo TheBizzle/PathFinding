@@ -25,7 +25,7 @@ object TestingCore {
 
   def apply[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle, ResultFlags <: TestAnalysisResultBundle,
             TFConsBundle <: TestFuncConstructionBundle, TFunc <: TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], TCluster <: TestCluster[TFunc, Subject, TFConsBundle]]
-           (args: List[TestCriteria[_]],
+           (args: List[TestCriteria],
             testable: T = null,
             cluster: TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], Subject, TFConsBundle] = null,
             baseTests: Seq[Suite] = Seq[Suite]()) {
@@ -38,7 +38,7 @@ object TestingCore {
   private def makeTestRunningDecisions[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle,
                                        ResultFlags <: TestAnalysisResultBundle, TFConsBundle <: TestFuncConstructionBundle,
                                        TFunc <: TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], TCluster <: TestCluster[TFunc, Subject, TFConsBundle]]
-                                       (argMap: Map[String, List[TestCriteria[_]]],
+                                       (argMap: Map[String, List[TestCriteria]],
                                         testable: T,
                                         cluster: TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], Subject, TFConsBundle],
                                         baseTests: Seq[Suite]) {
@@ -57,8 +57,8 @@ object TestingCore {
 
     if (!isSkippingExternalTests && wantsToRunExternals) {
 
-      val valuesOption = argMap.get(ArgKeyValue).asInstanceOf[Option[List[TestCriteriaValueTuple]]]
-      val rangesOption = argMap.get(ArgKeyRange).asInstanceOf[Option[List[TestCriteriaRangeTuple]]]
+      val valuesOption = argMap.get(ArgKeyValue).asInstanceOf[Option[List[TestRunningnessValue]]]
+      val rangesOption = argMap.get(ArgKeyRange).asInstanceOf[Option[List[TestRunningnessRange]]]
 
       val values = valuesOption map (sortCriteria(_)) getOrElse(Nil)
       val ranges = rangesOption map (sortCriteria(_)) getOrElse(Nil)
@@ -101,19 +101,19 @@ object TestingCore {
 
   // Basically, takes advantage of bucketing to quickly deal with test numbers and their test-ness/skip-ness
   // Calls an implicit conversion of List[RangeTuples] into List[List[ValueTuple]]s where it is called
-  private[tester] def generateResultArray(runRanges: List[TestCriteriaRangeTuple], runValues: List[TestCriteriaValueTuple],
-                                          skipRanges: List[TestCriteriaRangeTuple], skipValues: List[TestCriteriaValueTuple], maxNum: Int) : Array[Boolean] = {
+  private[tester] def generateResultArray(runRanges: List[TestRunningnessRange], runValues: List[TestRunningnessValue],
+                                          skipRanges: List[TestRunningnessRange], skipValues: List[TestRunningnessValue], maxNum: Int) : Array[Boolean] = {
     val arr  = new Array[Boolean](maxNum + 1)
     List(runRanges.flatten, runValues, skipRanges.flatten, skipValues) foreach (applyValuesToArr(_, arr))
     arr
   }
 
-  private[tester] def applyValuesToArr(values: List[TestCriteriaValueTuple], arr: Array[Boolean]) : Array[Boolean] = {
+  private[tester] def applyValuesToArr(values: List[TestRunningnessValue], arr: Array[Boolean]) : Array[Boolean] = {
     values foreach {
       x =>
         val isTesting = isIncludingTest(x)
-        if (arr(x.criteria.guide) != isTesting)
-          arr(x.criteria.guide) = isTesting
+        if (arr(x.guide) != isTesting)
+          arr(x.guide) = isTesting
         else
           throw new RedundancyException("Setting " + x.toString + " to" + ( if (isTesting) " run " else " skip " ) + "is unnecessary.")
     }
@@ -121,7 +121,7 @@ object TestingCore {
   }
 
   // Expects values and ranges to both be sorted
-  private[tester] def handleTestIntervals(values: List[TestCriteriaValueTuple], ranges: List[TestCriteriaRangeTuple], testCount: Int) : List[Int] = {
+  private[tester] def handleTestIntervals(values: List[TestRunningnessValue], ranges: List[TestRunningnessRange], testCount: Int) : List[Int] = {
 
     val (testRanges, skipRanges, maxRangeVal) = handleRanges(ranges, testCount)
     val (testValues, skipValues, maxValueVal) = handleValues(values, testCount)
@@ -141,7 +141,7 @@ object TestingCore {
   }
 
   // Expects ranges to be sorted
-  private[tester] def handleRanges(ranges: List[TestCriteriaRangeTuple], testCount: Int) : (List[TestCriteriaRangeTuple], List[TestCriteriaRangeTuple], Int) = {
+  private[tester] def handleRanges(ranges: List[TestRunningnessRange], testCount: Int) : (List[TestRunningnessRange], List[TestRunningnessRange], Int) = {
 
     if (!ranges.isEmpty) {
 
@@ -155,7 +155,7 @@ object TestingCore {
 
       val maxOfRanges = {
         if (!testList.isEmpty) {
-          val value = testList.last.criteria.guide._2
+          val value = testList.last.guide._2
           if (value <= testCount)
             value
           else
@@ -175,14 +175,14 @@ object TestingCore {
   }
 
   // Expects values to be sorted
-  private[tester] def handleValues(values: List[TestCriteriaValueTuple], testCount: Int) : (List[TestCriteriaValueTuple], List[TestCriteriaValueTuple], Int) = {
+  private[tester] def handleValues(values: List[TestRunningnessValue], testCount: Int) : (List[TestRunningnessValue], List[TestRunningnessValue], Int) = {
     if (!values.isEmpty) {
       val (testList, skipList) = values.partition(isIncludingTest)
-      val value = if (!testList.isEmpty) testList.last.criteria.guide else 0
+      val value = if (!testList.isEmpty) testList.last.guide else 0
       if (value <= testCount)
         (testList, skipList, value)
       else
-        throw new InvalidTestNumberException("There is no test #" + values.last.criteria.guide)
+        throw new InvalidTestNumberException("There is no test #" + values.last.guide)
     }
     else
       (Nil, Nil, 0)
@@ -192,34 +192,34 @@ object TestingCore {
     baseTests foreach { x => print("\n"); x.execute(stats = true) }
   }
 
-  private[tester] def assessExternalityDesire(argMap:  Map[String, List[TestCriteria[_]]]) : Boolean = {
-    argMap(ArgKeyValue).asInstanceOf[List[TestCriteriaValueTuple]].exists(isIncludingTest) || argMap(ArgKeyRange).asInstanceOf[List[TestCriteriaRangeTuple]].exists(isIncludingTest)
+  private[tester] def assessExternalityDesire(argMap:  Map[String, List[TestCriteria]]) : Boolean = {
+    argMap(ArgKeyValue).asInstanceOf[List[TestRunningnessValue]].exists(isIncludingTest) || argMap(ArgKeyRange).asInstanceOf[List[TestRunningnessRange]].exists(isIncludingTest)
   }
 
-  private[tester] def sortArgLists(args: List[TestCriteria[_]]) : Map[String, List[TestCriteria[_]]] = {
+  private[tester] def sortArgLists(args: List[TestCriteria]) : Map[String, List[TestCriteria]] = {
 
-    val baseMap = Map(ArgKeyValue  -> List[TestCriteriaValueTuple](),
-                      ArgKeyRange  -> List[TestCriteriaRangeTuple](),
+    val baseMap = Map(ArgKeyValue  -> List[TestRunningnessValue](),
+                      ArgKeyRange  -> List[TestRunningnessRange](),
                       ArgKeyToggle -> List[TestCriteriaToggleFlag]())
 
     val argMap = args.groupBy {
-      case _: TestCriteriaValueTuple => ArgKeyValue
-      case _: TestCriteriaRangeTuple => ArgKeyRange
+      case _: TestRunningnessValue   => ArgKeyValue
+      case _: TestRunningnessRange   => ArgKeyRange
       case _: TestCriteriaToggleFlag => ArgKeyToggle
-      case _                         => throw new MysteriousDataException("How did THAT get in there...?")
+      case x                         => throw new MysteriousDataException("How did THAT get in there...? : " + x)
     }
 
     baseMap ++ argMap
 
   }
 
-  private[tester] def sortCriteria[T <: TestCriteriaTuple[_, _] : Manifest](inList: List[T]) : List[T] = {
+  private[tester] def sortCriteria[T <: TestRunningnessCriteria[_, _] : Manifest](inList: List[T]) : List[T] = {
     inList sortBy (_.getKey)
   }
 
   // Assumes the passed-in list to be sorted
   @tailrec
-  private[tester] def containsOverlaps(inList: List[TestCriteriaRangeTuple]) : (Boolean, Option[TestCriteriaRangeTuple], Option[TestCriteriaRangeTuple]) = {
+  private[tester] def containsOverlaps(inList: List[TestRunningnessRange]) : (Boolean, Option[TestRunningnessRange], Option[TestRunningnessRange]) = {
     inList match {
       case h1::h2::_ =>
         if (h1 intersects h2)
@@ -230,8 +230,8 @@ object TestingCore {
     }
   }
 
-  private def isIncludingTest(tuple: TestCriteriaTuple[_,_]) : Boolean = {
-    tuple.criteria.flag == RunTest
+  private def isIncludingTest(tuple: TestRunningnessCriteria[_, _]) : Boolean = {
+    tuple.flag == RunTest
   }
 
 }

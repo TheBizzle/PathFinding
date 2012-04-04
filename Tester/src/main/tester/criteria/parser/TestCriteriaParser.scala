@@ -22,9 +22,9 @@ object TestCriteriaParser extends RegexParsers {
   }
 
   // The parser gets confused when there are TestCriteria with different top types
-  // The code looks ugly if I do a bunch of `asInstanceOf[TestCriteria[_]] calls`
+  // The code looks ugly if I do a bunch of `asInstanceOf[TestCriteria] calls`
   // This silly method alleviates both of those problems together
-  private def upcast(p: Parser[TestCriteria[_]]) = p
+  private def upcast(p: Parser[TestCriteria]) = p
 
   // =============== PARSERS =================
 
@@ -33,20 +33,20 @@ object TestCriteriaParser extends RegexParsers {
   val Num = """[1-9][0-9]*""".r
   val RangeSep = """,|(->)|-|:""".r
 
-  def testingnessValue: Parser[TestCriteriaValueTuple] = opt(Not) ~ Num ^^ {
-    case not ~ num => TestCriteriaValueTuple(num.toInt, not)
+  def testingnessValue: Parser[TestRunningnessValue] = opt(Not) ~ Num ^^ {
+    case not ~ num => TestRunningnessValue(num.toInt, not)
   }
 
-  def testingnessRange: Parser[TestCriteriaRangeTuple] = opt(Not) ~ Num ~ (RangeSep ~> Num) ^^ {
-    case not ~ start ~ end => TestCriteriaRangeTuple(start.toInt, end.toInt, not)
+  def testingnessRange: Parser[TestRunningnessRange] = opt(Not) ~ Num ~ (RangeSep ~> Num) ^^ {
+    case not ~ start ~ end => TestRunningnessRange(start.toInt, end.toInt, not)
   }
 
   def otherFlag: Parser[TestCriteriaToggleFlag] = ("(?i)" + flagNames.map("(%s)".format(_)).mkString("|")).r ^^ {
     case name => TestCriteriaToggleFlag(flags.zip(flagNames).find(_._2.compareToIgnoreCase(name) == 0).get._1)
   }
 
-  def criteria: Parser[List[TestCriteria[_]]] = rep1sep(upcast(testingnessRange) | upcast(testingnessValue) | upcast(otherFlag), Sep) ^^ {
-    case criteria: List[TestCriteria[_]] => criteria
+  def criteria: Parser[List[TestCriteria]] =  rep1sep(testingnessRange | testingnessValue | otherFlag, Sep) ^^ {
+    case criteria: List[TestCriteria] => criteria
   }
 
 }

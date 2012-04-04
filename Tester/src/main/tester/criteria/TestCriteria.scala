@@ -11,16 +11,14 @@ package tester.criteria
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>|  Sealed base classes  |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 // ==========================================+-----------------------+============================================
 
-sealed abstract class TestCriteria[T](criteriaValue: T) {
-  val criteria = criteriaValue
-}
+sealed trait TestCriteria
 
-sealed class TestTuple[T, U <: TestRunningnessFlag](testGuide: T, testFlag: U) {
-  val guide = testGuide
+abstract class TestFlagCriteria[T <: TestingFlag](testFlag: T) extends TestCriteria {
   val flag = testFlag
 }
 
-sealed abstract class TestCriteriaTuple[T, U <: TestRunningnessFlag](criteriaTuple: TestTuple[T, U]) extends TestCriteria(criteriaTuple) {
+sealed abstract class TestRunningnessCriteria[T, U <: TestRunningnessFlag](testGuide: T, testFlag: U) extends TestFlagCriteria(testFlag) {
+  val guide = testGuide
   def getKey : Int
 }
 
@@ -28,101 +26,98 @@ sealed abstract class TestCriteriaTuple[T, U <: TestRunningnessFlag](criteriaTup
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>|     Value tuple       |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 // ==========================================+-----------------------+============================================
 
-class TestCriteriaValueTuple(tuple: TestTuple[Int, TestRunningnessFlag]) extends TestCriteriaTuple(tuple) {
+class TestRunningnessValue(testGuide: Int, testFlag: TestRunningnessFlag) extends TestRunningnessCriteria(testGuide, testFlag) {
 
   def getKey : Int = {
-    criteria.guide
+    guide
   }
 
   override def toString : String = {
-    "(" + criteria.guide + ")"
+    "(" + guide + ")"
   }
 
   override def equals(that: Any) : Boolean = {
     that match {
-      case thatValueTuple: TestCriteriaValueTuple => (thatValueTuple canEqual this) && (criteria.guide == thatValueTuple.criteria.guide
-                                                                                    && (criteria.flag == thatValueTuple.criteria.flag))
-      case _ => false
+      case thatValueTuple: TestRunningnessValue => (thatValueTuple canEqual this) && (guide == thatValueTuple.guide && (flag == thatValueTuple.flag))
+      case _                                    => false
     }
   }
 
   def canEqual(that: Any) : Boolean = {
-    that.isInstanceOf[TestCriteriaValueTuple]
+    that.isInstanceOf[TestRunningnessValue]
   }
 
   override def hashCode : Int = {
-    41 * (4111 + criteria.guide) + criteria.flag.hashCode()
+    41 * (4111 + guide) + flag.hashCode()
   }
 
 }
 
-object TestCriteriaValueTuple {
-  def apply(guide: Int,  flag: TestRunningnessFlag) : TestCriteriaValueTuple = {
-    new TestCriteriaValueTuple(new TestTuple(guide, flag))
-  }
+object TestRunningnessValue {
+  def apply(guide: Int,  flag: TestRunningnessFlag) : TestRunningnessValue = new TestRunningnessValue(guide, flag)
 }
 
 // ==========================================+-----------------------+============================================
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>|     Range tuple       |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 // ==========================================+-----------------------+============================================
 
-class TestCriteriaRangeTuple(tuple: TestTuple[(Int, Int), TestRunningnessFlag]) extends TestCriteriaTuple(tuple) {
+class TestRunningnessRange(testBounds: (Int, Int), testFlag: TestRunningnessFlag) extends TestRunningnessCriteria(testBounds, testFlag) {
 
   def getKey : Int = {
-    criteria.guide._1
+    guide._1
   }
 
   override def toString : String = {
-    "(" + criteria.guide._1 + ", " + criteria.guide._2 + ")"
+    "(" + guide._1 + ", " + guide._2 + ")"
   }
 
   def isValid : Boolean = {
-    criteria.guide._1 <= criteria.guide._2
+    guide._1 <= guide._2
   }
 
-  def intersects(that: TestCriteriaRangeTuple) : Boolean = {
-    val thisRange = Range(criteria.guide._1, criteria.guide._2)
-    val thatRange = Range(that.criteria.guide._1, that.criteria.guide._2)
+  def intersects(that: TestRunningnessRange) : Boolean = {
+    val thisRange = Range(guide._1, guide._2)
+    val thatRange = Range(that.guide._1, that.guide._2)
     thisRange.intersect(thatRange).size > 0       // There's certainly a better way to do this (true... but writing out the boolean gymnastics for it just isn't fun)
   }
 
-  def encapsulates(that: TestCriteriaRangeTuple) : Boolean = {
-    val thisRange = Range(criteria.guide._1, criteria.guide._2)
-    val thatRange = Range(that.criteria.guide._1, that.criteria.guide._2)
+  def encapsulates(that: TestRunningnessRange) : Boolean = {
+    val thisRange = Range(guide._1, guide._2)
+    val thatRange = Range(that.guide._1, that.guide._2)
     thisRange containsSlice thatRange
   }
 
   override def equals(that: Any) : Boolean = {
     that match {
-      case thatRangeTuple: TestCriteriaRangeTuple => (thatRangeTuple canEqual this) && (criteria.guide._1 == thatRangeTuple.criteria.guide._1
-                                                                                    && (criteria.guide._2 == thatRangeTuple.criteria.guide._2)
-                                                                                    && (criteria.flag == thatRangeTuple.criteria.flag))
+      case thatRangeTuple: TestRunningnessRange => (thatRangeTuple canEqual this) && (guide._1 == thatRangeTuple.guide._1
+                                                                                  && (guide._2 == thatRangeTuple.guide._2)
+                                                                                  && (flag == thatRangeTuple.flag))
       case _ => false
     }
   }
 
   def canEqual(that: Any) : Boolean = {
-    that.isInstanceOf[TestCriteriaRangeTuple]
+    that.isInstanceOf[TestRunningnessRange]
   }
 
   override def hashCode : Int = {
-    41 * (41 * (4111 + criteria.guide._1) + criteria.guide._2) + criteria.flag.hashCode()
+    41 * (41 * (4111 + guide._1) + guide._2) + flag.hashCode()
   }
 
 }
 
-object TestCriteriaRangeTuple {
-  def apply(guide: (Int, Int),  flag: TestRunningnessFlag) : TestCriteriaRangeTuple = {
-    new TestCriteriaRangeTuple(new TestTuple(guide, flag))
+object TestRunningnessRange {
+  def apply(guide: (Int, Int),  flag: TestRunningnessFlag) : TestRunningnessRange = {
+    new TestRunningnessRange(guide, flag)
   }
-  def apply(guideStart: Int, guideEnd: Int,  flag: TestRunningnessFlag) : TestCriteriaRangeTuple = {
-    new TestCriteriaRangeTuple(new TestTuple((guideStart, guideEnd), flag))
+  def apply(guideStart: Int, guideEnd: Int,  flag: TestRunningnessFlag) : TestRunningnessRange = {
+    new TestRunningnessRange((guideStart, guideEnd), flag)
   }
-  implicit def rangeTupleListToValueTupleListList(that: List[TestCriteriaRangeTuple]) : List[List[TestCriteriaValueTuple]] = {
+  implicit def rangeTupleListToValueTupleListList(that: List[TestRunningnessRange]) : List[List[TestRunningnessValue]] = {
     that map (rangeTupleToValueTupleList(_))
   }
-  implicit def rangeTupleToValueTupleList(that: TestCriteriaRangeTuple) : List[TestCriteriaValueTuple] = {
-    Range(that.criteria.guide._1, that.criteria.guide._2).inclusive map (TestCriteriaValueTuple(_, that.criteria.flag)) toList
+  implicit def rangeTupleToValueTupleList(that: TestRunningnessRange) : List[TestRunningnessValue] = {
+    Range(that.guide._1, that.guide._2).inclusive map (TestRunningnessValue(_, that.flag)) toList
   }
 }
 
@@ -130,17 +125,17 @@ object TestCriteriaRangeTuple {
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>|     Toggle tuple      |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 // ==========================================+-----------------------+============================================
 
-class TestCriteriaToggleFlag(criteriaFlag: TestToggleFlag) extends TestCriteria(criteriaFlag) {
+class TestCriteriaToggleFlag(criteriaFlag: TestToggleFlag) extends TestFlagCriteria(criteriaFlag) {
 
   override def equals(that: Any) : Boolean = {
     that match {
-      case thatToggle: TestCriteriaToggleFlag => (thatToggle canEqual this) && (criteria == thatToggle.criteria)
+      case thatToggle: TestCriteriaToggleFlag => (thatToggle canEqual this) && (flag == thatToggle.flag)
       case _                                  => false
     }
   }
 
   override def hashCode : Int = {
-    (4111 + criteria.hashCode())
+    (4111 + flag.hashCode())
   }
 
   def canEqual(that: Any) : Boolean = {
@@ -150,7 +145,5 @@ class TestCriteriaToggleFlag(criteriaFlag: TestToggleFlag) extends TestCriteria(
 }
 
 object TestCriteriaToggleFlag {
-  def apply(flag: TestToggleFlag) : TestCriteriaToggleFlag = {
-    new TestCriteriaToggleFlag(flag)
-  }
+  def apply(flag: TestToggleFlag) : TestCriteriaToggleFlag = new TestCriteriaToggleFlag(flag)
 }
