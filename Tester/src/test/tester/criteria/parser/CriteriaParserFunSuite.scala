@@ -59,6 +59,18 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
     testingnessRangeShouldFail("-1->3")
   }
 
+  test("testingnessNotRange - Not-range") {
+    testingnessNotRangeShouldPass("3>!>1599")
+  }
+
+  test("testingnessNotRange - Not-range including zero") {
+    testingnessNotRangeShouldFail("0>!>5")
+  }
+
+  test("testingnessNotRange - Not-range including an already-negated number") {
+    testingnessNotRangeShouldFail("~1>!>3")
+  }
+
   test("otherFlag - StackTrace") {
     otherFlagShouldPass("StackTrace", TestCriteriaToggleFlag(StackTrace))
   }
@@ -107,8 +119,16 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
     criteriaShouldPass("~214->340")
   }
 
+  test("criteria - One not-range") {
+    criteriaShouldPass("214>!>340")
+  }
+
   test("criteria - Many ranges") {
     criteriaShouldPass("~214->340", "1->4", "6->12", "~410->413")
+  }
+
+  test("criteria - Many ranges (with not-ranges)") {
+    criteriaShouldPass("214>!>340", "1->4", "6->12", "410>!>413")
   }
 
   test("criteria - One toggle") {
@@ -123,8 +143,16 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
     criteriaShouldPass("RunBaseTests", "13", "24->50", "StackTrace", "~28", "~40->47", "2")
   }
 
+  test("criteria - Mixed #1 (with not-ranges)") {
+    criteriaShouldPass("RunBaseTests", "13", "24->50", "StackTrace", "~28", "40>!>47", "2")
+  }
+
   test("criteria - Mixed #2") {
     criteriaShouldPass("15", "17", "19", "~43", "30->300", "StackTrace", "SkipExternalTests", "~200->250", "~100->150", "~45->75")
+  }
+
+  test("criteria - Mixed #2 (with not-ranges)") {
+    criteriaShouldPass("15", "17", "19", "~43", "30->300", "StackTrace", "SkipExternalTests", "200>!>250", "100>!>150", "45>!>75")
   }
 
   test("criteria - Mixed #3") {
@@ -163,6 +191,15 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
     testShouldFail(testingnessRange, arg)
   }
 
+  private def testingnessNotRangeShouldPass(arg: String) {
+    val NotRangeTuple(start, end) = arg
+    testShouldPass(testingnessNotRange, arg, TestRunningnessRange(start.toInt, end.toInt, SkipTest))
+  }
+
+  private def testingnessNotRangeShouldFail(arg: String) {
+    testShouldFail(testingnessNotRange, arg)
+  }
+
   private def otherFlagShouldPass(arg: String, target: TestCriteriaToggleFlag) {
     testShouldPass(otherFlag, arg, target)
   }
@@ -191,46 +228,49 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
     resultMorpher(TestCriteriaParser.parseAll(parser, testStr)) should  equal (target)
   }
 
-  // ======================== UTILITIES - REGEX ============================
-
-  // Courtesy of mkneissl on StackOverflow
-  protected class RichRegex(underlying: Regex) {
-    def matches(s: String) = underlying.pattern.matcher(s).matches
-  }
-
-  // Courtesy of mkneissl on StackOverflow
-  implicit def regexToRichRegex(r: Regex) = new RichRegex(r)
-
   // ======================== UTILITIES - PARSING ============================
 
-  implicit def not2Flag(not: String): TestRunningnessFlag = {
-    if (not.isEmpty) RunTest else SkipTest
-  }
+  implicit def not2Flag(not: String) : TestRunningnessFlag = if (not.isEmpty) RunTest else SkipTest
 
   private val num = """[1-9][0-9]*"""
   private val ValueTuple = "(~?)(%s)".format(num).r
+  private val NotRangeTuple = "(%s)>!>(%s)".format(Stream.continually(num) take 2: _*).r
   private val RangeTuple = "(~?)(%s)->(%s)".format(Stream.continually(num) take 2: _*).r
-
+  
   // ======================== UTILITIES - PIMPED SEQS ============================
 
+  implicit private def stringSeq2TestCriteriaSeq(strings: Seq[String]) : CriteriaSeq = new CriteriaSeq(strings)
+
   private class CriteriaSeq(strings: Seq[String]) {
-    
+
     def toCriteria : Seq[TestCriteria] = strings map string2TestCriteria
 
-    private def string2TestCriteria(s: String) : TestCriteria = {
-      Some(s) collect { case x if (ValueTuple.matches(x)) => val ValueTuple(not, value) = s; TestRunningnessValue(value.toInt, not) } getOrElse (
-        Some(s) collect { case x if (RangeTuple.matches(x)) =>
-          val RangeTuple(not, start, end) = s; TestRunningnessRange(start.toInt, end.toInt, not) } getOrElse (
-          Some(s) collect { case x if (x == "Talkative") => TestCriteriaToggleFlag(Talkative) } getOrElse (
-            Some(s) collect { case x if (x == "StackTrace") => TestCriteriaToggleFlag(StackTrace) } getOrElse (
-              Some(s) collect { case x if (x == "SkipExternalTests") => TestCriteriaToggleFlag(SkipExternalTests) } getOrElse (
-                Some(s) collect { case x if (x == "RunBaseTests") => TestCriteriaToggleFlag(RunBaseTests) } get ))))).asInstanceOf[TestCriteria]
+    private def string2TestCriteria(str: String) : TestCriteria = {
+
+      def matchesTuple(r: Regex)(s: String) : Boolean = r.matches(s)
+      def getAsValue(s: String)    : TestRunningnessValue = { val ValueTuple(not, value) = s; TestRunningnessValue(value.toInt, not) }
+      def getAsNotRange(s: String) : TestRunningnessRange = { val NotRangeTuple(start, end) = s; TestRunningnessRange(start.toInt, end.toInt, SkipTest) }
+      def getAsRange(s: String)    : TestRunningnessRange = { val RangeTuple(not, start, end) = s; TestRunningnessRange(start.toInt, end.toInt, not) }
+      val tupleFuncs = List((ValueTuple, getAsValue(_)), (NotRangeTuple, getAsNotRange(_)), (RangeTuple, getAsRange(_))) map { case (rgx, func) => (matchesTuple(rgx)(_), func) }
+
+      def matchesFlag(name: String)(s: String) : Boolean = s == name
+      def getAsFlag(flag: TestToggleFlag)(s: String) : TestCriteriaToggleFlag = TestCriteriaToggleFlag(flag)
+      val flagFuncs = flagNames.map(name => matchesFlag(name)(_)) zip flags.map(flag => getAsFlag(flag)(_))
+
+      // I wish this could all be done more smoothly and/or readably with `Option`-juggling...
+      tupleFuncs ++ flagFuncs collectFirst { case (condFunc, resultFunc) if (condFunc(str)) => resultFunc(str) } getOrElse
+              (throw new Exception("Failed to convert %s to any `TestCriteria` subclass".format(str)))
+      
     }
     
-  }
+    // Courtesy of mkneissl on StackOverflow
+    implicit def regexToRichRegex(r: Regex) = new RichRegex(r)
 
-  implicit private def stringSeq2TestCriteriaSeq(strings: Seq[String]) : CriteriaSeq = {
-    new CriteriaSeq(strings)
+    // Courtesy of mkneissl on StackOverflow
+    protected class RichRegex(underlying: Regex) {
+      def matches(s: String) = underlying.pattern.matcher(s).matches
+    }
+    
   }
 
 }

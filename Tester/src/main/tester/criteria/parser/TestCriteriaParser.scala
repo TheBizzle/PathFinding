@@ -10,28 +10,26 @@ import tester.criteria._
  * Time: 11:13 PM
  */
 
+// This was a fun experiment, but it is actually no longer used in the code
+// It has been replaced by TestCriteriaDialect
 object TestCriteriaParser extends RegexParsers {
 
   // ============== MISC ====================
 
   val flags = TestingFlag.flags
-  val flagNames = flags.map(_.getClass.getName.replaceAll("""(\$$)|(.*\.)""", ""))  // Remove end-of-entry '$'s and all text before the last '.'
+  val flagNames = flags.map(_.getClass.getName.replaceAll("""(\$$)|(.*\.)""", ""))  // (i.e. "tester.criteria.RunTest$" => "RunTest")
 
   implicit private def not2Flag(not: Option[String]) : TestRunningnessFlag = {
     not map (x => SkipTest) getOrElse (RunTest)
   }
 
-  // The parser gets confused when there are TestCriteria with different top types
-  // The code looks ugly if I do a bunch of `asInstanceOf[TestCriteria] calls`
-  // This silly method alleviates both of those problems together
-  private def upcast(p: Parser[TestCriteria]) = p
-
   // =============== PARSERS =================
 
-  val Not = """~""".r
-  val Sep = """;""".r
+  val Not = """~|!""".r
+  val Sep = """;|&&""".r
   val Num = """[1-9][0-9]*""".r
-  val RangeSep = """,|(->)|-|:""".r
+  val RangeSep = """,|(->)|(>&>)|-|:""".r
+  val NotRangeSep = """>!>""".r
 
   def testingnessValue: Parser[TestRunningnessValue] = opt(Not) ~ Num ^^ {
     case not ~ num => TestRunningnessValue(num.toInt, not)
@@ -41,11 +39,16 @@ object TestCriteriaParser extends RegexParsers {
     case not ~ start ~ end => TestRunningnessRange(start.toInt, end.toInt, not)
   }
 
+  // Added for compatibility with TestCriteriaDialect
+  def testingnessNotRange: Parser[TestRunningnessRange] = Num ~ (NotRangeSep ~> Num) ^^ {
+    case start ~ end => TestRunningnessRange(start.toInt, end.toInt, SkipTest)
+  }
+
   def otherFlag: Parser[TestCriteriaToggleFlag] = ("(?i)" + flagNames.map("(%s)".format(_)).mkString("|")).r ^^ {
     case name => TestCriteriaToggleFlag(flags.zip(flagNames).find(_._2.compareToIgnoreCase(name) == 0).get._1)
   }
 
-  def criteria: Parser[List[TestCriteria]] =  rep1sep(testingnessRange | testingnessValue | otherFlag, Sep) ^^ {
+  def criteria: Parser[List[TestCriteria]] =  rep1sep(testingnessNotRange | testingnessRange | testingnessValue | otherFlag, Sep) ^^ {
     case criteria: List[TestCriteria] => criteria
   }
 
