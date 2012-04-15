@@ -1,6 +1,7 @@
 package astar_base.astar
 
 import pathfinding.testscript.TestScript
+import tester.testscript.dialect.TestCriteriaDialect._
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,5 +11,5 @@ import pathfinding.testscript.TestScript
  */
 
 object AStarQuiet extends TestScript {
-  run("1->39", AStar)
+  run(1 >&> 39, AStar)
 }

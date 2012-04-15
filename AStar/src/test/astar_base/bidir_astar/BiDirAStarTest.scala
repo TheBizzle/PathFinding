@@ -1,6 +1,8 @@
 package astar_base.bidir_astar
 
 import pathfinding.testscript.TestScript
+import tester.testscript.dialect.TestCriteriaDialect._
+import tester.criteria.Talkative
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,5 +12,5 @@ import pathfinding.testscript.TestScript
  */
 
 object BiDirAStarTest extends TestScript {
-  run("1->39 ; Talkative", BiDirAStar)
+  run(1 >&> 39 && Talkative, BiDirAStar)
 }

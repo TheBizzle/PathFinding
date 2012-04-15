@@ -1,6 +1,7 @@
 package astar_base.bidir_astar
 
 import pathfinding.testscript.TestScript
+import tester.testscript.dialect.TestCriteriaDialect._
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,6 +11,5 @@ import pathfinding.testscript.TestScript
  */
 
 object BiDirQuiet extends TestScript {
-  run("1->39", BiDirAStar)
-  //run(/* 1 ^-> */ 37 ^& 39 ^^, BiDirAStar)
+  run(1 >&> 39, BiDirAStar)
 }
