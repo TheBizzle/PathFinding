@@ -12,7 +12,7 @@ import tester.exceptions.MysteriousDataException
 sealed trait TestingFlag                              // A marker trait
 sealed trait TestRunningnessFlag extends TestingFlag  // A trait whose possessors will represent signs of about whether or not a test(s) should be run
 sealed trait TestToggleFlag extends TestingFlag {     // Everytime something is made to inherit from this, it MUST be added to TestToggleFlagWrapper's FlagList
-  implicit def flagToCriteria(that: TestToggleFlag) : TestCriteriaToggleFlag = {
+  implicit def flag2Criteria(that: TestToggleFlag) : TestCriteriaToggleFlag = {
     TestCriteriaToggleFlag(that)
   }
 }

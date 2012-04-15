@@ -2,6 +2,7 @@ package tester.suitereporter
 
 import tester.{TesterFunSuite, TesterSpec}
 import tester.criteria.parser.CriteriaParserFunSuite
+import tester.testscript.dialect.CriteriaDialectFunSuite
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,4 +11,4 @@ import tester.criteria.parser.CriteriaParserFunSuite
  * Time: 10:51 PM
  */
 
-object TesterSuiteReporter extends SuiteReporter(List(new TesterFunSuite(), new TesterSpec(), new CriteriaParserFunSuite()))
+object TesterSuiteReporter extends SuiteReporter(List(new TesterFunSuite(), new TesterSpec(), new CriteriaParserFunSuite(), new CriteriaDialectFunSuite()))
