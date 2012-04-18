@@ -11,9 +11,10 @@ import tester.criteria._
  */
 
 object TestCriteriaDialect {
-  implicit def int2PTCVal(value: Int)                                     : PimpedValueTuple = PimpedValueTuple(TestRunningnessValue(value, RunTest))
-  implicit def criteriaFlag2PTCFlag[T <% TestCriteriaToggleFlag](flag: T) : PimpedToggleFlag = PimpedToggleFlag(flag)
-  implicit def pimper2TCList(pimper: CombinatorPimper) : List[TestCriteria]                  = pimper.^^  // Might need to get rid of this at some point...
+  implicit def int2PTCVal(value: Int)                                     : PimpedValueTuple    = PimpedValueTuple(TestRunningnessValue(value, RunTest))
+  implicit def int2PTCPromoter(value: Int)                                : PimpedClassPromoter = PimpedClassPromoter(value)
+  implicit def criteriaFlag2PTCFlag[T <% TestCriteriaToggleFlag](flag: T) : PimpedToggleFlag    = PimpedToggleFlag(flag)
+  implicit def pimper2TCList(pimper: CombinatorPimper)                    : List[TestCriteria]  = pimper.^^  // Might need to get rid of this at some point...
 }
 
 
@@ -26,7 +27,7 @@ object TestCriteriaDialect {
 // to have weird, unclear, duplicated code, or weird, identity-crisis-suffering classes.
 // I've chosen the latter.
 private[dialect] sealed abstract class CombinatorPimper(private val crit: TestCriteria) {
-  
+
   private[dialect] val buffer = new ListBuffer[TestCriteria]() += crit
 
   def &&(that: CombinatorPimper) : CombinatorPimper   = { buffer ++= that.buffer; this }
@@ -34,11 +35,14 @@ private[dialect] sealed abstract class CombinatorPimper(private val crit: TestCr
 
 }
 
+private[dialect] case class PimpedValueTuple(valueTuple: TestRunningnessValue) extends CombinatorPimper(valueTuple)
 private[dialect] case class PimpedRangeTuple(rangeTuple: TestRunningnessRange) extends CombinatorPimper(rangeTuple)
 private[dialect] case class PimpedToggleFlag(toggleFlag: TestCriteriaToggleFlag) extends CombinatorPimper(toggleFlag)
-private[dialect] case class PimpedValueTuple(valueTuple: TestRunningnessValue) extends CombinatorPimper(valueTuple) {
-  // This design kind of sucks, but I don't feel like there's much I can do about it...
-  def unary_!       : PimpedValueTuple = PimpedValueTuple(TestRunningnessValue(valueTuple.guide, TestingFlag.flipRunningness(valueTuple.flag)))
-  def >&>(end: Int) : PimpedRangeTuple = PimpedRangeTuple(TestRunningnessRange(valueTuple.guide, end, RunTest))
-  def >!>(end: Int) : PimpedRangeTuple = PimpedRangeTuple(TestRunningnessRange(valueTuple.guide, end, SkipTest))
+
+// This class handles the class promotion of modified values, while barring invalid modifier combinations
+// i.e. `!13` is allowed (since it makes total sense), but `!13 >!> 18` is not.
+private[dialect] case class PimpedClassPromoter(value: Int) {
+  def unary_!       : PimpedValueTuple = PimpedValueTuple(TestRunningnessValue(value, SkipTest))
+  def >&>(end: Int) : PimpedRangeTuple = PimpedRangeTuple(TestRunningnessRange(value, end, RunTest))
+  def >!>(end: Int) : PimpedRangeTuple = PimpedRangeTuple(TestRunningnessRange(value, end, SkipTest))
 }
