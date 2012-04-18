@@ -35,6 +35,9 @@ private[dialect] sealed abstract class CombinatorPimper(private val crit: TestCr
 
 }
 
+// With the current state of things, the necessity of these pimped classes is actually questionable
+// Couldn't I just get rid of these altogether and directly instantiate `CombinatorPimper`s?
+// But is that a good idea...?
 private[dialect] case class PimpedValueTuple(valueTuple: TestRunningnessValue) extends CombinatorPimper(valueTuple)
 private[dialect] case class PimpedRangeTuple(rangeTuple: TestRunningnessRange) extends CombinatorPimper(rangeTuple)
 private[dialect] case class PimpedToggleFlag(toggleFlag: TestCriteriaToggleFlag) extends CombinatorPimper(toggleFlag)
