@@ -4,19 +4,19 @@ import org.scalatest.{GivenWhenThen, FlatSpec}
 import org.scalatest.matchers.ShouldMatchers
 
 /**
-* Created by IntelliJ IDEA.
-* User: Jason
-* Date: 3/16/12
-* Time: 12:19 AM
-*/
+ * Created by IntelliJ IDEA.
+ * User: Jason
+ * Date: 4/18/12
+ * Time: 11:44 PM
+ */
 
-class BiHashMapSpec extends FlatSpec with GivenWhenThen with ShouldMatchers {
+class FutureBiHashMapSpec extends FlatSpec with GivenWhenThen with ShouldMatchers {
 
   val aList = List(5, 17, 1, 9, 4)
   val bList = List("five", "seventeen", "one", "nine", "four")
   val inList = aList.zip(bList)
 
-  val biHash = OldBiHashMap(inList: _*)
+  val biHash = FutureBiHashMap(inList: _*)
 
   behavior of "A BiHashMap"
 
@@ -42,7 +42,7 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen with ShouldMatchers {
   it should "insert, retrieve, and assess equality correctly" in {
 
     given("an empty BHM")
-    val bhm = OldBiHashMap[Int, String]()
+    val bhm = FutureBiHashMap[Int, String]()
 
     when("inserting the same elements inserted into it as were used to construct the original BHM")
     bhm.put(1, "one")
@@ -147,7 +147,7 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen with ShouldMatchers {
   it should "be mutable correctly" in {
 
     given("an empty BHM")
-    var bhm = OldBiHashMap[Int, String]()
+    var bhm = FutureBiHashMap[Int, String]()
 
     when("using it mutably")
 

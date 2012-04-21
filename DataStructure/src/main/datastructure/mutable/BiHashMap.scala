@@ -15,10 +15,10 @@ import collection.mutable.{MapLike, Map}
 * Time: 9:35 PM
 */
 
-class BiHashMap[A, B] private[datastructure](contents: (A, B)*) extends Bijection[A, B](contents: _*) with Map[A, B]
-                                                                with MapLike[A, B, BiHashMap[A, B]] with CustomParallelizable[(A, B), ParBiHashMap[A, B]] {
+class OldBiHashMap[A, B] private[datastructure](contents: (A, B)*) extends Bijection[A, B](contents: _*) with Map[A, B]
+                                                                with MapLike[A, B, OldBiHashMap[A, B]] with CustomParallelizable[(A, B), ParBiHashMap[A, B]] {
 
-  override def empty: BiHashMap[A, B] = BiHashMap.empty[A, B]
+  override def empty: OldBiHashMap[A, B] = OldBiHashMap.empty[A, B]
   override def clear() { abMap.clear(); baMap.clear() }
   override def size: Int = { if (abMap.size == baMap.size) abMap.size else throw new IllegalStateException("Submap size mismatch!  Corrupted BiHashMap detected!") }
   override def par = new ParBiHashMap[A, B](contents: _*)  //@ Yeah, ummm... don't use this.  I'm considering just having it throw an exception...
@@ -151,7 +151,7 @@ class BiHashMap[A, B] private[datastructure](contents: (A, B)*) extends Bijectio
 
 }
 
-object BiHashMap extends MutableMapFactory[BiHashMap] {
-  implicit def canBuildFrom[A, B]: CanBuildFrom[Coll, (A, B), BiHashMap[A, B]] = new MapCanBuildFrom[A, B]
-  def empty[A, B]: BiHashMap[A, B] = new BiHashMap[A, B]()
+object OldBiHashMap extends MutableMapFactory[OldBiHashMap] {
+  implicit def canBuildFrom[A, B]: CanBuildFrom[Coll, (A, B), OldBiHashMap[A, B]] = new MapCanBuildFrom[A, B]
+  def empty[A, B]: OldBiHashMap[A, B] = new OldBiHashMap[A, B]()
 }
