@@ -10,12 +10,14 @@ import collection.generic.{CanBuildFrom, MutableMapFactory}
  * Time: 11:15 PM
  */
 
-class FutureBiHashMap[A, B] private[datastructure](contents: (A, B)*) extends Bijection[A, B](contents: _*) with BiHashSharedImpls[A, B] with BiHashForwardOps[A, B] with BiHashReverseOps[A, B] {
+class FutureBiHashMap[A, B] private[datastructure](contents: (A, B)*) extends Bijection[A, B](contents: _*) with BiHashForwardOps[A, B] with BiHashReverseOps[A, B] {
 
-  override def clone : FutureBiHashMap[A, B] = new FutureBiHashMap(abMap.toSeq: _*)
-
+  def aValues : scala.collection.Set[A] = abMap.keySet
+  def bValues : scala.collection.Set[B] = baMap.keySet
+  def size    : Int                     = { require (abMap.size == baMap.size); abMap.size }
   def clear() { abMap.clear(); baMap.clear() }
 
+  def canEqual(other: Any)       : Boolean = other.isInstanceOf[FutureBiHashMap[A, B]]  // Might pay to do "|| other.isInstanceOf[BiHashMap[B, A]]"... if not for type erasure
   override def equals(that: Any) : Boolean = {
     that match {
       case thatHash: FutureBiHashMap[A, B] => (thatHash canEqual this) &&
@@ -25,26 +27,8 @@ class FutureBiHashMap[A, B] private[datastructure](contents: (A, B)*) extends Bi
     }
   }
 
-  override def hashCode : Int = {
-    abMap.hashCode() ^ baMap.hashCode()  // XOR the hashcodes of the two maps
-  }
-
-  def canEqual(other: Any) : Boolean = {
-    other.isInstanceOf[FutureBiHashMap[A, B]]  // Might pay to do "|| other.isInstanceOf[BiHashMap[B, A]]" if not for type erasure
-  }
-
-  def aValues : scala.collection.Set[A] = {
-    abMap.keySet
-  }
-
-  def bValues : scala.collection.Set[B] = {
-    baMap.keySet
-  }
-
-  def size : Int = {
-    require (abMap.size == baMap.size)
-    abMap.size
-  }
+  override def clone    : FutureBiHashMap[A, B] = new FutureBiHashMap(abMap.toSeq: _*)
+  override def hashCode : Int                   = abMap.hashCode() ^ baMap.hashCode()        // XOR the hashcodes of the two maps
 
 }
 

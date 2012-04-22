@@ -7,27 +7,24 @@ package datastructure.mutable
  * Time: 9:41 PM
  */
 
-trait BiHashReverseOps[A, B] extends BiHashSharedImpls[A, B] {
+// It would be great if there were something that made this task easier--something like `Proxy`s.
+// But I'm not aware of any common pattern that allows me to have two different traits inheriting
+// the same functionality and wrapping it in different ways, with different type signatures (to avoid type erasure).
+// Utilizes `DummyImplicit` (from Predef) to give the methods herein different signatures to the JVM than the `_ForwardsOps` ones get
+trait BiHashReverseOps[A, B] {
 
-  self: FutureBiHashMap[A, B] with BiHashForwardOps[A, B] =>
+  self: FutureBiHashMap[A, B] =>
 
-  import ErasureDefeater._
+  private val implWrapper = new BiHashImplWrapper(baMap, abMap)
 
-  def apply(bKey: B)(implicit ignore: ErasureDefeater = BHMED)        : A =           baMap(bKey)
-  def default(bKey: B)(implicit ignore: ErasureDefeater = BHMED)      : B =           throw new NoSuchElementException("key not found: " + bKey)
-  def get(bKey: B)(implicit ignore: ErasureDefeater = BHMED)          : Option[A] =   baMap.get(bKey)
-  def += (ba: (B,  A))(implicit ignore: ErasureDefeater = BHMED)      : this.type = { put(ba._1, ba._2); this }
-  def put(bKey: B, aVal: A)(implicit ignore: ErasureDefeater = BHMED) : Option[A] =   put_base(aVal, bKey)._1
-  def remove(bKey: B)(implicit ignore: ErasureDefeater = BHMED)       : Option[A] = { val holdOn = baMap.get(bKey); holdOn foreach (remove_base(_)); holdOn }
-  def -= (bKey: B)(implicit ignore: ErasureDefeater = BHMED)          : this.type = { remove(bKey); this }
-  def update(bKey: B, aVal: A)(implicit ignore: ErasureDefeater = BHMED)            { update_base(aVal, bKey) }
-  def contains(bKey: B)(implicit ignore: ErasureDefeater = BHMED)     : Boolean =     baMap.contains(bKey)
+  def apply(bKey: B)(implicit ignore: DummyImplicit)        : A         =   implWrapper.apply(bKey)
+  def default(bKey: B)(implicit ignore: DummyImplicit)      : A         =   implWrapper.default(bKey)
+  def get(bKey: B)(implicit ignore: DummyImplicit)          : Option[A] =   implWrapper.get(bKey)
+  def += (ba: (B,  A))(implicit ignore: DummyImplicit)      : this.type = { put(ba._1, ba._2); this }
+  def put(bKey: B, aVal: A)(implicit ignore: DummyImplicit) : Option[A] =   implWrapper.put(bKey, aVal)
+  def -= (bKey: B)(implicit ignore: DummyImplicit)          : this.type = { remove(bKey); this }
+  def remove(bKey: B)(implicit ignore: DummyImplicit)       : Option[A] =   implWrapper.remove(bKey)
+  def update(bKey: B, aVal: A)(implicit ignore: DummyImplicit)            { implWrapper.update(bKey, aVal) }
+  def contains(bKey: B)(implicit ignore: DummyImplicit)     : Boolean   =   implWrapper.contains(bKey)
 
 }
-
-// The `BHMED` ("BiHashMapErasureDefeater") is tacked onto each method here to give a different signature to the JVM than the one in `_ForwardOps` has
-sealed trait ErasureDefeater
-private object ErasureDefeater {
-  object BHMED extends ErasureDefeater
-}
-
