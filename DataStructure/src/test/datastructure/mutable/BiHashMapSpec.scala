@@ -147,7 +147,7 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen with ShouldMatchers {
   it should "be mutable correctly" in {
 
     given("an empty BHM")
-    var bhm = OldBiHashMap[Int, String]()
+    var bhm = BiHashMap[Int, String]()
 
     when("using it mutably")
 
