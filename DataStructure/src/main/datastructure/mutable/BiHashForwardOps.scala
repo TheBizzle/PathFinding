@@ -9,7 +9,7 @@ package datastructure.mutable
 
 trait BiHashForwardOps[A, B] {
 
-  self: FutureBiHashMap[A, B] =>
+  self: BiHashMap[A, B] =>
 
   private val implWrapper = new BiHashImplWrapper(abMap, baMap)
 

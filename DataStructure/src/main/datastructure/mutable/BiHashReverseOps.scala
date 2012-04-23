@@ -13,7 +13,7 @@ package datastructure.mutable
 // Utilizes `DummyImplicit` (from Predef) to give the methods herein different signatures to the JVM than the `_ForwardsOps` ones get
 trait BiHashReverseOps[A, B] {
 
-  self: FutureBiHashMap[A, B] =>
+  self: BiHashMap[A, B] =>
 
   private val implWrapper = new BiHashImplWrapper(baMap, abMap)
 

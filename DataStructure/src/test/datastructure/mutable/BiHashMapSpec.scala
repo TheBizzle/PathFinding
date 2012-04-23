@@ -16,7 +16,7 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen with ShouldMatchers {
   val bList = List("five", "seventeen", "one", "nine", "four")
   val inList = aList.zip(bList)
 
-  val biHash = FutureBiHashMap(inList: _*)
+  val biHash = BiHashMap(inList: _*)
 
   behavior of "A BiHashMap"
 
@@ -42,7 +42,7 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen with ShouldMatchers {
   it should "insert, retrieve, and assess equality correctly" in {
 
     given("an empty BHM")
-    val bhm = FutureBiHashMap[Int, String]()
+    val bhm = BiHashMap[Int, String]()
 
     when("inserting the same elements inserted into it as were used to construct the original BHM")
     bhm.put(1, "one")
