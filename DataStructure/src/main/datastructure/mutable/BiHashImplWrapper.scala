@@ -11,11 +11,14 @@ import collection.mutable.Map
 
 private[datastructure] class BiHashImplWrapper[X, Y](primaryMap: Map[X, Y], secondaryMap: Map[Y, X]) {
 
-  def apply(key: X)         : Y         =   primaryMap(key)
-  def default(key: X)       : Y         =   primaryMap.default(key)
-  def get(key: X)           : Option[Y] =   primaryMap.get(key)
-  def put(xKey: X, yVal: Y) : Option[Y] = { secondaryMap.put(yVal, xKey); primaryMap.put(xKey, yVal) }
-  def contains(key: X)      : Boolean   =   primaryMap.contains(key)
+  def apply(key: X)         : Y           =   primaryMap(key)
+  def default(key: X)       : Y           =   primaryMap.default(key)
+  def get(key: X)           : Option[Y]   =   primaryMap.get(key)
+  def put(xKey: X, yVal: Y) : Option[Y]   = { secondaryMap.put(yVal, xKey); primaryMap.put(xKey, yVal) }
+  def contains(key: X)      : Boolean     =   primaryMap.contains(key)
+  def keysIterator          : Iterator[X] =   primaryMap.keysIterator
+  def keySet    : scala.collection.Set[X] =   primaryMap.keySet
+  def foreach[C](f: ((X, Y)) => C)          { primaryMap foreach f }
 
   def remove(key: X) : Option[Y] = {
     get(key) foreach (secondaryMap.remove(_))

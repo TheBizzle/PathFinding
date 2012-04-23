@@ -20,7 +20,7 @@ import collection.mutable.DefaultEntry
 class ParBiHashMap[A, B] private[datastructure](contents: (A, B)*)
 extends ParMap[A, B]
    with GenericParMapTemplate[A, B, ParBiHashMap]
-   with ParMapLike[A, B, ParBiHashMap[A, B], datastructure.mutable.OldBiHashMap[A, B]]
+   with ParMapLike[A, B, ParBiHashMap[A, B], datastructure.mutable.FutureBiHashMap[A, B]]
    with ParHashTable[A, DefaultEntry[A, B]] //@ Doubtful
    with Serializable
 {
