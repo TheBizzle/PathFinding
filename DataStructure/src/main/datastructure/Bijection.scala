@@ -10,7 +10,7 @@ import collection.mutable.Map
  * Time: 11:33 PM
  */
 
-abstract class Bijection[A, B, M[X, Y] <: Map[X, Y]](protected val abMap: M[A, B], protected val baMap: M[B, A]) extends Map[A, B] {
+abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B, A]](protected val abMap: MAB, protected val baMap: MBA) extends Map[A, B] {
 
   override def hashCode() : Int                =   abMap.hashCode() ^ baMap.hashCode()   // XOR the hashcodes of the two maps
   override def clear()                           { abMap.clear(); baMap.clear() }
@@ -19,10 +19,10 @@ abstract class Bijection[A, B, M[X, Y] <: Map[X, Y]](protected val abMap: M[A, B
   override def canEqual(other: Any) : Boolean
   override def equals(that: Any)    : Boolean  = {
     that match {
-      case b: Bijection[_, _, _] => (b canEqual this) &&
-                                    ( (b.abMap.equals(abMap) && b.baMap.equals(baMap)) ||
-                                      (b.abMap.equals(baMap) && b.baMap.equals(abMap)) )
-      case _                     => false
+      case b: Bijection[_, _, _, _, _] => (b canEqual this) &&
+                                          ( (b.abMap.equals(abMap) && b.baMap.equals(baMap)) ||
+                                            (b.abMap.equals(baMap) && b.baMap.equals(abMap)) )
+      case _                           => false
     }
   }
 

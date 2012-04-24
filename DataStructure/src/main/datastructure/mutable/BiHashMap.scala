@@ -14,19 +14,22 @@ import collection.mutable.{HashMap, MapLike}
  */
 
 //@ Should I instantiate and fill the maps here, or should I instantiate here and leave the population of the maps to `Bijection`...?
-class BiHashMap[A, B] private[datastructure](contents: (A, B)*)
-                                            (implicit aToBMap: HashMap[A, B] = contents.foldRight(new HashMap[A, B]){ case (ab, m) => m += ab },
-                                                      bToAMap: HashMap[B, A] = contents.foldRight(new HashMap[B, A]){ case (ab, m) => m += ab._2 -> ab._1 })
-    extends Bijection(aToBMap, bToAMap)
+class BiHashMap[A, B] private[datastructure](abm: HashMap[A, B], bam: HashMap[B, A])
+    extends Bijection[A, B, HashMap, HashMap[A, B], HashMap[B, A]](abm, bam)
     with MapLike[A, B, BiHashMap[A, B]]
     with CustomParallelizable[(A, B), ParBiHashMap[A, B]]
     with BiHashForwardOps[A, B]
     with BiHashReverseOps[A, B] {
 
+  def this(contents: (A, B)*)(implicit aToBMap: HashMap[A, B] = contents.foldRight(new HashMap[A, B]){ case (ab, m) => m += ab },
+                                       bToAMap: HashMap[B, A] = contents.foldRight(new HashMap[B, A]){ case (ab, m) => m += ab._2 -> ab._1 }) {
+    this(aToBMap, bToAMap)
+  }
+
   def useSizeMap(t: Boolean) { abMap.useSizeMap(t); baMap.useSizeMap(t) }
 
   override def clone() : BiHashMap[A, B]      = new BiHashMap(abMap.toSeq: _*)
-  override def par     : ParBiHashMap[A, B]   = new ParBiHashMap[A, B](contents: _*)  //@ Yeah, ummm... don't use this.  I'm considering just having it throw an exception...
+  override def par     : ParBiHashMap[A, B]   = new ParBiHashMap[A, B](abMap, baMap)  //@ Yeah, ummm... don't use this.  I'm considering just having it throw an exception...
   override def empty   : BiHashMap[A, B]      = BiHashMap.empty[A, B]
   override def canEqual(other: Any) : Boolean = other.isInstanceOf[BiHashMap[A, B]]  // Might pay to do "|| other.isInstanceOf[BiHashMap[B, A]]"... if not for type erasure
 

@@ -13,17 +13,19 @@ import collection.parallel.mutable.{ParHashTable, ParMapLike, ParMap}
 import collection.parallel.Combiner
 import collection.generic._
 import collection.mutable.DefaultEntry
+import collection.mutable.HashMap
 
 
 //@ Does not even come close to working right now.  And I do not really care (for the time being).
 @SerialVersionUID(1L)
-class ParBiHashMap[A, B] private[datastructure](contents: (A, B)*)
+class ParBiHashMap[A, B] private[datastructure](abm: HashMap[A, B], bam: HashMap[B, A])
 extends ParMap[A, B]
    with GenericParMapTemplate[A, B, ParBiHashMap]
    with ParMapLike[A, B, ParBiHashMap[A, B], datastructure.mutable.BiHashMap[A, B]]
    with ParHashTable[A, DefaultEntry[A, B]] //@ Doubtful
    with Serializable
 {
+  def this(contents: (A, B)*) = this(new HashMap[A, B](), new HashMap[B, A]()) //@ Fix this... eventually!
   override def mapCompanion: GenericParMapCompanion[ParBiHashMap] = ParBiHashMap
   override def empty: ParBiHashMap[A, B] = new ParBiHashMap[A, B]
   protected[this] override def newCombiner = throw new UnsupportedOperationException("")

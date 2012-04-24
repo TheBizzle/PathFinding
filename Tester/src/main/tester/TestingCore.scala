@@ -22,7 +22,7 @@ object TestingCore {
   private[tester] val ArgKeyRange = "range"
   private[tester] val ArgKeyToggle = "toggle"
 
-
+  //@ Annoying compiler bug....  Fix this rubbish when the compiler gets fixed!
   def apply[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle, ResultFlags <: TestAnalysisResultBundle,
             TFConsBundle <: TestFuncConstructionBundle, TFunc <: TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], TCluster <: TestCluster[TFunc, Subject, TFConsBundle]]
            (args: List[TestCriteria],
