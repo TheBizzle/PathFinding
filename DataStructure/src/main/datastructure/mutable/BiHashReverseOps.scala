@@ -17,12 +17,13 @@ trait BiHashReverseOps[A, B] {
 
   private val implWrapper = new BiHashImplWrapper(baMap, abMap)
 
+  def += (ba: (B,  A))(implicit ignore: DummyImplicit)      : this.type   = { put(ba._1, ba._2); this }
+  def -= (bKey: B)(implicit ignore: DummyImplicit)          : this.type   = { remove(bKey); this }
+
   def apply(bKey: B)(implicit ignore: DummyImplicit)        : A           =   implWrapper.apply(bKey)
   def default(bKey: B)(implicit ignore: DummyImplicit)      : A           =   implWrapper.default(bKey)
   def get(bKey: B)(implicit ignore: DummyImplicit)          : Option[A]   =   implWrapper.get(bKey)
-  def += (ba: (B,  A))(implicit ignore: DummyImplicit)      : this.type   = { put(ba._1, ba._2); this }
   def put(bKey: B, aVal: A)(implicit ignore: DummyImplicit) : Option[A]   =   implWrapper.put(bKey, aVal)
-  def -= (bKey: B)(implicit ignore: DummyImplicit)          : this.type   = { remove(bKey); this }
   def remove(bKey: B)(implicit ignore: DummyImplicit)       : Option[A]   =   implWrapper.remove(bKey)
   def update(bKey: B, aVal: A)(implicit ignore: DummyImplicit)              { implWrapper.update(bKey, aVal) }
   def contains(bKey: B)(implicit ignore: DummyImplicit)     : Boolean     =   implWrapper.contains(bKey)
