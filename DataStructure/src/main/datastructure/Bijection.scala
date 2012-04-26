@@ -26,7 +26,6 @@ abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B,
     }
   }
 
-  // Toggles whether a size map is used to track hash map statistics for the child maps.
   def iterator : Iterator[(A, B)] = abMap.iterator
 
 }

@@ -26,21 +26,24 @@ class BiHashMap[A, B] private[datastructure](abm: HashMap[A, B], bam: HashMap[B,
     this(aToBMap, bToAMap)
   }
 
-  def useSizeMap(t: Boolean) { abMap.useSizeMap(t); baMap.useSizeMap(t) }
+  // Toggles whether a size map is used to track hash map statistics for the child maps.
+  def useSizeMap(t: Boolean)                     { abMap.useSizeMap(t); baMap.useSizeMap(t) }
+  def flip                   : BiHashMap[B, A] =   new BiHashMap(baMap.clone(), abMap.clone())
+  def swap                   : BiHashMap[B, A] =   flip                                         // I feel like I should get rid of one, but I like both names...
 
   override def clone() : BiHashMap[A, B]      = new BiHashMap(abMap.toSeq: _*)
-  override def par     : ParBiHashMap[A, B]   = new ParBiHashMap[A, B](abMap, baMap)  //@ Yeah, ummm... don't use this.  I'm considering just having it throw an exception...
+  override def par     : ParBiHashMap[A, B]   = throw new UnsupportedOperationException("`ParBiHashMap` is not yet in an operable state.")
   override def empty   : BiHashMap[A, B]      = BiHashMap.empty[A, B]
   override def canEqual(other: Any) : Boolean = other.isInstanceOf[BiHashMap[A, B]]  // Might pay to do "|| other.isInstanceOf[BiHashMap[B, A]]"... if not for type erasure
 
   @deprecated("Using this will throw an exception!  Use `aValues` or `bValues` instead.", "forever")
   override def keySet : collection.immutable.Set[A] = {
-    throw new UnsupportedOperationException("`keySet` function ambiguous for BiHashMap; use `aValues` or `bValues`, instead")
+    throw new UnsupportedOperationException("`keySet` function ambiguous for BiHashMap; use `aValues` or `bValues` instead")
   }
 
   @deprecated("Using this will throw an exception!  Use `aValues` or `bValues` instead.", "forever")
   override def values : collection.Iterable[B] = {
-    throw new UnsupportedOperationException("`values` function ambiguous for BiHashMap; use `aValues` or `bValues`, instead")
+    throw new UnsupportedOperationException("`values` function ambiguous for BiHashMap; use `aValues` or `bValues` instead")
   }
 
 }
