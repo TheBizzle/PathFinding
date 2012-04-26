@@ -1,7 +1,7 @@
 package datastructure.mutable
 
-import org.scalatest.{GivenWhenThen, FlatSpec}
 import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{BeforeAndAfterEach, GivenWhenThen, FlatSpec}
 
 /**
 * Created by IntelliJ IDEA.
@@ -10,13 +10,19 @@ import org.scalatest.matchers.ShouldMatchers
 * Time: 12:19 AM
 */
 
-class BiHashMapSpec extends FlatSpec with GivenWhenThen with ShouldMatchers {
+// A loose overview of the basic things that the user should expect the BHM to be able to do
+class BiHashMapSpec extends FlatSpec with BeforeAndAfterEach with GivenWhenThen with ShouldMatchers {
 
   val aList = List(5, 17, 1, 9, 4)
   val bList = List("five", "seventeen", "one", "nine", "four")
   val inList = aList.zip(bList)
+  val biHash = BiHashMap[Int, String]()
 
-  val biHash = BiHashMap(inList: _*)
+  override def beforeEach() {
+    biHash.clear()
+    biHash ++= inList
+    super.beforeEach()
+  }
 
   behavior of "A BiHashMap"
 
