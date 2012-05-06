@@ -13,14 +13,18 @@ import org.scalatest.{BeforeAndAfterEach, GivenWhenThen, FlatSpec}
 // A loose overview of the basic things that the user should expect the BHM to be able to do
 class BiHashMapSpec extends FlatSpec with BeforeAndAfterEach with GivenWhenThen with ShouldMatchers {
 
-  val aList = List(5, 17, 1, 9, 4)
-  val bList = List("five", "seventeen", "one", "nine", "four")
-  val inList = aList.zip(bList)
-  val biHash = BiHashMap[Int, String]()
+  type A = Int
+  type B = String
+  type BHM = BiHashMap[A, B]
+
+  val aList: List[A] = List(5, 17, 1, 9, 4)
+  val bList: List[B] = List("five", "seventeen", "one", "nine", "four")
+  val baseList: List[(A, B)] = aList zip bList
+  val biHash = BiHashMap[A, B]()
 
   override def beforeEach() {
     biHash.clear()
-    biHash ++= inList
+    biHash ++= baseList
     super.beforeEach()
   }
 
@@ -35,7 +39,7 @@ class BiHashMapSpec extends FlatSpec with BeforeAndAfterEach with GivenWhenThen 
     val bSet = biHash.bValues
 
     then("the size should equal equal to the size of what was passed in")
-    size should equal (inList.size)
+    size should equal (baseList.size)
 
     and("the set of As should hold all and only the As that were passed in")
     aList.sorted.zipAll(aSet.toList.sorted, -1, "-1") map { case (x,y) => x should equal (y) }
@@ -174,6 +178,50 @@ class BiHashMapSpec extends FlatSpec with BeforeAndAfterEach with GivenWhenThen 
     bhm -= "zero"
     bhm.get(0) should equal (None)
     bhm.get("zero") should equal (None)
+
+    and("it should react appropriately to duplicative binds (A to B)")
+    val (a, badB, goodB) = (60, "fifty-nine", "sixty")
+    bhm += a -> badB
+    bhm(a) should equal (badB)
+    bhm(badB) should equal (a)
+
+    bhm += a -> goodB
+    bhm(a) should equal (goodB)
+    bhm(goodB) should equal (a)
+    bhm.get(badB) should equal (None)
+
+    and("it should react appropriately to duplicative binds (B to A)")
+    val (a2, badB2, goodB2) = (50, "fourty-nine", "fifty")
+    bhm += badB2 -> a2
+    bhm(a2) should equal (badB2)
+    bhm(badB2) should equal (a2)
+
+    bhm += goodB2 -> a2
+    bhm(a2) should equal (goodB2)
+    bhm(goodB2) should equal (a2)
+    bhm.get(badB2) should equal (None)
+
+    and("it should react appropriately to duplicative binds (AB, then BA)")
+    val (a3, badB3, goodB3) = (70, "sixty-nine", "seventy")
+    bhm += a3 -> badB3
+    bhm(a3) should equal (badB3)
+    bhm(badB3) should equal (a3)
+
+    bhm += goodB3 -> a3
+    bhm(a3) should equal (goodB3)
+    bhm(goodB3) should equal (a3)
+    bhm.get(badB3) should equal (None)
+
+    and("it should react appropriately to duplicative binds (BA, then AB)")
+    val (a4, badB4, goodB4) = (80, "seventy-nine", "eighty")
+    bhm += badB4 -> a4
+    bhm(a4) should equal (badB4)
+    bhm(badB4) should equal (a4)
+
+    bhm += a4 -> goodB4
+    bhm(a4) should equal (goodB4)
+    bhm(goodB4) should equal (a4)
+    bhm.get(badB4) should equal (None)
 
   }
 

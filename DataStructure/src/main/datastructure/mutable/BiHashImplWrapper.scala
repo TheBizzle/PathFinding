@@ -14,7 +14,7 @@ private[datastructure] class BiHashImplWrapper[X, Y](primaryMap: Map[X, Y], seco
   def apply(key: X)         : Y           =   primaryMap(key)
   def default(key: X)       : Y           =   primaryMap.default(key)
   def get(key: X)           : Option[Y]   =   primaryMap.get(key)
-  def put(xKey: X, yVal: Y) : Option[Y]   = { secondaryMap.put(yVal, xKey); primaryMap.put(xKey, yVal) }
+  def put(xKey: X, yVal: Y) : Option[Y]   = { clearBinds(xKey, yVal); secondaryMap.put(yVal, xKey); primaryMap.put(xKey, yVal) }
   def contains(key: X)      : Boolean     =   primaryMap.contains(key)
   def keysIterator          : Iterator[X] =   primaryMap.keysIterator
   def keySet    : scala.collection.Set[X] =   primaryMap.keySet
@@ -30,6 +30,14 @@ private[datastructure] class BiHashImplWrapper[X, Y](primaryMap: Map[X, Y], seco
     primaryMap.update(x, y)
     hold foreach (secondaryMap.remove(_))
     secondaryMap.put(y, x)
+  }
+
+  private def clearBinds(x: X, y: Y) {
+    def removeY(y: Y) {
+      secondaryMap.get(y) foreach (primaryMap.remove(_))
+      secondaryMap.remove(y)
+    }
+    removeY(y); remove(x)
   }
 
 }
