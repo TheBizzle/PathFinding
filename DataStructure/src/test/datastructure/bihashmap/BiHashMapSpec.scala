@@ -127,7 +127,7 @@ class BiHashMapSpec extends FlatSpec with GivenWhenThen with ShouldMatchers {
       bhm("five")
     }
     intercept[NoSuchElementException] {
-       bhm(15)
+      bhm(15)
     }
     intercept[NoSuchElementException] {
       bhm(9001)
