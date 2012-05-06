@@ -30,7 +30,9 @@ trait BiHashReverseOps[A, B] {
 
   def foreach[C](f: ((B, A)) => C)(implicit ignore: DummyImplicit)          { implWrapper.foreach(f) }
 
+  //@ Should `Bijection` have base implementations of these things?  Seems probable
   def bIterator : Iterator[B]             = implWrapper.keysIterator
-  def bValues   : scala.collection.Set[B] = implWrapper.keySet
+  def bSet      : scala.collection.Set[B] = implWrapper.keySet
+  def bValues   : Iterable[B]             = implWrapper.keys
 
 }

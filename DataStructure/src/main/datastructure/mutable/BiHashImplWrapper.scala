@@ -18,6 +18,7 @@ private[datastructure] class BiHashImplWrapper[X, Y](primaryMap: Map[X, Y], seco
   def contains(key: X)      : Boolean     =   primaryMap.contains(key)
   def keysIterator          : Iterator[X] =   primaryMap.keysIterator
   def keySet    : scala.collection.Set[X] =   primaryMap.keySet
+  def keys                  : Iterable[X] =   primaryMap.keys
   def foreach[C](f: ((X, Y)) => C)          { primaryMap foreach f }
 
   def remove(key: X) : Option[Y] = {

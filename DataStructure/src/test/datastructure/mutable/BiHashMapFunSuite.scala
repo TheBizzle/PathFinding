@@ -333,11 +333,6 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     (biHash.aIterator.toList sameElements baseList.map(_._1)) should equal (true)
   }
 
-  //@ Can share with `bValues`
-  test("aValues") {
-    (biHash.aValues sameElements baseList.map(_._1)) should equal (true)
-  }
-
   //@ Can refactor
   test("addString(sb, sep, start, end)") {
     val (sep, start, end) = ("york", "dork", "bjork")
@@ -375,12 +370,17 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     biHash(baseList(1)._2) should equal (baseList(1)._1)
   }
 
+  //@ Can share with `bSet`
+  test("aSet") {
+    (biHash.aSet sameElements baseList.map(_._1)) should equal (true)
+  }
+
   test("bIterator") {
     biHash.aIterator.toList should have ('sameElements (baseList.map(_._1)))
   }
 
-  test("bValues") {
-    biHash.aValues should have ('sameElements (baseList.map(_._1)))
+  test("bSet") {
+    biHash.aSet should have ('sameElements (baseList.map(_._1)))
   }
 
   test("clear()") {
@@ -604,7 +604,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@
   test("filterKeys(func)") {
-    // TODO : Break; As and Bs
+    // TODO : Split
   }
 
   //@
@@ -707,6 +707,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     }
     forwards (biHash.clone(), biHash map (_._1) product, 1,   { case (elem: (Int, String), acc) => acc * elem._1 })
     backwards(biHash.clone(), biHash map (_._2) mkString, "", { case (elem: (String, Int), acc) => acc + elem._1 })
+    biHash.mapResult
   }
 
   //@
@@ -853,7 +854,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@
   test("keys") {
-    // TODO : Break and split
+    // TODO : Split
   }
 
   // Share code with below
@@ -879,11 +880,19 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@
   test("mapValues") {
-    // TODO : Break and override
+    // TODO : Split
   }
 
-  test("max") {
-    // TODO : Break
+  //@
+  // Refactor
+  test("mapResult") {
+
+    val abFunc = (ab: (A, B)) => (ab._1, ab._2.getBytes)
+    biHash.mapResult(_ map abFunc).result() should equal (BiHashMap(baseList map abFunc: _*))
+
+    val baFunc = (ba: (B, A)) => (ba._1, ba._2.toDouble)
+    biHash.mapResult(_ map baFunc).result() should equal (BiHashMap(baseList map (_.swap) map baFunc: _*))
+
   }
 
   //@
@@ -891,10 +900,6 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   test("maxBy") {
     biHash maxBy { case (a: A, b: B) => a } should equal (baseList maxBy (_._1))
     biHash maxBy { case (b: B, a: A) => b.length } should equal (baseList maxBy (_._2.length))
-  }
-
-  test("min") {
-    // TODO : Break
   }
 
   //@
@@ -1422,10 +1427,6 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     (biHash updated (baseList(0)._2, aElem))(baseList(0)._2) should equal (aElem)
   }
 
-  test("valuesIterator") {
-    // TODO : Break
-  }
-
   //@
   test("withDefault(func)") {
     biHash.withDefault(_.toString + " totally was not found")
@@ -1433,7 +1434,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   test("withDefaultValue(derp)") {
-    // TODO : Break and replace with A/Bs
+    // TODO : Split
   }
 
   //@
@@ -1473,7 +1474,6 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   /*
   //@ No support added for:
-
   -$init$
   -synchronized
   -tranpose
@@ -1481,8 +1481,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   -sum
   -sizeHint - 1-arg/2-arg
   -sizeHintBounded
-  -flatten
-
+  -flatten (what the hell does this even DO on Maps?)
   */
 
 }

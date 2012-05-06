@@ -35,8 +35,8 @@ class BiHashMapSpec extends FlatSpec with BeforeAndAfterEach with GivenWhenThen 
     given("a pre-initialized BHM")
     when("asked for the size and its parts")
     val size = biHash.size
-    val aSet = biHash.aValues
-    val bSet = biHash.bValues
+    val aSet = biHash.aSet
+    val bSet = biHash.bSet
 
     then("the size should equal equal to the size of what was passed in")
     size should equal (baseList.size)
@@ -84,10 +84,10 @@ class BiHashMapSpec extends FlatSpec with BeforeAndAfterEach with GivenWhenThen 
     and("the clone should equal the original")
     bhm should equal (biHash)
 
-    val cloneAs = bhm.aValues
-    val cloneBs = bhm.bValues
-    val origAs = biHash.aValues
-    val origBs = biHash.bValues
+    val cloneAs = bhm.aSet
+    val cloneBs = bhm.bSet
+    val origAs = biHash.aSet
+    val origBs = biHash.bSet
 
     and("the clone should contain all of the original's As")
     origAs foreach { cloneAs.contains(_) should equal (true) }
@@ -146,8 +146,8 @@ class BiHashMapSpec extends FlatSpec with BeforeAndAfterEach with GivenWhenThen 
     and("the clone should clear correctly")
     bhm.clear()
     bhm.size should equal (0)
-    bhm.aValues.size should equal (0)
-    bhm.bValues.size should equal (0)
+    bhm.aSet.size should equal (0)
+    bhm.bSet.size should equal (0)
     bhm.get("five") should equal (None)
     bhm.get(17) should equal (None)
     bhm.get(3) should equal (None)

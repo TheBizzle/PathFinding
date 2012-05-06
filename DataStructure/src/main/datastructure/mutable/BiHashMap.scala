@@ -15,7 +15,7 @@ import collection.mutable.{HashMap, MapLike}
 
 //@ Should I instantiate and fill the maps here, or should I instantiate here and leave the population of the maps to `Bijection`...?
 class BiHashMap[A, B] private[datastructure](abm: HashMap[A, B], bam: HashMap[B, A])
-    extends Bijection[A, B, HashMap, HashMap[A, B], HashMap[B, A]](abm, bam)
+    extends Bijection[A, B, HashMap, HashMap[A, B], HashMap[B, A], BiHashMap](abm, bam)
     with MapLike[A, B, BiHashMap[A, B]]
     with CustomParallelizable[(A, B), ParBiHashMap[A, B]]
     with BiHashForwardOps[A, B]
@@ -28,23 +28,13 @@ class BiHashMap[A, B] private[datastructure](abm: HashMap[A, B], bam: HashMap[B,
 
   // Toggles whether a size map is used to track hash map statistics for the child maps.
   def useSizeMap(t: Boolean)                     { abMap.useSizeMap(t); baMap.useSizeMap(t) }
-  def flip                   : BiHashMap[B, A] =   new BiHashMap(baMap.clone(), abMap.clone())
-  def swap                   : BiHashMap[B, A] =   flip                                         // I feel like I should get rid of one, but I like both names...
+  def swap                   : BiHashMap[B, A] =   new BiHashMap(baMap.clone(), abMap.clone())
+  def flip                   : BiHashMap[B, A] =   swap                                        // I feel like I should get rid of one, but I like both names...
 
   override def clone() : BiHashMap[A, B]      = new BiHashMap(abMap.toSeq: _*)
   override def par     : ParBiHashMap[A, B]   = throw new UnsupportedOperationException("`ParBiHashMap` is not yet in an operable state.")
   override def empty   : BiHashMap[A, B]      = BiHashMap.empty[A, B]
   override def canEqual(other: Any) : Boolean = other.isInstanceOf[BiHashMap[A, B]]  // Might pay to do "|| other.isInstanceOf[BiHashMap[B, A]]"... if not for type erasure
-
-  @deprecated("Using this will throw an exception!  Use `aValues` or `bValues` instead.", "forever")
-  override def keySet : collection.immutable.Set[A] = {
-    throw new UnsupportedOperationException("`keySet` function ambiguous for BiHashMap; use `aValues` or `bValues` instead")
-  }
-
-  @deprecated("Using this will throw an exception!  Use `aValues` or `bValues` instead.", "forever")
-  override def values : collection.Iterable[B] = {
-    throw new UnsupportedOperationException("`values` function ambiguous for BiHashMap; use `aValues` or `bValues` instead")
-  }
 
 }
 

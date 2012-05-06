@@ -27,8 +27,7 @@ trait BiHashForwardOps[A, B] {
   override def foreach[C](f: ((A, B)) => C) { implWrapper.foreach(f) }
 
   def aIterator : Iterator[A]             = implWrapper.keysIterator
-  def aValues   : scala.collection.Set[A] = implWrapper.keySet
-
-
+  def aSet      : scala.collection.Set[A] = implWrapper.keySet
+  def aValues   : Iterable[A]             = implWrapper.keys
 
 }

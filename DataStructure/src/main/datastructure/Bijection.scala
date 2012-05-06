@@ -1,7 +1,7 @@
 package datastructure
 
 import collection.mutable.Map
-
+import scala.deprecated
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,5 +27,61 @@ abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B,
   }
 
   def iterator : Iterator[(A, B)] = abMap.iterator
+
+
+  // Abstracts for As
+  def filterAs(p: (A) => Boolean) : this.type
+  def mapAs[C](f: (A) => C)       : Map[C, B]  //@ I'd like to return essentially `this.type[C, B]`, but that'll require some `Repr` magic, I think
+
+  def withDefaultA[A1 >: A](d: A1) : Map[A1, B] //@ I'd like to return essentially `this.type[A1, B]`, but that'll require some `Repr` magic, I think
+
+  def aIterator: Iterator[A]
+  def aSet:      collection.immutable.Set[A]
+  def aValues:   Iterable[A]
+
+
+  // Abstracts for Bs
+  def filterBs(p: (B) => Boolean) : this.type
+  def mapBs[C](f: (B) => C)       : Map[A, C]  //@ I'd like to return essentially `this.type[A, C]`, but that'll require some `Repr` magic, I think
+
+  def withDefaultB[B1 >: B](d: B1) : Map[A, B1] //@ I'd like to return essentially `this.type[A, B1]`, but that'll require some `Repr` magic, I think
+
+  def bIterator: Iterator[B]
+  def bSet:      collection.immutable.Set[B]
+  def bValues:   Iterable[B]
+
+  // Purposely-broken methods
+  @deprecated(CommonDeprecationStrFormat("filterAs", "filterBs"), CommonDeprecationSinceVersion)
+  override def filterKeys = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("filterKeys", "filterAs", "filterBs"))
+
+  @deprecated(CommonDeprecationStrFormat("mapAs", "mapBs"), CommonDeprecationSinceVersion)
+  override def mapValues = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("mapValues", "mapAs", "mapBs"))
+
+  @deprecated(CommonDeprecationStrFormat("minBy"), CommonDeprecationSinceVersion)
+  override def min = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("min", "minBy"))
+
+  @deprecated(CommonDeprecationStrFormat("maxBy"), CommonDeprecationSinceVersion)
+  override def max = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("max", "maxBy"))
+
+  @deprecated(CommonDeprecationStrFormat("withDefaultA", "withDefaultB"), CommonDeprecationSinceVersion)
+  override def withDefaultValue = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("withDefaultValue", "withDefaultA", "withDefaultB"))
+
+  @deprecated(CommonDeprecationStrFormat("aSet", "bSet"), CommonDeprecationSinceVersion)
+  override def keySet : collection.immutable.Set[A] = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("keySet", "aSet", "bSet"))
+
+  @deprecated(CommonDeprecationStrFormat("aValues", "bValues"), CommonDeprecationSinceVersion)
+  override def keys : collection.Iterable[A] = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("keys", "aValues", "bValues"))
+
+  @deprecated(CommonDeprecationStrFormat("aValues", "bValues"), CommonDeprecationSinceVersion)
+  override def values : collection.Iterable[B] = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("values", "aValues", "bValues"))
+
+  @deprecated(CommonDeprecationStrFormat("aIterator", "bIterator"), CommonDeprecationSinceVersion)
+  override def valuesIterator: Iterator[B] = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("valuesIterator", "aIterator", "bIterator"))
+
+
+  // Silly constants
+  private def CommonUnsupportedOpExMsgFormat(x: String, xs: String*) : String = ("`" + x + "` function ambiguous for " + this.getClass.getName + "; use %s instead").format(xs.mkString("`", "` or `", "`"))
+  private def CommonDeprecationStrFormat(xs: String*) : String = "Using this will throw an exception!  Use %s instead.".format(xs.mkString("`", "` or `", "`"))
+  private val CommonDeprecationSinceVersion = "forever"
 
 }
