@@ -13,6 +13,18 @@ import collection.mutable.{HashMap, MapLike}
  * Time: 11:15 PM
  */
 
+/*
+No explicit support was added for any of the following (doesn't mean that it's broken--I simply haven't _tried_ to do anything for it):
+-$init$
+-synchronized
+-tranpose
+-product
+-sum
+-sizeHint [1-arg/2-arg]
+-sizeHintBounded
+-flatten (what the hell does this even DO on Maps, anyway?!)
+*/
+
 //@ Should I instantiate and fill the maps here, or should I instantiate here and leave the population of the maps to `Bijection`...?
 class BiHashMap[A, B] private[datastructure](abm: HashMap[A, B], bam: HashMap[B, A])
     extends Bijection[A, B, HashMap, HashMap[A, B], HashMap[B, A], BiHashMap](abm, bam)

@@ -12,12 +12,20 @@ import collection.mutable.ListBuffer
  * Time: 9:20 PM
  */
 
-// Oh, lawd...
 class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatchers {
 
   type A = Int
   type B = String
   type BHM = BiHashMap[A, B]
+
+  // Type disjunction, courtesy of the great Miles Sabin
+  type ~[X]     = X => Nothing
+  type |[X, Y]  = ~[~[X] with ~[Y]]
+  type ~~[X]    = ~[~[X]]
+  type ||[X, Y] = { type T[L] = ~~[L] <:< (X | Y) }
+
+  type AB      = (A || B)#T
+  type ABTuple = ((A, B) || (B, A))#T
 
   val aList: List[A] = List(5, 17, 1, 9, 4)
   val bList: List[B] = List("five", "seventeen", "one", "nine", "four")
@@ -25,9 +33,9 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   val biHash = BiHashMap[A, B]()
 
   override def beforeEach() {
+    super.beforeEach()
     biHash.clear()
     biHash ++= baseList
-    super.beforeEach()
   }
   
   test("==") {
@@ -602,9 +610,21 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   }
 
-  //@
-  test("filterKeys(func)") {
-    // TODO : Split
+  // Refactor
+  // Share with below
+  test("filterAs(func)") {
+    biHash filterAs (a => baseList map (_._2) contains (a)) should equal (biHash.empty)
+    biHash filterAs (a => baseList map (_._1) contains (a)) should equal (biHash)
+    biHash filterAs (_ == baseList.head._1) should equal (BiHashMap(baseList.head))
+    biHash filterAs (_ != baseList.tail.head._1) should equal (BiHashMap((baseList.head :: baseList.tail.tail): _*))
+  }
+
+  // Refactor
+  test("filterBs(func)") {
+    biHash filterBs (b => baseList map (_._1) contains (b)) should equal (biHash.empty)
+    biHash filterBs (b => baseList map (_._2) contains (b)) should equal (biHash)
+    biHash filterBs (_ == baseList.head._2) should equal (BiHashMap(baseList.head))
+    biHash filterBs (_ != baseList.tail.head._2) should equal (BiHashMap((baseList.head :: baseList.tail.tail): _*))
   }
 
   //@
@@ -852,9 +872,13 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     biHash.iterator.toList should have ('sameElements (baseList))
   }
 
-  //@
-  test("keys") {
-    // TODO : Split
+  // Share code with below
+  test("aSet") {
+    biHash.aSet should equal (baseList map (_._1) toSet)
+  }
+
+  test("bSet") {
+    biHash.bSet should equal (baseList map (_._2) toSet)
   }
 
   // Share code with below
@@ -878,9 +902,16 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   }
 
-  //@
-  test("mapValues") {
-    // TODO : Split
+  // Refactor
+  // Share code with below
+  test("mapAs") {
+    biHash mapAs (_.toDouble) should have ('sameElements (biHash map { case (a: A, b: B) => (a.toDouble, b) } ))
+    biHash.empty mapAs (_.toDouble) should equal (biHash.empty)
+  }
+
+  test("mapBs") {
+    biHash mapBs (_.getBytes) should have ('sameElements (biHash map { case (a: A, b: B) => (a, b.getBytes) } ))
+    biHash.empty mapBs (_.getBytes) should equal (biHash.empty)
   }
 
   //@
@@ -1427,14 +1458,26 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     (biHash updated (baseList(0)._2, aElem))(baseList(0)._2) should equal (aElem)
   }
 
-  //@
-  test("withDefault(func)") {
-    biHash.withDefault(_.toString + " totally was not found")
-    // TODO : Implementation is unclear
+  // Refactor
+  //@ Is currently inoperatable (must fix return type)
+  test("withDefaultA(a)") {
+//    val deffy = biHash withDefaultA { case b: B => b.size }
+//    val badB  = "jkashdgkjlashdgkljsdagh"
+//    deffy(baseList.head._2) should equal (baseList.head._1)
+//    deffy(badB) should equal (badB.size)
   }
 
-  test("withDefaultValue(derp)") {
-    // TODO : Split
+  // Refactor
+  //@ Can share code with above
+  test("withDefaultB(b)") {
+
+    val aFunc = (a: A) => a.toString + " is outta this world!"
+    val deffy = biHash withDefaultB aFunc
+    val badA  = -18
+
+    deffy(baseList.head._1) should equal (baseList.head._2)
+    deffy(badA) should equal (aFunc(badA))
+
   }
 
   //@
@@ -1471,17 +1514,5 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     val elem = baseList(0)
     BiHashMap[A, B](elem).zipWithIndex.apply(elem) should equal (0)
   }
-
-  /*
-  //@ No support added for:
-  -$init$
-  -synchronized
-  -tranpose
-  -product
-  -sum
-  -sizeHint - 1-arg/2-arg
-  -sizeHintBounded
-  -flatten (what the hell does this even DO on Maps?)
-  */
 
 }
