@@ -26,6 +26,11 @@ object TestCriteriaDialect {
 // to how the single item does in the first place.  So... it seems that I either have
 // to have weird, unclear, duplicated code, or weird, identity-crisis-suffering classes.
 // I've chosen the latter.
+
+//@ This could be substantially more FP (by having making constructor take form: Cons(crit, tail)
+//  and having `&&` return `new CombiantorPimper(crit, tail :: (that.crit :: that.tail))`)
+//  Could even leverage HList-like static typing on the list, then....
+//  This deserves to be fixed at some point.
 private[dialect] sealed abstract class CombinatorPimper(private val crit: TestCriteria) {
 
   private[dialect] val buffer = new ListBuffer[TestCriteria]() += crit

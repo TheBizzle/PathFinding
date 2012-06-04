@@ -7,7 +7,7 @@ package pathfinding.coordinate
  * Time: 1:52 AM
  */
 
-case class PriorityCoordinate(private val xLoc: Int, private val yLoc: Int, priority: Int) extends Coordinate(xLoc, yLoc) {
+class PriorityCoordinate(private val xLoc: Int, private val yLoc: Int, priority: Int) extends Coordinate(xLoc, yLoc) with Equals {
 
   def this(coord: Coordinate, priorityVal: Int) {
     this(coord.x, coord.y, priorityVal)
@@ -40,4 +40,9 @@ case class PriorityCoordinate(private val xLoc: Int, private val yLoc: Int, prio
     other.isInstanceOf[PriorityCoordinate]
   }
 
+}
+
+object PriorityCoordinate {
+  def apply(xLoc: Int, yLoc: Int, priority: Int) = new PriorityCoordinate(xLoc, yLoc, priority)
+  def apply(coord: Coordinate, priority: Int) = new PriorityCoordinate(coord.x, coord.y, priority)
 }

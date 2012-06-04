@@ -72,7 +72,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
           }
 
           if (!doesContainNeighbor)
-            queue.enqueue(new PriorityCoordinate(neighbor, totalArr(x)(y)))
+            queue.enqueue(PriorityCoordinate(neighbor, totalArr(x)(y)))
 
         }
 

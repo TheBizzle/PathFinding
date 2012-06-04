@@ -7,7 +7,7 @@ package pathfinding.coordinate
  * Time: 12:25 AM
  */
 
-case class Coordinate(x: Int = Coordinate.InvalidValue, y: Int = Coordinate.InvalidValue) {
+class Coordinate(val x: Int = Coordinate.InvalidValue, val y: Int = Coordinate.InvalidValue) extends Equals {
 
   override def toString : String = {
     "(" + x + "," + y + ")"
@@ -49,4 +49,5 @@ case class Coordinate(x: Int = Coordinate.InvalidValue, y: Int = Coordinate.Inva
 
 object Coordinate {
   val InvalidValue = -1    // Invalid (initial) X/Y values for Coordinates
+  def apply(x: Int = Coordinate.InvalidValue, y: Int = Coordinate.InvalidValue) = new Coordinate(x, y)
 }

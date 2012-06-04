@@ -17,7 +17,7 @@ abstract class TestFlagCriteria[T <: TestingFlag](testFlag: T) extends TestCrite
   val flag = testFlag
 }
 
-sealed abstract class TestRunningnessCriteria[T, U <: TestRunningnessFlag](testGuide: T, testFlag: U) extends TestFlagCriteria(testFlag) {
+sealed abstract class TestRunningnessCriteria[T, U <: TestRunningnessFlag](testGuide: T, testFlag: U) extends TestFlagCriteria(testFlag) with Equals {
   val guide = testGuide
   def getKey : Int
 }
