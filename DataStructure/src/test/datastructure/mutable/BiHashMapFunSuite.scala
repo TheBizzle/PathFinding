@@ -6,11 +6,11 @@ import org.scalatest.matchers.ShouldMatchers
 import collection.mutable.ListBuffer
 
 /**
- * Created by IntelliJ IDEA.
- * User: Jason
- * Date: 4/17/12
- * Time: 9:20 PM
- */
+* Created by IntelliJ IDEA.
+* User: Jason
+* Date: 4/17/12
+* Time: 9:20 PM
+*/
 
 class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatchers {
 
@@ -37,7 +37,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     biHash.clear()
     biHash ++= baseList
   }
-  
+
   test("==") {
     (biHash == BiHashMap[Double, B]()) should equal (false)
     (biHash == BiHashMap((aList tail) zip (bList tail) map { case (i, s) => (i.toDouble, s) }: _*)) should equal (false)
@@ -344,9 +344,9 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@ Can refactor
   test("addString(sb, sep, start, end)") {
     val (sep, start, end) = ("york", "dork", "bjork")
-    val target1 = baseList.addString(new StringBuilder()).toString replaceAll (",", " -> ") replaceAll ("\(|\)", "")
-    val target2 = baseList.addString(new StringBuilder(), sep).toString replaceAll (",", " -> ") replaceAll ("\(|\)", "")
-    val target4 = baseList.addString(new StringBuilder(), sep, start, end).toString replaceAll (",", " -> ") replaceAll ("\(|\)", "")
+    val target1 = baseList.addString(new StringBuilder()).toString replaceAll (",", " -> ") replaceAll ("""\(|\)""", "")
+    val target2 = baseList.addString(new StringBuilder(), sep).toString replaceAll (",", " -> ") replaceAll ("""\(|\)""", "")
+    val target4 = baseList.addString(new StringBuilder(), sep, start, end).toString replaceAll (",", " -> ") replaceAll ("""\(|\)""", "")
     biHash.addString(new StringBuilder()).toString should equal (target1)                    // One-arg version
     biHash.addString(new StringBuilder(), sep).toString should equal (target2)               // Two-arg version
     biHash.addString(new StringBuilder(), sep, start, end).toString should equal (target4)   // Four-arg version
@@ -446,7 +446,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     val aFunc = (a: A) => a + 1
     intercept[NoSuchElementException] { biHash compose (aFunc(baseList.minBy(_._1)._1)) }
     biHash compose (aFunc(baseList.minBy(_._1)._1 - 1)) should equal (baseList.minBy(_._1)._2)
-    
+
     val bFunc = (b: B) => new String(b.getBytes map (x => (x ^ 2).toByte))
     intercept[NoSuchElementException] { biHash compose (bFunc(baseList.head._2)) }
     biHash compose (bFunc(bFunc(baseList.head._2))) should equal (baseList.head._1)
@@ -667,7 +667,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
     val baFunc = (ba: (B, A)) => BiHashMap((ba._1, ba._2 * 6))
     (biHash flatMap baFunc) should equal (BiHashMap((baseList map (_.swap) map baFunc): _*))
-    
+
   }
 
   test("flip") {
@@ -680,7 +680,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     def forwards(bhm: BHM, target: (A, B), initializer: (A, B), func: ((A, B), (A, B)) => (A, B)) {
       testFunc(bhm, target, initializer, func)
     }
-    
+
     def backwards(bhm: BHM, target: (B, A), initializer: (B, A), func: ((B, A), (B, A)) => (B, A)) {
       testFunc(bhm, target, initializer, func)
     }
@@ -946,7 +946,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     val (sep, start, end) = ("york", "dork", "bjork")
     val target0 = baseList.mkString
     val target1 = baseList.mkString(sep)
-    val target3 = baseList.mkString(sep, start, end) replaceAll (",", " -> ") replaceAll ("\(|\)", "")
+    val target3 = baseList.mkString(sep, start, end) replaceAll (",", " -> ") replaceAll ("""\(|\)""", "")
     biHash.mkString should equal (target0)                    // No-arg version
     biHash.mkString(sep) should equal (target1)               // One-arg version
     biHash.mkString(sep, start, end) should equal (target3)   // Three-arg version
@@ -1030,7 +1030,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@
   test("reduceLeft(func)") {
-    
+
     def forwards(bhm: BHM, target: (A, B), func: ((A, B), (A, B)) => (A, B)) {
       testFunc(bhm, target, func)
     }
@@ -1050,7 +1050,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
     forwards (biHash.clone(), (aRes, bRes), abFunc)
     backwards(biHash.clone(), (bRes, aRes), baFunc)
-    
+
   }
 
   //@
@@ -1092,7 +1092,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     def backwards(bhm: BHM, target: Option[(B, A)], func: ((B, A), (B, A)) => (B, A)) {
       testFunc(bhm, target, func)
     }
-    
+
     def testFunc[T](bhm: BHM, target: Option[T], func: (T, T) => T) {
       (bhm reduceOption (func)) should equal (target)
     }
@@ -1131,7 +1131,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
     forwards (biHash.clone(), (aRes, bRes), abFunc)
     backwards(biHash.clone(), (bRes, aRes), baFunc)
-    
+
   }
 
   //@
@@ -1191,7 +1191,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
     val allMapBA = biHash.retain((b: B, a: A) => true)
     allMapBA should have ('sameElements (biHash))
-    
+
   }
 
   //@ Be smart when implementing this!
@@ -1344,7 +1344,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     allTaken.size should equal (baseList.size)
     allTaken.toList.distinct.size should equal (baseList.size)
     allTaken.toList foreach (baseList should contain (_))
-  
+
   }
 
   //@
@@ -1447,7 +1447,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     biHash update (baseList(0)._2, baseList(0)._1 + 987)
     biHash(baseList(0)._2) should equal (baseList(0)._1 + 987)
   }
-  
+
   //@
   //@ Refactor
   //@ Can share code with above
@@ -1484,7 +1484,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   test("withFilter(func)") {
 
     import collection.mutable.ListBuffer
-    
+
     val abBuffer = new ListBuffer[(A, B)]()
     biHash withFilter (_._1 < (baseList map (_._1) max)) foreach (abBuffer += _)
     abBuffer.toList.size should equal (baseList.size - 1)
@@ -1492,7 +1492,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     val baBuffer = new ListBuffer[(B, A)]()
     biHash withFilter (_._1.contains("klajshfgkljadngkljangdkjlangdkljn")) foreach (baBuffer += _)
     baBuffer.toList.size should equal (0)
-    
+
   }
 
   //@ Can share code with below

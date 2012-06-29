@@ -1,11 +1,11 @@
 package datastructure.mutable
 
 /**
- * Created by IntelliJ IDEA.
- * User: Jason
- * Date: 4/17/12
- * Time: 9:41 PM
- */
+* Created by IntelliJ IDEA.
+* User: Jason
+* Date: 4/17/12
+* Time: 9:41 PM
+*/
 
 // It would be great if there were something that made this task easier--something like `Proxy`s.
 // But I'm not aware of any common pattern that allows me to have two different traits inheriting

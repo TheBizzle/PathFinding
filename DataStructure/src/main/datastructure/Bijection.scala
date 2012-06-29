@@ -4,13 +4,13 @@ import collection.mutable.Map
 import scala.deprecated
 
 /**
- * Created by IntelliJ IDEA.
- * User: Jason
- * Date: 3/12/12
- * Time: 11:33 PM
- */
+* Created by IntelliJ IDEA.
+* User: Jason
+* Date: 3/12/12
+* Time: 11:33 PM
+*/
 
-abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B, A]](protected val abMap: MAB, protected val baMap: MBA) extends Map[A, B] {
+abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B, A]](protected val abMap: MAB, protected val baMap: MBA) extends Map[A, B] with Equals {
 
   override def hashCode() : Int                =   abMap.hashCode() ^ baMap.hashCode()   // XOR the hashcodes of the two maps
   override def clear()                           { abMap.clear(); baMap.clear() }

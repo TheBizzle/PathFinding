@@ -7,11 +7,11 @@ import collection.CustomParallelizable
 import collection.mutable.{HashMap, MapLike}
 
 /**
- * Created by IntelliJ IDEA.
- * User: Jason
- * Date: 4/18/12
- * Time: 11:15 PM
- */
+* Created by IntelliJ IDEA.
+* User: Jason
+* Date: 4/18/12
+* Time: 11:15 PM
+*/
 
 /*
 No explicit support was added for any of the following (doesn't mean that it's broken--I simply haven't _tried_ to do anything for it):
