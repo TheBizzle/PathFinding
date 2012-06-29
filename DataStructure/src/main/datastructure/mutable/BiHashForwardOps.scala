@@ -3,11 +3,11 @@ package datastructure.mutable
 import collection.generic.CanBuildFrom
 
 /**
-* Created by IntelliJ IDEA.
-* User: Jason
-* Date: 4/17/12
-* Time: 9:47 PM
-*/
+ * Created by IntelliJ IDEA.
+ * User: Jason
+ * Date: 4/17/12
+ * Time: 9:47 PM
+ */
 
 trait BiHashForwardOps[A, B] {
 

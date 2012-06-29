@@ -6,11 +6,11 @@ import org.scalatest.matchers.ShouldMatchers
 import collection.mutable.ListBuffer
 
 /**
-* Created by IntelliJ IDEA.
-* User: Jason
-* Date: 4/17/12
-* Time: 9:20 PM
-*/
+ * Created by IntelliJ IDEA.
+ * User: Jason
+ * Date: 4/17/12
+ * Time: 9:20 PM
+ */
 
 class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatchers {
 
