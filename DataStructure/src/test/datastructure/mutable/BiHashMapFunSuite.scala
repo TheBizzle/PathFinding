@@ -368,8 +368,15 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     backwards(biHash.clone(), biHash map (_._2) mkString, "", { case (acc, elem: (String, Int)) => acc + elem._1 }, { case (b1: B, b2: B) => null })
   }
 
+  //@ Refactor
   test("andThen(func)") {
-    biHash andThen (_(baseList(0)._1)) should equal (baseList(0)._2)
+
+    val bFunc: (B) => B = (b: B) => identity(b)
+    biHash andThen bFunc apply baseList(0)._1 should equal (baseList(0)._2)
+
+    val aFunc: (A) => A = (a: A) => identity(a)
+    biHash andThen aFunc apply baseList(0)._2 should equal (baseList(0)._1)
+
   }
 
   //@
@@ -443,13 +450,13 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   // Refactor
   test("compose(func)") {
 
-    val aFunc = (a: A) => a + 1
-    intercept[NoSuchElementException] { biHash compose (aFunc(baseList.minBy(_._1)._1)) }
-    biHash compose (aFunc(baseList.minBy(_._1)._1 - 1)) should equal (baseList.minBy(_._1)._2)
+    val aFunc: (A) => A = (a: A) => a + 1
+    intercept[NoSuchElementException] { biHash compose aFunc apply baseList.minBy(_._1)._1 }
+    (biHash compose aFunc apply baseList.minBy(_._1)._1 - 1) should equal (baseList.minBy(_._1)._2)
 
-    val bFunc = (b: B) => new String(b.getBytes map (x => (x ^ 2).toByte))
-    intercept[NoSuchElementException] { biHash compose (bFunc(baseList.head._2)) }
-    biHash compose (bFunc(bFunc(baseList.head._2))) should equal (baseList.head._1)
+    val bFunc: (B) => B = (b: B) => new String(b.getBytes map (x => (x ^ 2).toByte))
+    intercept[NoSuchElementException] { biHash compose bFunc apply baseList.head._2 }
+    biHash compose bFunc apply bFunc(baseList.head._2) should equal (baseList.head._1)
 
   }
 
@@ -727,7 +734,6 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     }
     forwards (biHash.clone(), biHash map (_._1) product, 1,   { case (elem: (Int, String), acc) => acc * elem._1 })
     backwards(biHash.clone(), biHash map (_._2) mkString, "", { case (elem: (String, Int), acc) => acc + elem._1 })
-    biHash.mapResult
   }
 
   //@
