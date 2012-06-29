@@ -11,6 +11,8 @@ import collection.mutable.Map
 
 private[datastructure] class BiHashImplWrapper[X, Y](primaryMap: Map[X, Y], secondaryMap: Map[Y, X]) {
 
+  type Tup = (X, Y)
+
   def apply(key: X)         : Y           =   primaryMap(key)
   def default(key: X)       : Y           =   primaryMap.default(key)
   def get(key: X)           : Option[Y]   =   primaryMap.get(key)
@@ -19,7 +21,23 @@ private[datastructure] class BiHashImplWrapper[X, Y](primaryMap: Map[X, Y], seco
   def keysIterator          : Iterator[X] =   primaryMap.keysIterator
   def keySet    : scala.collection.Set[X] =   primaryMap.keySet
   def keys                  : Iterable[X] =   primaryMap.keys
-  def foreach[C](f: ((X, Y)) => C)          { primaryMap foreach f }
+
+  def andThen[C](k: (Y) => C) : PartialFunction[X, C] =   primaryMap andThen k
+  def compose[C](g: (C) => X) : (C) => Y              =   primaryMap compose g
+
+  def /:[C]          (z: C)(op: (C, Tup) => C)   : C           =   primaryMap./:(z)(op)
+  def /:\[A1 >: Tup] (z: A1)(op: (A1, A1) => A1) : A1          =   primaryMap./:\(z)(op)
+  def :\[C]          (z: C)(op: (Tup, C) => C)   : C           =   primaryMap.:\(z)(op)
+  def aggregate[C]   (z: C)(seqop: (C, Tup) => C,
+                            combop: (C, C) => C) : C           =   primaryMap.aggregate(z)(seqop, combop)
+  def count          (p: (Tup) => Boolean)       : Int         =   primaryMap count p
+  def exists         (p: (Tup) => Boolean)       : Boolean     =   primaryMap exists p
+  def find           (p: (Tup) => Boolean)       : Option[Tup] =   primaryMap find p
+  def fold[A1 >: Tup](z: A1)(op: (A1, A1) => A1) : A1          =   primaryMap.fold(z)(op)
+  def foldLeft[C]    (z: C)(op: (C, Tup) => C)   : C           =   primaryMap.foldLeft(z)(op)
+  def foldRight[C]   (z: C)(op: (Tup, C) => C)   : C           =   primaryMap.foldRight(z)(op)
+  def foreach[C]     (f: (Tup) => C)                             { primaryMap foreach f }
+  // filter, map, flatMap, collect, collectFirst (`Repr`s...)
 
   def remove(key: X) : Option[Y] = {
     get(key) foreach (secondaryMap.remove(_))

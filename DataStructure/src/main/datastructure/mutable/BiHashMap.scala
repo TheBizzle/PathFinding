@@ -51,6 +51,6 @@ class BiHashMap[A, B] private[datastructure](abm: HashMap[A, B], bam: HashMap[B,
 }
 
 object BiHashMap extends MutableMapFactory[BiHashMap] {
-  implicit def canBuildFrom[A, B]: CanBuildFrom[Coll, (A, B), BiHashMap[A, B]] = new MapCanBuildFrom[A, B]
-  def empty[A, B]: BiHashMap[A, B] = new BiHashMap[A, B]()
+  implicit def canBuildFrom[A, B] : CanBuildFrom[Coll, (A, B), BiHashMap[A, B]] = new MapCanBuildFrom[A, B]
+  def empty[A, B] : BiHashMap[A, B] = new BiHashMap[A, B]()
 }
