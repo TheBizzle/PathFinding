@@ -50,16 +50,16 @@ trait BiHashReverseOps[A, B] {
   def --=(bas: TraversableOnce[Tup])    (implicit ignore: DummyImplicit) : this.type = { bas.seq foreach -= ; this }
 
   // General methods
-  def apply             (bKey: B)               (implicit ignore: DummyImplicit) : A         =   implWrapper.apply(bKey)
-  def contains          (bKey: B)               (implicit ignore: DummyImplicit) : Boolean   =   implWrapper.contains(bKey)
-  def default           (bKey: B)               (implicit ignore: DummyImplicit) : A         =   implWrapper.default(bKey)
-  def get               (bKey: B)               (implicit ignore: DummyImplicit) : Option[A] =   implWrapper.get(bKey)
-  def getOrElse[A1 >: A](key: B, default: => A1)(implicit ignore: DummyImplicit) : A1        =   implWrapper.getOrElse(key, default)
-  def getOrElseUpdate   (key: B, op: => A)      (implicit ignore: DummyImplicit) : A         =   implWrapper.getOrElseUpdate(key, op)
-  def isDefinedAt       (key: B)                (implicit ignore: DummyImplicit) : Boolean   =   implWrapper.isDefinedAt(key)
-  def put               (bKey: B, aVal: A)      (implicit ignore: DummyImplicit) : Option[A] =   implWrapper.put(bKey, aVal)
-  def remove            (bKey: B)               (implicit ignore: DummyImplicit) : Option[A] =   implWrapper.remove(bKey)
-  def update            (bKey: B, aVal: A)      (implicit ignore: DummyImplicit)               { implWrapper.update(bKey, aVal) }
+  def apply             (bKey: B)                (implicit ignore: DummyImplicit) : A         =   implWrapper.apply(bKey)
+  def contains          (bKey: B)                (implicit ignore: DummyImplicit) : Boolean   =   implWrapper.contains(bKey)
+  def default           (bKey: B)                (implicit ignore: DummyImplicit) : A         =   implWrapper.default(bKey)
+  def get               (bKey: B)                (implicit ignore: DummyImplicit) : Option[A] =   implWrapper.get(bKey)
+  def getOrElse[A1 >: A](bKey: B, default: => A1)(implicit ignore: DummyImplicit) : A1        =   implWrapper.getOrElse(bKey, default)
+  def getOrElseUpdate   (bKey: B, aOp: => A)     (implicit ignore: DummyImplicit) : A         =   implWrapper.getOrElseUpdate(bKey, aOp)
+  def isDefinedAt       (bKey: B)                (implicit ignore: DummyImplicit) : Boolean   =   implWrapper.isDefinedAt(bKey)
+  def put               (bKey: B, aVal: A)       (implicit ignore: DummyImplicit) : Option[A] =   implWrapper.put(bKey, aVal)
+  def remove            (bKey: B)                (implicit ignore: DummyImplicit) : Option[A] =   implWrapper.remove(bKey)
+  def update            (bKey: B, aVal: A)       (implicit ignore: DummyImplicit)               { implWrapper.update(bKey, aVal) }
 
   // Function-chaining methods
   def andThen[C]              (k: (A) => C)(implicit ignore: DummyImplicit)                   : PartialFunction[B, C]   = implWrapper andThen k
@@ -67,26 +67,37 @@ trait BiHashReverseOps[A, B] {
   def orElse[B1 <: B, A1 >: A](that: PartialFunction[B1, A1])(implicit ignore: DummyImplicit) : PartialFunction[B1, A1] = implWrapper orElse that
 
   // Lambda-operation methods
-  def /:[C]          (z: C)(op: (C, Tup) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper./:(z)(op)
-  def /:\[A1 >: Tup] (z: A1)(op: (A1, A1) => A1)                      (implicit ignore: DummyImplicit) : A1          =   implWrapper./:\(z)(op)
-  def :\[C]          (z: C)(op: (Tup, C) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper.:\(z)(op)
-  def aggregate[C]   (z: C)(seqop: (C, Tup) => C, combop: (C, C) => C)(implicit ignore: DummyImplicit) : C           =   implWrapper.aggregate(z)(seqop, combop)
-  def count          (p: (Tup) => Boolean)                            (implicit ignore: DummyImplicit) : Int         =   implWrapper count p
-  def exists         (p: (Tup) => Boolean)                            (implicit ignore: DummyImplicit) : Boolean     =   implWrapper exists p
-  def find           (p: (Tup) => Boolean)                            (implicit ignore: DummyImplicit) : Option[Tup] =   implWrapper find p
-  def fold[A1 >: Tup](z: A1)(op: (A1, A1) => A1)                      (implicit ignore: DummyImplicit) : A1          =   implWrapper.fold(z)(op)
-  def foldLeft[C]    (z: C)(op: (C, Tup) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper.foldLeft(z)(op)
-  def foldRight[C]   (z: C)(op: (Tup, C) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper.foldRight(z)(op)
-  def forall         (p: (Tup) => Boolean)                            (implicit ignore: DummyImplicit) : Boolean     =   implWrapper forall p
-  def foreach[C]     (f: (Tup) => C)                                  (implicit ignore: DummyImplicit)                 { implWrapper.foreach(f) }
-  def minBy[C]       (f: (Tup) => C)                (implicit cmp: Ordering[C], ignore: DummyImplicit) : Tup         =   implWrapper.minBy(f)
-  def maxBy[C]       (f: (Tup) => C)                (implicit cmp: Ordering[C], ignore: DummyImplicit) : Tup         =   implWrapper.maxBy(f)
+  def /:[C]                      (z: C)(op: (C, Tup) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper./:(z)(op)
+  def /:\[A1 >: Tup]             (z: A1)(op: (A1, A1) => A1)                      (implicit ignore: DummyImplicit) : A1          =   implWrapper./:\(z)(op)
+  def :\[C]                      (z: C)(op: (Tup, C) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper.:\(z)(op)
+  def aggregate[C]               (z: C)(seqop: (C, Tup) => C, combop: (C, C) => C)(implicit ignore: DummyImplicit) : C           =   implWrapper.aggregate(z)(seqop, combop)
+  def count                      (p: (Tup) => Boolean)                            (implicit ignore: DummyImplicit) : Int         =   implWrapper count p
+  def exists                     (p: (Tup) => Boolean)                            (implicit ignore: DummyImplicit) : Boolean     =   implWrapper exists p
+  def find                       (p: (Tup) => Boolean)                            (implicit ignore: DummyImplicit) : Option[Tup] =   implWrapper find p
+  def fold[A1 >: Tup]            (z: A1)(op: (A1, A1) => A1)                      (implicit ignore: DummyImplicit) : A1          =   implWrapper.fold(z)(op)
+  def foldLeft[C]                (z: C)(op: (C, Tup) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper.foldLeft(z)(op)
+  def foldRight[C]               (z: C)(op: (Tup, C) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper.foldRight(z)(op)
+  def forall                     (p: (Tup) => Boolean)                            (implicit ignore: DummyImplicit) : Boolean     =   implWrapper forall p
+  def foreach[C]                 (f: (Tup) => C)                                  (implicit ignore: DummyImplicit)                 { implWrapper.foreach(f) }
+  def minBy[C]                   (f: (Tup) => C)                (implicit cmp: Ordering[C], ignore: DummyImplicit) : Tup         =   implWrapper.minBy(f)
+  def maxBy[C]                   (f: (Tup) => C)                (implicit cmp: Ordering[C], ignore: DummyImplicit) : Tup         =   implWrapper.maxBy(f)
+  def reduce[A1 >: Tup]          (op: (A1, A1) => A1)                             (implicit ignore: DummyImplicit) : A1          =   implWrapper reduce op
+  def reduceLeft[B >: Tup]       (op: (B, Tup) => B)                              (implicit ignore: DummyImplicit) : B           =   implWrapper reduceLeft op
+  def reduceLeftOption[B >: Tup] (op: (B, Tup) => B)                              (implicit ignore: DummyImplicit) : Option[B]   =   implWrapper reduceLeftOption op
+  def reduceOption[A1 >: Tup]    (op: (A1, A1) => A1)                             (implicit ignore: DummyImplicit) : Option[A1]  =   implWrapper reduceOption op
+  def reduceRight[B >: Tup]      (op: (Tup, B) => B)                              (implicit ignore: DummyImplicit) : B           =   implWrapper reduceRight op
+  def reduceRightOption[B >: Tup](op: (Tup, B) => B)                              (implicit ignore: DummyImplicit) : Option[B]   =   implWrapper reduceRightOption op
+  def retain                     (p: (A, B) => Boolean)                           (implicit ignore: DummyImplicit) : this.type   = { this.seq foreach { case (k, v) => if (!p(k, v)) this -= k }; this }
+  def transform                  (f: (A, B) => B)                                 (implicit ignore: DummyImplicit) : this.type   = { this.iterator foreach { case (k, v) => update(k, f(k, v)) }; this }
 
   // Collection-morphing methods
   //@ Should `Bijection` have base implementations of these things?  Seems probable
   def bIterator : Iterator[B]             = implWrapper.keysIterator
   def bSet      : scala.collection.Set[B] = implWrapper.keySet
   def bValues   : Iterable[B]             = implWrapper.keys
+
+  def copyToArray[C >: Tup] (xs: Array[C], start: Int, len: Int)(implicit ignore: DummyImplicit) { implWrapper.copyToArray(xs, start, len) }
+  def copyToBuffer[C >: Tup](dest: collection.mutable.Buffer[C])(implicit ignore: DummyImplicit) { implWrapper.copyToBuffer(dest) }
 
   //@ Maybe I'll need this; maybe I won't.
   private def forwardize[C](f: (B, A) => C) : (A, B) => C = (a: A, b: B) => f(b, a)

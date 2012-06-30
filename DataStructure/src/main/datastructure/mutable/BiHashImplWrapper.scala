@@ -33,30 +33,33 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: Map[X, Y]
   def orElse[X1 <: X, Y1 >: Y](that: PartialFunction[X1, Y1]) : PartialFunction[X1, Y1] = primaryMap orElse that
 
   // Lambda-operation methods
-  def /:[C]          (z: C)(op: (C, Tup) => C)                         : C           =   primaryMap./:(z)(op)
-  def /:\[A1 >: Tup] (z: A1)(op: (A1, A1) => A1)                       : A1          =   primaryMap./:\(z)(op)
-  def :\[C]          (z: C)(op: (Tup, C) => C)                         : C           =   primaryMap.:\(z)(op)
-  def aggregate[C]   (z: C)(seqop: (C, Tup) => C, combop: (C, C) => C) : C           =   primaryMap.aggregate(z)(seqop, combop)
-  def count          (p: (Tup) => Boolean)                             : Int         =   primaryMap count p
-  def exists         (p: (Tup) => Boolean)                             : Boolean     =   primaryMap exists p
-  def find           (p: (Tup) => Boolean)                             : Option[Tup] =   primaryMap find p
-  def fold[A1 >: Tup](z: A1)(op: (A1, A1) => A1)                       : A1          =   primaryMap.fold(z)(op)
-  def foldLeft[C]    (z: C)(op: (C, Tup) => C)                         : C           =   primaryMap.foldLeft(z)(op)
-  def foldRight[C]   (z: C)(op: (Tup, C) => C)                         : C           =   primaryMap.foldRight(z)(op)
-  def forall         (p: (Tup) => Boolean)                             : Boolean     =   primaryMap forall p
-  def foreach[C]     (f: (Tup) => C)                                                   { primaryMap foreach f }
-  def minBy[C]       (f: (Tup) => C)(implicit cmp: Ordering[C])        : Tup         =   primaryMap minBy f
-  def maxBy[C]       (f: (Tup) => C)(implicit cmp: Ordering[C])        : Tup         =   primaryMap maxBy f
+  def /:[C]                      (z: C)(op: (C, Tup) => C)                         : C           =   primaryMap./:(z)(op)
+  def /:\[C >: Tup]              (z: C)(op: (C, C) => C)                           : C           =   primaryMap./:\(z)(op)
+  def :\[C]                      (z: C)(op: (Tup, C) => C)                         : C           =   primaryMap.:\(z)(op)
+  def aggregate[C]               (z: C)(seqop: (C, Tup) => C, combop: (C, C) => C) : C           =   primaryMap.aggregate(z)(seqop, combop)
+  def count                      (p: (Tup) => Boolean)                             : Int         =   primaryMap count p
+  def exists                     (p: (Tup) => Boolean)                             : Boolean     =   primaryMap exists p
+  def find                       (p: (Tup) => Boolean)                             : Option[Tup] =   primaryMap find p
+  def fold[C >: Tup]             (z: C)(op: (C, C) => C)                           : C           =   primaryMap.fold(z)(op)
+  def foldLeft[C]                (z: C)(op: (C, Tup) => C)                         : C           =   primaryMap.foldLeft(z)(op)
+  def foldRight[C]               (z: C)(op: (Tup, C) => C)                         : C           =   primaryMap.foldRight(z)(op)
+  def forall                     (p: (Tup) => Boolean)                             : Boolean     =   primaryMap forall p
+  def foreach[C]                 (f: (Tup) => C)                                                   { primaryMap foreach f }
+  def minBy[C]                   (f: (Tup) => C)(implicit cmp: Ordering[C])        : Tup         =   primaryMap minBy f
+  def maxBy[C]                   (f: (Tup) => C)(implicit cmp: Ordering[C])        : Tup         =   primaryMap maxBy f
+  def reduce[C >: Tup]           (op: (C, C) => C)                                 : C           =   primaryMap reduce op
+  def reduceLeft[C >: Tup]       (op: (C, Tup) => C)                               : C           =   primaryMap reduceLeft op
+  def reduceLeftOption[C >: Tup] (op: (C, Tup) => C)                               : Option[C]   =   primaryMap reduceLeftOption op
+  def reduceOption[C >: Tup]     (op: (C, C) => C)                                 : Option[C]   =   primaryMap reduceOption op
+  def reduceRight[C >: Tup]      (op: (Tup, C) => C)                               : C           =   primaryMap reduceRight op
+  def reduceRightOption[C >: Tup](op: (Tup, C) => C)                               : Option[C]   =   primaryMap reduceRightOption op
 
-  
   //@ `Repr`s:
-  // filter, map, mapResult, flatMap, collect, collectFirst, partition, withDefault, withFilter
+  // filter, map, mapResult, flatMap, collect, collectFirst, partition, scan, scanLeft, scanRight, span, withDefault, withFilter
 
-  //@ Normals:
-  // copyToArray x 3, copyToBuffer
-  // reduce, reduceOption, reduceLeft, reduceLeftOption, reduceRight, reduceRightOption, retain, sameElements
-  // scan, scanLeft, scanRight, span, transform, updated
-
+  // Miscellaneously-used methods
+  def copyToArray[C >: Tup] (xs: Array[C], start: Int = 0, len: Int = primaryMap.size) { primaryMap.copyToArray(xs, start, len) }
+  def copyToBuffer[C >: Tup](dest: collection.mutable.Buffer[C])                       { primaryMap.copyToBuffer(dest) }
 
   def remove(key: X) : Option[Y] = {
     get(key) foreach (secondaryMap.remove(_))
