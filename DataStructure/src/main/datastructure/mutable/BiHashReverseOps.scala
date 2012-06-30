@@ -33,18 +33,17 @@ trait BiHashReverseOps[A, B] {
   def andThen[C](k: (A) => C) : PartialFunction[B, C] =   implWrapper andThen k
   def compose[C](g: (C) => B) : (C) => A              =   implWrapper compose g
 
-  def /:[C]          (z: C)(op: (C, Tup) => C)   : C           =       implWrapper./:(z)(op)
-  def /:\[A1 >: Tup] (z: A1)(op: (A1, A1) => A1) : A1          =       implWrapper./:\(z)(op)
-  def :\[C]          (z: C)(op: (Tup, C) => C)   : C           =       implWrapper.:\(z)(op)
-  def aggregate[C]   (z: C)(seqop: (C, Tup) => C,
-                            combop: (C, C) => C) : C           =       implWrapper.aggregate(z)(seqop, combop)
-  def count          (p: (Tup) => Boolean)       : Int         =       implWrapper count p
-  def exists         (p: (Tup) => Boolean)       : Boolean     =       implWrapper exists p
-  def find           (p: (Tup) => Boolean)       : Option[Tup] =       implWrapper find p
-  def fold[A1 >: Tup](z: A1)(op: (A1, A1) => A1) : A1          =       implWrapper.fold(z)(op)
-  def foldLeft[C]    (z: C)(op: (C, Tup) => C)   : C           =       implWrapper.foldLeft(z)(op)
-  def foldRight[C]   (z: C)(op: (Tup, C) => C)   : C           =       implWrapper.foldRight(z)(op)
-  def foreach[C]     (f: (Tup) => C)(implicit ignore: DummyImplicit) { implWrapper.foreach(f) }
+  def /:[C]          (z: C)(op: (C, Tup) => C)                          : C            =   implWrapper./:(z)(op)
+  def /:\[A1 >: Tup] (z: A1)(op: (A1, A1) => A1)                        : A1           =   implWrapper./:\(z)(op)
+  def :\[C]          (z: C)(op: (Tup, C) => C)                          : C            =   implWrapper.:\(z)(op)
+  def aggregate[C]   (z: C)(seqop: (C, Tup) => C, combop: (C, C) => C)  : C            =   implWrapper.aggregate(z)(seqop, combop)
+  def count          (p: (Tup) => Boolean)                              : Int          =   implWrapper count p
+  def exists         (p: (Tup) => Boolean)                              : Boolean      =   implWrapper exists p
+  def find           (p: (Tup) => Boolean)                              : Option[Tup]  =   implWrapper find p
+  def fold[A1 >: Tup](z: A1)(op: (A1, A1) => A1)                        : A1           =   implWrapper.fold(z)(op)
+  def foldLeft[C]    (z: C)(op: (C, Tup) => C)                          : C            =   implWrapper.foldLeft(z)(op)
+  def foldRight[C]   (z: C)(op: (Tup, C) => C)                          : C            =   implWrapper.foldRight(z)(op)
+  def foreach[C]     (f: (Tup) => C)(implicit ignore: DummyImplicit)                     { implWrapper.foreach(f) }
   
   //@ Should `Bijection` have base implementations of these things?  Seems probable
   def bIterator : Iterator[B]             = implWrapper.keysIterator
