@@ -4,6 +4,7 @@ import org.scalatest.{BeforeAndAfterEach, FunSuite}
 import collection.GenTraversableOnce
 import org.scalatest.matchers.ShouldMatchers
 import collection.mutable.ListBuffer
+import utilitylib.typewarfare.TypeWarfare.||
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,12 +18,6 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   type A = Int
   type B = String
   type BHM = BiHashMap[A, B]
-
-  // Type disjunction, courtesy of the great Miles Sabin
-  type ~[X]     = X => Nothing
-  type |[X, Y]  = ~[~[X] with ~[Y]]
-  type ~~[X]    = ~[~[X]]
-  type ||[X, Y] = { type T[L] = ~~[L] <:< (X | Y) }
 
   type AB      = (A || B)#T
   type ABTuple = ((A, B) || (B, A))#T
@@ -473,34 +468,57 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   }
 
-  //@ Do reverse, as well?
   test("copyToArray(arr)") {
-    val arr = new Array[(A, B)](biHash.size)
-    biHash.copyToArray(arr)
-    arr should equal (biHash.toArray)
+
+    val abArr = new Array[(A, B)](biHash.size)
+    biHash.copyToArray(abArr)
+    abArr should equal (biHash.toArray)
+
+    val baArr = new Array[(B, A)](biHash.size)
+    biHash.copyToArray(baArr)
+    baArr should equal (biHash.flip.toArray)
+
   }
 
-  //@ Do reverse, as well?
   test("copyToArray(arr, start)") {
+
     val start = 2
-    val arr = new Array[(A, B)](biHash.size - start)
-    biHash.copyToArray(arr, start)
-    arr should equal (biHash.toArray drop (start))
+
+    val abArr = new Array[(A, B)](biHash.size - start)
+    biHash.copyToArray(abArr, start)
+    abArr should equal (biHash.toArray drop (start))
+
+    val baArr = new Array[(B, A)](biHash.size - start)
+    biHash.copyToArray(baArr, start)
+    baArr should equal (biHash.flip.toArray drop (start))
+
   }
 
-  //@ Do reverse, as well?
   test("copyToArray(arr, start, len)") {
+
     val (start, len) = (2, 2)
-    val arr = new Array[(A, B)](len)
-    biHash.copyToArray(arr, start, len)
-    arr should equal (biHash.toArray slice (start, start + len))
+
+    val abArr = new Array[(A, B)](len)
+    biHash.copyToArray(abArr, start, len)
+    abArr should equal (biHash.toArray slice (start, start + len))
+
+    val baArr = new Array[(B, A)](len)
+    biHash.copyToArray(baArr, start, len)
+    baArr should equal (biHash.flip.toArray slice (start, start + len))
+
   }
 
-  //@ Do reverse, as well?
+  //@Refactor (along with the 3 above)
   test("copyToBuffer(buff)") {
-    val buff = new ListBuffer[(A, B)]()
-    biHash.copyToBuffer(buff)
-    buff.toList should equal (biHash.toList)
+
+    val abBuff = new ListBuffer[(A, B)]()
+    biHash.copyToBuffer(abBuff)
+    abBuff.toList should equal (biHash.toList)
+
+    val baBuff = new ListBuffer[(B, A)]()
+    biHash.copyToBuffer(baBuff)
+    baBuff.toList should equal (biHash.toList)
+
   }
 
   //@
@@ -818,7 +836,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@ Refactor
   test("groupBy(f)") {
 
-    val newKV = baseList.head._1 * 1000 -> baseList.head._2
+    val newKV: (A, B) = baseList.head._1 * 1000 -> baseList.head._2
     biHash += newKV
 
     biHash groupBy { case (a: A, b: B) => b } should equal (Map(BiHashMap(baseList.head, newKV), baseList.tail map (BiHashMap(_): _*)))
@@ -1206,8 +1224,10 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@ Be smart when implementing this!
   test("sameElements(that)") {
     biHash should have ('sameElements (baseList))
+    biHash.flip should have ('sameElements (baseList))
     biHash should not have ('sameElements (biHash.empty))
     biHash.empty should have ('sameElements (BiHashMap[A, B]()))
+    biHash.empty should have ('sameElements (BiHashMap[B, A]()))
   }
 
   //@
@@ -1469,20 +1489,16 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@ Refactor
   //@ Is currently inoperable (must fix return type)
-  test("withDefaultA(a)") {
+  test("withDefault(that)") {
+
 //    val deffy = biHash withDefaultA { case b: B => b.size }
 //    val badB  = "jkashdgkjlashdgkljsdagh"
 //    deffy(baseList.head._2) should equal (baseList.head._1)
 //    deffy(badB) should equal (badB.size)
-  }
-
-  //@ Refactor
-  //@ Can share code with above
-  test("withDefaultB(b)") {
 
     //@ WTF is going on here...?
     val aFunc = (a: A) => a.toString + " is outta this world!"
-    val deffy = biHash withDefaultB aFunc
+    val deffy = biHash withDefault aFunc
     val badA  = -18
 
     deffy(baseList.head._1) should equal (baseList.head._2)
