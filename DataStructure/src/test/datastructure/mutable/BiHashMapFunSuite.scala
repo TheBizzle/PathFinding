@@ -56,7 +56,6 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     (biHash != BiHashMap(baseList: _*)) should equal (false)
   }
 
-  //?
   //@
   test("+(elem)") {
     def forwards(bhm: BHM, target: BHM, elems: (A, B)*) {
@@ -407,8 +406,8 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Can share below
-  // Refactor
+  //@ Can share below
+  //@ Refactor
   test("collect(pf)") {
 
     val abList = baseList
@@ -447,7 +446,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
+  //@ Refactor
   test("compose(func)") {
 
     val aFunc: (A) => A = (a: A) => a + 1
@@ -474,12 +473,14 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   }
 
+  //@ Do reverse, as well?
   test("copyToArray(arr)") {
     val arr = new Array[(A, B)](biHash.size)
     biHash.copyToArray(arr)
     arr should equal (biHash.toArray)
   }
 
+  //@ Do reverse, as well?
   test("copyToArray(arr, start)") {
     val start = 2
     val arr = new Array[(A, B)](biHash.size - start)
@@ -487,6 +488,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     arr should equal (biHash.toArray drop (start))
   }
 
+  //@ Do reverse, as well?
   test("copyToArray(arr, start, len)") {
     val (start, len) = (2, 2)
     val arr = new Array[(A, B)](len)
@@ -494,6 +496,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     arr should equal (biHash.toArray slice (start, start + len))
   }
 
+  //@ Do reverse, as well?
   test("copyToBuffer(buff)") {
     val buff = new ListBuffer[(A, B)]()
     biHash.copyToBuffer(buff)
@@ -501,7 +504,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
+  //@ Refactor
   test("count(func)") {
 
     val abFunc = (ab: (A, B), a: A) => ab._1 < a
@@ -515,7 +518,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
+  //@ Refactor
   test("default(elem)") {
 
     val aDef = 4879
@@ -526,7 +529,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   }
 
-  // Should share code with the two below
+  //@ Should share code with the two below
   test("drop(n)") {
 
     val cleansed = biHash drop 2
@@ -552,10 +555,10 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   test("dropWhile(func)") {
 
-    val abCleansed = biHash dropWhile (_._1 <= (baseList map (_._1) max))
+    val abCleansed = biHash dropWhile { case (a: A, b: B) => a <= (baseList map (_._1) max) }
     abCleansed.size should equal (0)
 
-    val baCleansed = biHash dropWhile (_._1.contains(""))
+    val baCleansed = biHash dropWhile { case (b: B, a: A) => b.contains("") }
     baCleansed.size should equal (0)
 
     var counter = 0
@@ -568,7 +571,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     biHash.empty should equal (BiHashMap[A, B]())
   }
 
-  // Can share code with below
+  //@ Can share code with below
   test("ensuring(cond)") {
     intercept [AssertionError] { biHash ensuring ({false}) }
     biHash ensuring ({true}) should equal (biHash)
@@ -587,7 +590,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
+  //@ Refactor
   test("exists(func)") {
 
     val badA = 3421
@@ -602,8 +605,8 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
-  // Share code with some below
+  //@ Refactor
+  //@ Share code with some below
   test("filter(func)") {
 
     val badA = 3421
@@ -617,8 +620,8 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   }
 
-  // Refactor
-  // Share with below
+  //@ Refactor
+  //@ Share with below
   test("filterAs(func)") {
     biHash filterAs (a => baseList map (_._2) contains (a)) should equal (biHash.empty)
     biHash filterAs (a => baseList map (_._1) contains (a)) should equal (biHash)
@@ -626,7 +629,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     biHash filterAs (_ != baseList.tail.head._1) should equal (BiHashMap((baseList.head :: baseList.tail.tail): _*))
   }
 
-  // Refactor
+  //@ Refactor
   test("filterBs(func)") {
     biHash filterBs (b => baseList map (_._1) contains (b)) should equal (biHash.empty)
     biHash filterBs (b => baseList map (_._2) contains (b)) should equal (biHash)
@@ -635,23 +638,23 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
+  //@ Refactor
   test("filterNot(func)") {
 
     val badA = 3421
     val badB = "I'm bad!  Let's go eat some cheeseburgers with President Ronnie!"
 
-    biHash filter { case (a: A, b: B) => a != badA } should equal (biHash)
-    biHash filter { case (b: B, a: A) => b != badB } should equal (biHash)
+    biHash filterNot { case (a: A, b: B) => a != badA } should equal (biHash)
+    biHash filterNot { case (b: B, a: A) => b != badB } should equal (biHash)
 
-    biHash filter { case (a: A, b: B) => a != baseList.head._1 } should equal (BiHashMap(baseList.head))
-    biHash filter { case (b: B, a: A) => b != baseList.head._2 } should equal (BiHashMap(baseList.head))
+    biHash filterNot { case (a: A, b: B) => a != baseList.head._1 } should equal (BiHashMap(baseList.head))
+    biHash filterNot { case (b: B, a: A) => b != baseList.head._2 } should equal (BiHashMap(baseList.head))
 
   }
 
   //@
-  // Refactor
-  // Share code with above
+  //@ Refactor
+  //@ Share code with above
   test("find(func)") {
 
     val badA = 3421
@@ -666,7 +669,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Share code with `map`
+  //@ Share code with `map`
   test("flatMap(func)") {
 
     val abFunc = (ab: (A, B)) => BiHashMap((ab._1 * 6, ab._2))
@@ -737,21 +740,21 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
+  //@ Refactor
   test("forall(func)") {
 
-    biHash.forall { case (k: A, v: B) => baseList.contains((k, v)) } should be (true)
-    biHash.forall { case (k: A, v: B) => v == "five" } should be (false)
-    biHash.forall { case (k: A, v: B) => v == "lkjhadskjhsadl" } should be (false)
+    biHash forall { case (k: A, v: B) => baseList.contains((k, v)) } should be (true)
+    biHash forall { case (k: A, v: B) => v == "five" } should be (false)
+    biHash forall { case (k: A, v: B) => v == "lkjhadskjhsadl" } should be (false)
 
-    biHash.forall { case (k: B, v: A) => baseList map (_.swap) contains((k, v)) } should be (true)
-    biHash.forall { case (k: B, v: A) => k == "five" } should be (false)
-    biHash.forall { case (k: B, v: A) => k == "lkjhadskjhsadl" } should be (false)
+    biHash forall { case (k: B, v: A) => baseList map (_.swap) contains((k, v)) } should be (true)
+    biHash forall { case (k: B, v: A) => k == "five" } should be (false)
+    biHash forall { case (k: B, v: A) => k == "lkjhadskjhsadl" } should be (false)
 
   }
 
   //@
-  // Refactor
+  //@ Refactor
   test("foreach(func)") {
 
     val accInit = (0, "")
@@ -781,8 +784,8 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
-  // Can share code with below
+  //@ Refactor
+  //@ Can share code with below
   test("getOrElse(a, default)") {
 
     val badA = 98384
@@ -797,7 +800,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
+  //@ Refactor
   test("getOrElseUpdate(a, => b)") {
 
     val badA = 98384
@@ -812,7 +815,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
+  //@ Refactor
   test("groupBy(f)") {
 
     val newKV = baseList.head._1 * 1000 -> baseList.head._2
@@ -833,7 +836,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     biHash.hasDefiniteSize should equal (true)
   }
 
-  // Share code with below
+  //@ Share code with below
   test("head") {
     baseList should have ('exists (biHash.head))
   }
@@ -878,7 +881,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     biHash.iterator.toList should have ('sameElements (baseList))
   }
 
-  // Share code with below
+  //@ Share code with below
   test("aSet") {
     biHash.aSet should equal (baseList map (_._1) toSet)
   }
@@ -887,7 +890,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     biHash.bSet should equal (baseList map (_._2) toSet)
   }
 
-  // Share code with below
+  //@ Share code with below
   test("last") {
     baseList should have ('exists (biHash.last))
   }
@@ -897,7 +900,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
+  //@ Refactor
   test("map(func)") {
 
     val abFunc = (ab: (A, B)) => (ab._1 * 6, ab._2)
@@ -908,8 +911,8 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   }
 
-  // Refactor
-  // Share code with below
+  //@ Refactor
+  //@ Share code with below
   test("mapAs") {
     biHash mapAs (_.toDouble) should have ('sameElements (biHash map { case (a: A, b: B) => (a.toDouble, b) } ))
     biHash.empty mapAs (_.toDouble) should equal (biHash.empty)
@@ -921,7 +924,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
+  //@ Refactor
   test("mapResult") {
 
     val abFunc = (ab: (A, B)) => (ab._1, ab._2.getBytes)
@@ -964,7 +967,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
+  //@ Refactor
   test("orElse(pFunc)") {
 
     val errorResB = "NOOOOOOO!"
@@ -978,7 +981,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor
+  //@ Refactor
   test("partition(func)") {
 
     val abList = baseList
@@ -1060,7 +1063,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Share with `reduceLeft`
+  //@ Share with `reduceLeft`
   test("reduceLeftOption(func)") {
 
     def forwards(bhm: BHM, target: Option[(A, B)], func: ((A, B), (A, B)) => (A, B)) {
@@ -1088,7 +1091,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Share code with `reduce`
+  //@ Share code with `reduce`
   test("reduceOption(func)") {
 
     def forwards(bhm: BHM, target: Option[(A, B)], func: ((A, B), (A, B)) => (A, B)) {
@@ -1177,13 +1180,13 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Refactor within self
+  //@ Refactor within self
   test("retain(func)") {
 
     val headMapAB = biHash.retain((a: A, b: B) => (a, b) == biHash.head)
     headMapAB should have ('sameElements (BiHashMap(biHash.head)))
 
-    val tailMapAB = biHash.retain{(a: A, b: B) => val x = (a, b); biHash.tail.exists(_ == x)}  // WHY IS THIS NECESSARY?!
+    val tailMapAB = biHash.retain{(a: A, b: B) => val x = (a, b); biHash.tail.exists(_ == x)}  //@ WHY IS THIS NECESSARY?!
     tailMapAB should have ('sameElements (BiHashMap(biHash.tail: _*)))
 
     val allMapAB = biHash.retain((a: A, b: B) => true)
@@ -1192,7 +1195,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     val headMapBA = biHash.retain((b: B, a: A) => (b, a) == biHash.head.swap)
     headMapBA should have ('sameElements (BiHashMap(biHash.head.swap)))
 
-    val tailMapBA = biHash.retain{(b: B, a: A) => val x = (b, a); biHash.tail.map(_.swap).exists(_ == x)}  // WHY IS THIS NECESSARY?!
+    val tailMapBA = biHash.retain{(b: B, a: A) => val x = (b, a); biHash.tail.map(_.swap).exists(_ == x)}  //@ WHY IS THIS NECESSARY?!
     tailMapBA should have ('sameElements (BiHashMap(biHash.tail.map(_.swap): _*)))
 
     val allMapBA = biHash.retain((b: B, a: A) => true)
@@ -1208,7 +1211,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  // Share code with the two below
+  //@ Share code with the two below
   test("scan(res)(func)") {
 
     val (abBase, abFunc) = ((0, ""), (x: (A, B), y: (A, B)) => (x._1 + y._1, x._2 + y._2))
@@ -1255,20 +1258,20 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   test("sliding(size)") {
     val slider = biHash.sliding(2)
-    val window = slider.next
+    val window = slider.next()
     window should have size (2)
     window foreach (baseList.contains(_) should equal (true))
   }
 
   test("sliding(size, step)") {
     val slider = biHash.sliding(2, 2)
-    val window = slider.next
+    val window = slider.next()
     window should have size (2)
     window foreach (baseList.contains(_) should equal (true))
   }
 
   //@
-  // Refactor for code sharing within self
+  //@ Refactor for code sharing within self
   test("span(func)") {
 
     val (preAB1, postAB1) = biHash.span(baseList.contains((_: (A, B))))
@@ -1308,7 +1311,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     after.size should equal (baseList.length - (baseList.length / 2))
   }
 
-  // Share with `flip`
+  //@ Share with `flip`
   test("swap") {
     biHash.swap should equal (BiHashMap(baseList map (_.swap): _*))
   }
@@ -1464,8 +1467,8 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     (biHash updated (baseList(0)._2, aElem))(baseList(0)._2) should equal (aElem)
   }
 
-  // Refactor
-  //@ Is currently inoperatable (must fix return type)
+  //@ Refactor
+  //@ Is currently inoperable (must fix return type)
   test("withDefaultA(a)") {
 //    val deffy = biHash withDefaultA { case b: B => b.size }
 //    val badB  = "jkashdgkjlashdgkljsdagh"
@@ -1473,10 +1476,11 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 //    deffy(badB) should equal (badB.size)
   }
 
-  // Refactor
+  //@ Refactor
   //@ Can share code with above
   test("withDefaultB(b)") {
 
+    //@ WTF is going on here...?
     val aFunc = (a: A) => a.toString + " is outta this world!"
     val deffy = biHash withDefaultB aFunc
     val badA  = -18
