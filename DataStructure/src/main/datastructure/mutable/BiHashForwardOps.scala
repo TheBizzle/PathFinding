@@ -17,8 +17,8 @@ trait BiHashForwardOps[A, B] {
 
   private val implWrapper = new BiHashImplWrapper(abMap, baMap)
 
-  override def += (ab: (A,  B)) : this.type = { put(ab._1, ab._2); this }
-  override def -= (aKey: A)     : this.type = { remove(aKey); this }
+  override def +=(ab: (A,  B)) : this.type = { put(ab._1, ab._2); this }
+  override def -=(aKey: A)     : this.type = { remove(aKey); this }
 
   override def apply   (aKey: A)          : B           =   implWrapper.apply(aKey)
   override def contains(aKey: A)          : Boolean     =   implWrapper.contains(aKey)
