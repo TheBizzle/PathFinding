@@ -91,7 +91,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  test("++(that)") {
+  test("++(genTraversableOnce[(A, B)])") {
     def forwards(bhm: BHM, target: GenTraversableOnce[(A, B)], appendee: GenTraversableOnce[(A, B)]) {
       testFunc(bhm, bhm, bhm)
       testFunc(bhm, target, appendee)
@@ -110,7 +110,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@
   //@ Can share with above
-  test("++:(that)") {
+  test("++:(traversableOnce[(A, B)])") {
     def forwards(bhm: BHM, target: Traversable[(A, B)], appendee: Traversable[(A, B)]) {
       testFunc(bhm, bhm, bhm)
       testFunc(bhm, target, appendee)
@@ -128,7 +128,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  test("++=(that)") {
+  test("++=(traversableOnce[(A, B)])") {
     def forwards(bhm: BHM, target: TraversableOnce[(A, B)], appendee: TraversableOnce[(A, B)]) {
       testFunc(bhm, target, appendee)
     }
@@ -226,7 +226,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  test("--=(traversableonce[A])") {
+  test("--=(traversableOnce[A])") {
     def forwards(bhm: BHM, target: TraversableOnce[(A, B)], removees: TraversableOnce[A]) {
       testFunc(bhm, BiHashMap.empty, bhm)
       testFunc(bhm, target, removees)
