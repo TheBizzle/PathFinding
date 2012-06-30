@@ -1,5 +1,8 @@
 package datastructure.mutable
 
+import collection.generic.CanBuildFrom
+import collection.GenTraversableOnce
+
 /**
  * Created by IntelliJ IDEA.
  * User: Jason
@@ -15,13 +18,38 @@ trait BiHashReverseOps[A, B] {
 
   self: BiHashMap[A, B] =>
 
-  type Tup = (B, A)
+  private type Tup = (B, A)
 
   private val implWrapper = new BiHashImplWrapper(baMap, abMap)
 
-  def +=(ba: (B,  A))(implicit ignore: DummyImplicit) : this.type = { put(ba._1, ba._2); this }
-  def -=(bKey: B)    (implicit ignore: DummyImplicit) : this.type = { remove(bKey); this }
+  // General manipulation operators
+  //@ I'm uneasy about this usage of `BiHashMap` in the return type
+  def + [A1 >: A](ba: (B, A1))                              (implicit ignore: DummyImplicit) : BiHashMap[A1, B] = clone().asInstanceOf[BiHashMap[A1, B]] += ba
+  def + [A1 >: A](ba1: (B, A1), ba2: (B, A1), bas: (B, A1)*)(implicit ignore: DummyImplicit) : BiHashMap[A1, B] = clone().asInstanceOf[BiHashMap[A1, B]] += ba1 += ba2 ++= bas
+  def ++[A1 >: A](bas: GenTraversableOnce[(B, A1)])         (implicit ignore: DummyImplicit) : BiHashMap[A1, B] = clone().asInstanceOf[BiHashMap[A1, B]] ++= bas.seq
+  def -          (bKey: A)                                  (implicit ignore: DummyImplicit) : this.type        = clone() -= bKey
+  def -          (bKey1: A, bKey2: A, bKeys: A*)            (implicit ignore: DummyImplicit) : this.type        = clone() -= bKey1 -= bKey2 --= bKeys
+  def --         (bKeys: GenTraversableOnce[A])             (implicit ignore: DummyImplicit) : this.type        = clone() --= bKeys.seq
 
+  // Satanry
+  //@ There is no `That`!
+  override def ++:[B >: A, That](that: TraversableOnce[B])(implicit bf: CanBuildFrom[Repr, B, That], ignore: DummyImplicit) : That = {
+    val b = bf(repr)
+    if (that.isInstanceOf[collection.IndexedSeqLike[_, _]]) b.sizeHint(this, that.size)
+    b ++= that
+    b ++= thisCollection
+    b.result
+  }
+
+  // Self-return operators
+  def += (ba: Tup)                      (implicit ignore: DummyImplicit) : this.type = { put(ba._1, ba._2); this }
+  def += (ba1: Tup, ba2: Tup, bas: Tup*)(implicit ignore: DummyImplicit) : this.type =   this += ba1 += ba2 ++= bas
+  def ++=(bas: TraversableOnce[Tup])    (implicit ignore: DummyImplicit) : this.type = { bas.seq foreach += ; this }
+  def -= (bKey: B)                      (implicit ignore: DummyImplicit) : this.type = { remove(bKey); this }
+  def -= (bKey1: B, bKey2: B, bKeys: B*)(implicit ignore: DummyImplicit) : this.type = { this -= bKey1; this -= bKey2; this --= bKeys }
+  def --=(bas: TraversableOnce[Tup])    (implicit ignore: DummyImplicit) : this.type = { bas.seq foreach -= ; this }
+
+  // General methods
   def apply   (bKey: B)         (implicit ignore: DummyImplicit) : A         =   implWrapper.apply(bKey)
   def contains(bKey: B)         (implicit ignore: DummyImplicit) : Boolean   =   implWrapper.contains(bKey)
   def default (bKey: B)         (implicit ignore: DummyImplicit) : A         =   implWrapper.default(bKey)
@@ -30,9 +58,11 @@ trait BiHashReverseOps[A, B] {
   def remove  (bKey: B)         (implicit ignore: DummyImplicit) : Option[A] =   implWrapper.remove(bKey)
   def update  (bKey: B, aVal: A)(implicit ignore: DummyImplicit)               { implWrapper.update(bKey, aVal) }
 
+  // Function-chaining methods
   def andThen[C](k: (A) => C)(implicit ignore: DummyImplicit) : PartialFunction[B, C] =   implWrapper andThen k
   def compose[C](g: (C) => B)(implicit ignore: DummyImplicit) : (C) => A              =   implWrapper compose g
 
+  // Lambda-operation methods
   def /:[C]          (z: C)(op: (C, Tup) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper./:(z)(op)
   def /:\[A1 >: Tup] (z: A1)(op: (A1, A1) => A1)                      (implicit ignore: DummyImplicit) : A1          =   implWrapper./:\(z)(op)
   def :\[C]          (z: C)(op: (Tup, C) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper.:\(z)(op)
@@ -44,7 +74,8 @@ trait BiHashReverseOps[A, B] {
   def foldLeft[C]    (z: C)(op: (C, Tup) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper.foldLeft(z)(op)
   def foldRight[C]   (z: C)(op: (Tup, C) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper.foldRight(z)(op)
   def foreach[C]     (f: (Tup) => C)                                  (implicit ignore: DummyImplicit)                 { implWrapper.foreach(f) }
-  
+
+  // Collection-morphing methods
   //@ Should `Bijection` have base implementations of these things?  Seems probable
   def bIterator : Iterator[B]             = implWrapper.keysIterator
   def bSet      : scala.collection.Set[B] = implWrapper.keySet

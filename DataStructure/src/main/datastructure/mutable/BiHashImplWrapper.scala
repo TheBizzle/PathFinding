@@ -10,10 +10,11 @@ import collection.Set
  * Time: 9:45 PM
  */
 
-private[datastructure] class BiHashImplWrapper[X, Y](primaryMap: Map[X, Y], secondaryMap: Map[Y, X]) {
+private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: Map[X, Y], secondaryMap: Map[Y, X]) {
 
-  type Tup = (X, Y)
+  private type Tup = (X, Y)
 
+  // General methods
   def apply       (key: X)           : Y           =   primaryMap(key)
   def contains    (key: X)           : Boolean     =   primaryMap.contains(key)
   def default     (key: X)           : Y           =   primaryMap.default(key)
@@ -23,9 +24,11 @@ private[datastructure] class BiHashImplWrapper[X, Y](primaryMap: Map[X, Y], seco
   def keySet                         : Set[X]      =   primaryMap.keySet
   def put         (xKey: X, yVal: Y) : Option[Y]   = { clearBinds(xKey, yVal); secondaryMap.put(yVal, xKey); primaryMap.put(xKey, yVal) }
 
+  // Function-chaining methods
   def andThen[C](k: (Y) => C) : PartialFunction[X, C] = primaryMap andThen k
   def compose[C](g: (C) => X) : (C) => Y              = primaryMap compose g
 
+  // Lambda-operation methods
   def /:[C]          (z: C)(op: (C, Tup) => C)                         : C           =   primaryMap./:(z)(op)
   def /:\[A1 >: Tup] (z: A1)(op: (A1, A1) => A1)                       : A1          =   primaryMap./:\(z)(op)
   def :\[C]          (z: C)(op: (Tup, C) => C)                         : C           =   primaryMap.:\(z)(op)
