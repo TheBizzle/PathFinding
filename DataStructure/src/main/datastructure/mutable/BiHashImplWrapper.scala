@@ -15,18 +15,22 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: Map[X, Y]
   private type Tup = (X, Y)
 
   // General methods
-  def apply       (key: X)           : Y           =   primaryMap(key)
-  def contains    (key: X)           : Boolean     =   primaryMap.contains(key)
-  def default     (key: X)           : Y           =   primaryMap.default(key)
-  def get         (key: X)           : Option[Y]   =   primaryMap.get(key)
-  def keys                           : Iterable[X] =   primaryMap.keys
-  def keysIterator                   : Iterator[X] =   primaryMap.keysIterator
-  def keySet                         : Set[X]      =   primaryMap.keySet
-  def put         (xKey: X, yVal: Y) : Option[Y]   = { clearBinds(xKey, yVal); secondaryMap.put(yVal, xKey); primaryMap.put(xKey, yVal) }
+  def apply             (key: X)                 : Y           =   primaryMap(key)
+  def contains          (key: X)                 : Boolean     =   primaryMap.contains(key)
+  def default           (key: X)                 : Y           =   primaryMap.default(key)
+  def get               (key: X)                 : Option[Y]   =   primaryMap.get(key)
+  def getOrElse[Y1 >: Y](key: X, default: => Y1) : Y1          =   primaryMap.getOrElse(key, default)
+  def getOrElseUpdate   (key: X, op: => Y)       : Y           =   primaryMap.getOrElseUpdate(key, op)
+  def isDefinedAt       (key: X)                 : Boolean     =   primaryMap.isDefinedAt(key)
+  def keys                                       : Iterable[X] =   primaryMap.keys
+  def keysIterator                               : Iterator[X] =   primaryMap.keysIterator
+  def keySet                                     : Set[X]      =   primaryMap.keySet
+  def put               (key: X, value: Y)       : Option[Y]   = { clearBinds(key, value); secondaryMap.put(value, key); primaryMap.put(key, value) }
 
   // Function-chaining methods
-  def andThen[C](k: (Y) => C) : PartialFunction[X, C] = primaryMap andThen k
-  def compose[C](g: (C) => X) : (C) => Y              = primaryMap compose g
+  def andThen[C]              (k: (Y) => C)                   : PartialFunction[X, C]   = primaryMap andThen k
+  def compose[C]              (g: (C) => X)                   : (C) => Y                = primaryMap compose g
+  def orElse[X1 <: X, Y1 >: Y](that: PartialFunction[X1, Y1]) : PartialFunction[X1, Y1] = primaryMap orElse that
 
   // Lambda-operation methods
   def /:[C]          (z: C)(op: (C, Tup) => C)                         : C           =   primaryMap./:(z)(op)
@@ -39,8 +43,20 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: Map[X, Y]
   def fold[A1 >: Tup](z: A1)(op: (A1, A1) => A1)                       : A1          =   primaryMap.fold(z)(op)
   def foldLeft[C]    (z: C)(op: (C, Tup) => C)                         : C           =   primaryMap.foldLeft(z)(op)
   def foldRight[C]   (z: C)(op: (Tup, C) => C)                         : C           =   primaryMap.foldRight(z)(op)
+  def forall         (p: (Tup) => Boolean)                             : Boolean     =   primaryMap forall p
   def foreach[C]     (f: (Tup) => C)                                                   { primaryMap foreach f }
-  // filter, map, flatMap, collect, collectFirst (`Repr`s...)
+  def minBy[C]       (f: (Tup) => C)(implicit cmp: Ordering[C])        : Tup         =   primaryMap minBy f
+  def maxBy[C]       (f: (Tup) => C)(implicit cmp: Ordering[C])        : Tup         =   primaryMap maxBy f
+
+  
+  //@ `Repr`s:
+  // filter, map, mapResult, flatMap, collect, collectFirst, partition, withDefault, withFilter
+
+  //@ Normals:
+  // copyToArray x 3, copyToBuffer
+  // reduce, reduceOption, reduceLeft, reduceLeftOption, reduceRight, reduceRightOption, retain, sameElements
+  // scan, scanLeft, scanRight, span, transform, updated
+
 
   def remove(key: X) : Option[Y] = {
     get(key) foreach (secondaryMap.remove(_))

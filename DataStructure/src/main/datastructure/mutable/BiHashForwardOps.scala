@@ -46,17 +46,21 @@ trait BiHashForwardOps[A, B] {
   override def --=(abs: TraversableOnce[Tup])     : this.type = { abs.seq foreach -= ; this }
 
   // General methods
-  override def apply   (aKey: A)          : B         =   implWrapper.apply(aKey)
-  override def contains(aKey: A)          : Boolean   =   implWrapper.contains(aKey)
-  override def default (aKey: A)          : B         =   implWrapper.default(aKey)
-  override def get     (aKey: A)          : Option[B] =   implWrapper.get(aKey)
-  override def put     (aKey: A, bVal: B) : Option[B] =   implWrapper.put(aKey, bVal)
-  override def remove  (aKey: A)          : Option[B] =   implWrapper.remove(aKey)
-  override def update  (aKey: A, bVal: B)               { implWrapper.update(aKey, bVal) }
+  override def apply             (aKey: A)                : B         =   implWrapper.apply(aKey)
+  override def contains          (aKey: A)                : Boolean   =   implWrapper.contains(aKey)
+  override def default           (aKey: A)                : B         =   implWrapper.default(aKey)
+  override def get               (aKey: A)                : Option[B] =   implWrapper.get(aKey)
+  override def getOrElse[B1 >: B](key: A, default: => B1) : B1        =   implWrapper.getOrElse(key, default)
+  override def getOrElseUpdate   (key: A, op: => B)       : B         =   implWrapper.getOrElseUpdate(key, op)
+  override def isDefinedAt       (key: A)                 : Boolean   =   implWrapper.isDefinedAt(key)
+  override def put               (aKey: A, bVal: B)       : Option[B] =   implWrapper.put(aKey, bVal)
+  override def remove            (aKey: A)                : Option[B] =   implWrapper.remove(aKey)
+  override def update            (aKey: A, bVal: B)                     { implWrapper.update(aKey, bVal) }
 
   // Function-chaining methods
-  override def andThen[C](k: (B) => C) : PartialFunction[A, C] =   implWrapper andThen k
-  override def compose[C](g: (C) => A) : (C) => B =                implWrapper compose g
+  override def andThen[C]              (k: (B) => C)                   : PartialFunction[A, C]   = implWrapper andThen k
+  override def compose[C]              (g: (C) => A)                   : (C) => B                = implWrapper compose g
+  override def orElse[A1 <: A, B1 >: B](that: PartialFunction[A1, B1]) : PartialFunction[A1, B1] = implWrapper orElse that
 
   //@ Am I doing the first type parameter for these `CanBuildFrom`s correctly...?
   // override def collect[C, That](pf: PartialFunction[(A, B), C])(implicit bf: CanBuildFrom[this.type, C, That]) : That = implWrapper.collect(pf)
@@ -72,7 +76,10 @@ trait BiHashForwardOps[A, B] {
   override def fold[A1 >: Tup](z: A1)(op: (A1, A1) => A1)                        : A1          =   implWrapper.fold(z)(op)
   override def foldLeft[C]    (z: C)(op: (C, Tup) => C)                          : C           =   implWrapper.foldLeft(z)(op)
   override def foldRight[C]   (z: C)(op: (Tup, C) => C)                          : C           =   implWrapper.foldRight(z)(op)
-  override def foreach[C]     (f: (Tup) => C)(implicit ignore: DummyImplicit)                    { implWrapper.foreach(f) }
+  override def forall         (p: (Tup) => Boolean)                              : Boolean     =   implWrapper forall p
+  override def foreach[C]     (f: (Tup) => C)                                                    { implWrapper.foreach(f) }
+  override def minBy[C]       (f: (Tup) => C)(implicit cmp: Ordering[C])         : Tup         =   implWrapper.minBy(f)
+  override def maxBy[C]       (f: (Tup) => C)(implicit cmp: Ordering[C])         : Tup         =   implWrapper.maxBy(f)
 
   // Collection-morphing methods
   def aIterator : Iterator[A]             = implWrapper.keysIterator
