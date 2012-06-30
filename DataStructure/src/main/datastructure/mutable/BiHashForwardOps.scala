@@ -21,12 +21,12 @@ trait BiHashForwardOps[A, B] {
   override def -= (aKey: A)     : this.type = { remove(aKey); this }
 
   override def apply   (aKey: A)          : B           =   implWrapper.apply(aKey)
+  override def contains(aKey: A)          : Boolean     =   implWrapper.contains(aKey)
   override def default (aKey: A)          : B           =   implWrapper.default(aKey)
   override def get     (aKey: A)          : Option[B]   =   implWrapper.get(aKey)
   override def put     (aKey: A, bVal: B) : Option[B]   =   implWrapper.put(aKey, bVal)
   override def remove  (aKey: A)          : Option[B]   =   implWrapper.remove(aKey)
   override def update  (aKey: A, bVal: B)                 { implWrapper.update(aKey, bVal) }
-  override def contains(aKey: A)          : Boolean     =   implWrapper.contains(aKey)
 
   override def andThen[C](k: (B) => C) : PartialFunction[A, C] =   implWrapper andThen k
   override def compose[C](g: (C) => A) : (C) => B =                implWrapper compose g

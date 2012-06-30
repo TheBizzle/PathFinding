@@ -22,13 +22,13 @@ trait BiHashReverseOps[A, B] {
   def +=(ba: (B,  A))(implicit ignore: DummyImplicit) : this.type = { put(ba._1, ba._2); this }
   def -=(bKey: B)    (implicit ignore: DummyImplicit) : this.type = { remove(bKey); this }
 
-  def apply(bKey: B)          (implicit ignore: DummyImplicit) : A         =   implWrapper.apply(bKey)
-  def default(bKey: B)        (implicit ignore: DummyImplicit) : A         =   implWrapper.default(bKey)
-  def get(bKey: B)            (implicit ignore: DummyImplicit) : Option[A] =   implWrapper.get(bKey)
-  def put(bKey: B, aVal: A)   (implicit ignore: DummyImplicit) : Option[A] =   implWrapper.put(bKey, aVal)
-  def remove(bKey: B)         (implicit ignore: DummyImplicit) : Option[A] =   implWrapper.remove(bKey)
-  def update(bKey: B, aVal: A)(implicit ignore: DummyImplicit)               { implWrapper.update(bKey, aVal) }
-  def contains(bKey: B)       (implicit ignore: DummyImplicit) : Boolean   =   implWrapper.contains(bKey)
+  def apply   (bKey: B)         (implicit ignore: DummyImplicit) : A         =   implWrapper.apply(bKey)
+  def contains(bKey: B)         (implicit ignore: DummyImplicit) : Boolean   =   implWrapper.contains(bKey)
+  def default (bKey: B)         (implicit ignore: DummyImplicit) : A         =   implWrapper.default(bKey)
+  def get     (bKey: B)         (implicit ignore: DummyImplicit) : Option[A] =   implWrapper.get(bKey)
+  def put     (bKey: B, aVal: A)(implicit ignore: DummyImplicit) : Option[A] =   implWrapper.put(bKey, aVal)
+  def remove  (bKey: B)         (implicit ignore: DummyImplicit) : Option[A] =   implWrapper.remove(bKey)
+  def update  (bKey: B, aVal: A)(implicit ignore: DummyImplicit)               { implWrapper.update(bKey, aVal) }
 
   def andThen[C](k: (A) => C)(implicit ignore: DummyImplicit) : PartialFunction[B, C] =   implWrapper andThen k
   def compose[C](g: (C) => B)(implicit ignore: DummyImplicit) : (C) => A              =   implWrapper compose g
