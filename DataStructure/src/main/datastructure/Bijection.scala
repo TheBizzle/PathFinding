@@ -2,6 +2,7 @@ package datastructure
 
 import collection.mutable.Map
 import scala.deprecated
+import utilitylib.typewarfare.TypeWarfare.||
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,9 +34,6 @@ abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B,
   def filterAs(p: (A) => Boolean) : this.type
   def mapAs[C](f: (A) => C)       : Map[C, B]  //@ I'd like to return essentially `this.type[C, B]`, but that'll require some `Repr` magic, I think
 
-  def withDefaultA              (d: B => A) : Map[A, B]  //@ See comments below
-  def withDefaultAValue[A1 >: A](d: A1)     : Map[A1, B] //@ I'd like to return essentially `this.type[A1, B]`, but that'll require some `Repr` magic, I think
-
   def aIterator: Iterator[A]
   def aSet:      collection.immutable.Set[A]
   def aValues:   Iterable[A]
@@ -45,38 +43,26 @@ abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B,
   def filterBs(p: (B) => Boolean) : this.type
   def mapBs[C](f: (B) => C)       : Map[A, C]  //@ I'd like to return essentially `this.type[A, C]`, but that'll require some `Repr` magic, I think
 
-  def withDefaultB              (d: A => B) : Map[A, B]  //@ See comments below
-  def withDefaultBValue[B1 >: B](d: B1)     : Map[A, B1] //@ I'd like to return essentially `this.type[A, B1]`, but that'll require some `Repr` magic, I think
-
   def bIterator: Iterator[B]
   def bSet:      collection.immutable.Set[B]
   def bValues:   Iterable[B]
 
 
+  def sameElements[C >: ((A, B) || (B, A))#T](that: collection.GenIterable[C]) : Boolean = (abMap sameElements that) || (baMap sameElements that)
+
+
   // Purposely-broken methods
-  //@ Is this really ambiguous?  Can't I make this work? (Ambi?)
   @deprecated(CommonDeprecationStrFormat("filterAs", "filterBs"), CommonDeprecationSinceVersion)
   override def filterKeys(p: (A) => Boolean) : Map[A, B] = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("filterKeys", "filterAs", "filterBs"))
 
-  //@ Ambi?
   @deprecated(CommonDeprecationStrFormat("mapAs", "mapBs"), CommonDeprecationSinceVersion)
   override def mapValues[C](f: (B) => C) : Map[A, C] = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("mapValues", "mapAs", "mapBs"))
 
-  //@ Ambi?
   @deprecated(CommonDeprecationStrFormat("minBy"), CommonDeprecationSinceVersion)
   override def min[B >: A](implicit cmp: Ordering[B]) : A = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("min", "minBy"))
 
-  //@ Ambi?
   @deprecated(CommonDeprecationStrFormat("maxBy"), CommonDeprecationSinceVersion)
   override def max[B >: A](implicit cmp: Ordering[B]) : A = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("max", "maxBy"))
-
-  //@ Ambi?
-  @deprecated(CommonDeprecationStrFormat("withDefaultA", "withDefaultB"), CommonDeprecationSinceVersion)
-  override def withDefault(d: A => B): Map[A, B] = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("withDefault", "withDefaultA", "withDefaultB"))
-
-  //@ Ambi?
-  @deprecated(CommonDeprecationStrFormat("withDefaultAValue", "withDefaultBValue"), CommonDeprecationSinceVersion)
-  override def withDefaultValue(d: B): Map[A, B] = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("withDefaultValue", "withDefaultAValue", "withDefaultBValue"))
 
   @deprecated(CommonDeprecationStrFormat("aSet", "bSet"), CommonDeprecationSinceVersion)
   override def keySet : collection.immutable.Set[A] = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("keySet", "aSet", "bSet"))
