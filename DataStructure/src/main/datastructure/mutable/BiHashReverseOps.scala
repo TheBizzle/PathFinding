@@ -64,7 +64,7 @@ trait BiHashReverseOps[A, B] {
   // Function-chaining methods
   def andThen[C]              (k: (A) => C)(implicit ignore: DummyImplicit)                   : PartialFunction[B, C]   = implWrapper andThen k
   def compose[C]              (g: (C) => B)(implicit ignore: DummyImplicit)                   : (C) => A                = implWrapper compose g
-  def orElse[A1 <: A, B1 >: B](that: PartialFunction[A1, B1])(implicit ignore: DummyImplicit) : PartialFunction[A1, B1] = implWrapper orElse that
+  def orElse[B1 <: B, A1 >: A](that: PartialFunction[B1, A1])(implicit ignore: DummyImplicit) : PartialFunction[B1, A1] = implWrapper orElse that
 
   // Lambda-operation methods
   def /:[C]          (z: C)(op: (C, Tup) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper./:(z)(op)
