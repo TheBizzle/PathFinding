@@ -27,7 +27,7 @@ No explicit support was added for any of the following (doesn't mean that it's b
 
 //@ Should I instantiate and fill the maps here, or should I instantiate here and leave the population of the maps to `Bijection`...?
 class BiHashMap[A, B] private[datastructure](abm: HashMap[A, B], bam: HashMap[B, A])
-    extends Bijection[A, B, HashMap, HashMap[A, B], HashMap[B, A], BiHashMap](abm, bam)
+    extends Bijection[A, B, HashMap, HashMap[A, B], HashMap[B, A], BiHashMap[A, B]](abm, bam)
     with MapLike[A, B, BiHashMap[A, B]]
     with CustomParallelizable[(A, B), ParBiHashMap[A, B]]
     with BiHashForwardOps[A, B]

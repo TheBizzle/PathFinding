@@ -1,8 +1,9 @@
 package datastructure
 
-import collection.mutable.Map
 import scala.deprecated
 import utilitylib.typewarfare.TypeWarfare.||
+import collection.generic.CanBuildFrom
+import collection.mutable.{Builder, Map}
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,7 +12,9 @@ import utilitylib.typewarfare.TypeWarfare.||
  * Time: 11:33 PM
  */
 
-abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B, A]](protected val abMap: MAB, protected val baMap: MBA) extends Map[A, B] with Equals {
+abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B, A], Rpr <: Map[A, B]](protected val abMap: MAB, protected val baMap: MBA) extends Map[A, B] with Equals {
+
+  protected type Repr = Rpr
 
   override def hashCode() : Int                =   abMap.hashCode() ^ baMap.hashCode()   // XOR the hashcodes of the two maps
   override def clear()                           { abMap.clear(); baMap.clear() }
@@ -49,6 +52,18 @@ abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B,
 
 
   def sameElements[C >: ((A, B) || (B, A))#T](that: collection.GenIterable[C]) : Boolean = (abMap sameElements that) || (baMap sameElements that)
+
+
+  //@ An algebraic turd...
+  override def mapResult[NewTo](f: Repr => NewTo) : Builder[(A, B), NewTo] = {
+    new Builder[(A, B), NewTo] with Proxy {
+      val self = Builder.this
+      def +=(x: (A, B)): this.type = { self += x; this }
+      def clear() = self.clear()
+      override def ++=(xs: TraversableOnce[(A, B)]): this.type = { self ++= xs; this }
+      def result(): NewTo = f(self.result())
+    }
+  }
 
 
   // Purposely-broken methods

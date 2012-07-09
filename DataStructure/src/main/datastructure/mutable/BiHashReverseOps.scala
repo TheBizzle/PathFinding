@@ -1,7 +1,8 @@
 package datastructure.mutable
 
-import collection.generic.CanBuildFrom
 import collection.GenTraversableOnce
+import collection.mutable.{Map => MMap}
+import collection.generic.{FilterMonadic, CanBuildFrom}
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,7 +21,7 @@ trait BiHashReverseOps[A, B] {
 
   private type Tup = (B, A)
 
-  private val implWrapper = new BiHashImplWrapper(baMap, abMap)
+  private val implWrapper = new BiHashImplWrapper(baMap, abMap, repr)
 
   // General manipulation operators
   //@ I'm uneasy about this usage of `BiHashMap` in the return type
@@ -71,6 +72,7 @@ trait BiHashReverseOps[A, B] {
   def /:\[A1 >: Tup]             (z: A1)(op: (A1, A1) => A1)                      (implicit ignore: DummyImplicit) : A1          =   implWrapper./:\(z)(op)
   def :\[C]                      (z: C)(op: (Tup, C) => C)                        (implicit ignore: DummyImplicit) : C           =   implWrapper.:\(z)(op)
   def aggregate[C]               (z: C)(seqop: (C, Tup) => C, combop: (C, C) => C)(implicit ignore: DummyImplicit) : C           =   implWrapper.aggregate(z)(seqop, combop)
+  def collectFirst[B]            (pf: PartialFunction[Tup, B])                    (implicit ignore: DummyImplicit) : Option[B]   =   implWrapper collectFirst pf
   def count                      (p: (Tup) => Boolean)                            (implicit ignore: DummyImplicit) : Int         =   implWrapper count p
   def exists                     (p: (Tup) => Boolean)                            (implicit ignore: DummyImplicit) : Boolean     =   implWrapper exists p
   def find                       (p: (Tup) => Boolean)                            (implicit ignore: DummyImplicit) : Option[Tup] =   implWrapper find p
@@ -89,6 +91,21 @@ trait BiHashReverseOps[A, B] {
   def reduceRightOption[B >: Tup](op: (Tup, B) => B)                              (implicit ignore: DummyImplicit) : Option[B]   =   implWrapper reduceRightOption op
   def retain                     (p: (A, B) => Boolean)                           (implicit ignore: DummyImplicit) : this.type   = { this.seq foreach { case (k, v) => if (!p(k, v)) this -= k }; this }
   def transform                  (f: (A, B) => B)                                 (implicit ignore: DummyImplicit) : this.type   = { this.iterator foreach { case (k, v) => update(k, f(k, v)) }; this }
+  def withDefault                (d: A => B)                                      (implicit ignore: DummyImplicit) : MMap[A, B]  =   implWrapper withDefault d   //@ I'd love to do this with a better return type...
+
+  //@ `Repr` Madness
+  type FM = FilterMonadic
+
+  def collect[C, That]    (pf: PartialFunction[Tup, C])    (implicit bf: CanBuildFrom[Repr, C, That],  ignore: DummyImplicit) : That         = implWrapper collect pf
+  def filter              (p: Tup => Boolean)                                                (implicit ignore: DummyImplicit) : Repr         = implWrapper filter p
+  def flatMap[C, That]    (f: Tup => GenTraversableOnce[C])(implicit bf: CanBuildFrom[Repr, C, That],  ignore: DummyImplicit) : That         = implWrapper flatMap f
+  def map[C, That]        (f: Tup => C)                    (implicit bf: CanBuildFrom[Repr, C, That],  ignore: DummyImplicit) : That         = implWrapper map f
+  def partition           (p: Tup => Boolean)                                                (implicit ignore: DummyImplicit) : (Repr, Repr) = implWrapper partition p
+  def scan[C >: Tup, That](z: C)(op: (C, C) => C)          (implicit cbf: CanBuildFrom[Repr, C, That], ignore: DummyImplicit) : That         = implWrapper.scan(z)(op)
+  def scanLeft[C, That]   (z: C)(op: (C, Tup) => C)        (implicit bf: CanBuildFrom[Repr, C, That],  ignore: DummyImplicit) : That         = implWrapper.scanLeft(z)(op)
+  def scanRight[C, That]  (z: C)(op: (Tup, C) => C)        (implicit bf: CanBuildFrom[Repr, C, That],  ignore: DummyImplicit) : That         = implWrapper.scanRight(z)(op)
+  def span                (p: Tup => Boolean)                                                (implicit ignore: DummyImplicit) : (Repr, Repr) = implWrapper span p
+  def withFilter          (p: B => Boolean)                                                  (implicit ignore: DummyImplicit) : FM[B, Repr]  = implWrapper withFilter p
 
   // Collection-morphing methods
   //@ Should `Bijection` have base implementations of these things?  Seems probable

@@ -1,7 +1,8 @@
 package datastructure.mutable
 
-import collection.generic.CanBuildFrom
 import collection.GenTraversableOnce
+import collection.mutable.{Builder, Map => MMap}
+import collection.generic.{FilterMonadic, CanBuildFrom}
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,7 +17,7 @@ trait BiHashForwardOps[A, B] {
 
   private type Tup = (A, B)
 
-  private val implWrapper = new BiHashImplWrapper(abMap, baMap)
+  private val implWrapper = new BiHashImplWrapper(abMap, baMap, repr)
 
   // General manipulation operators
   //@ I'm uneasy about this usage of `BiHashMap` in the return type
@@ -28,13 +29,12 @@ trait BiHashForwardOps[A, B] {
   override def --         (aKeys: GenTraversableOnce[A])              : this.type        = clone() --= aKeys.seq
 
   // Satanry
-  //@ There is no `That`!
-  override def ++:[B >: A, That](that: TraversableOnce[B])(implicit bf: CanBuildFrom[Repr, B, That]) : That = {
-    val b = bf(repr)
-    if (that.isInstanceOf[collection.IndexedSeqLike[_, _]]) b.sizeHint(this, that.size)
+  //@ There is no `That`!  (Dummy!  The CBF figures that out!)
+  override def ++:[C >: Tup, That](that: TraversableOnce[B])(implicit bf: CanBuildFrom[Repr, C, That]) : That = {
+    val b = createAndSizeBf(bf, repr, that)
     b ++= that
     b ++= thisCollection
-    b.result
+    b.result()
   }
 
   // Self-return operators
@@ -63,14 +63,12 @@ trait BiHashForwardOps[A, B] {
   override def compose[C]              (g: (C) => A)                   : (C) => B                = implWrapper compose g
   override def orElse[A1 <: A, B1 >: B](that: PartialFunction[A1, B1]) : PartialFunction[A1, B1] = implWrapper orElse that
 
-  //@ Am I doing the first type parameter for these `CanBuildFrom`s correctly...?
-  // override def collect[C, That](pf: PartialFunction[(A, B), C])(implicit bf: CanBuildFrom[this.type, C, That]) : That = implWrapper.collect(pf)
-
   // Lambda-operation methods
   override def /:[C]                      (z: C)(op: (C, Tup) => C)                          : C           =   implWrapper./:(z)(op)
   override def /:\[A1 >: Tup]             (z: A1)(op: (A1, A1) => A1)                        : A1          =   implWrapper./:\(z)(op)
   override def :\[C]                      (z: C)(op: (Tup, C) => C)                          : C           =   implWrapper.:\(z)(op)
   override def aggregate[C]               (z: C)(seqop: (C, Tup) => C, combop: (C, C) => C)  : C           =   implWrapper.aggregate(z)(seqop, combop)
+  override def collectFirst[B]            (pf: PartialFunction[Tup, B])                      : Option[B]   =   implWrapper collectFirst pf
   override def count                      (p: (Tup) => Boolean)                              : Int         =   implWrapper count p
   override def exists                     (p: (Tup) => Boolean)                              : Boolean     =   implWrapper exists p
   override def find                       (p: (Tup) => Boolean)                              : Option[Tup] =   implWrapper find p
@@ -89,6 +87,21 @@ trait BiHashForwardOps[A, B] {
   override def reduceRightOption[B >: Tup](op: (Tup, B) => B)                                : Option[B]   =   implWrapper reduceRightOption op
   override def retain                     (p: (A, B) => Boolean)                             : this.type   = { this.seq foreach { case (k, v) => if (!p(k, v)) this -= k }; this }
   override def transform                  (f: (A, B) => B)                                   : this.type   = { this.iterator foreach { case (k, v) => update(k, f(k, v)) }; this }
+  override def withDefault                (d: A => B)                                        : MMap[A, B]  =   implWrapper withDefault d   //@ I'd love to do this with a better return type...
+
+  //@ `Repr` Madness
+  private type FM = FilterMonadic
+
+  def collect[C, That]    (pf: PartialFunction[Tup, C])    (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper collect pf
+  def filter              (p: Tup => Boolean)                                                          : Repr         = implWrapper filter p
+  def flatMap[C, That]    (f: Tup => GenTraversableOnce[C])(implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper flatMap f
+  def map[C, That]        (f: Tup => C)                    (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper map f
+  def partition           (p: Tup => Boolean)                                                          : (Repr, Repr) = implWrapper partition p
+  def scan[C >: Tup, That](z: C)(op: (C, C) => C)          (implicit cbf: CanBuildFrom[Repr, C, That]) : That         = implWrapper.scan(z)(op)
+  def scanLeft[C, That]   (z: C)(op: (C, Tup) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper.scanLeft(z)(op)
+  def scanRight[C, That]  (z: C)(op: (Tup, C) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper.scanRight(z)(op)
+  def span                (p: Tup => Boolean)                                                          : (Repr, Repr) = implWrapper span p
+  def withFilter          (p: A => Boolean)                                                            : FM[A, Repr]  = implWrapper withFilter p
 
   // Collection-morphing methods
   def aIterator : Iterator[A]             = implWrapper.keysIterator

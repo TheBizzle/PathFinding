@@ -1,7 +1,8 @@
 package datastructure.mutable
 
-import collection.mutable.Map
-import collection.Set
+import collection.generic.{FilterMonadic, CanBuildFrom}
+import collection.{GenTraversableOnce, Set}
+import collection.mutable.{Builder, Map => MMap}
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,7 +11,9 @@ import collection.Set
  * Time: 9:45 PM
  */
 
-private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: Map[X, Y], secondaryMap: Map[Y, X]) {
+//@ Most of this should probably get abstracted out to a BijectionOpsImplWrapper that gets inherited from this class,
+//  and, here, we can override for the few unique behaviors about our particular case (BiHash: `put`, `remove`, `update`)
+private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: MMap[X, Y], secondaryMap: MMap[Y, X], repr: Repr) {
 
   private type Tup = (X, Y)
 
@@ -37,6 +40,7 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: Map[X, Y]
   def /:\[C >: Tup]              (z: C)(op: (C, C) => C)                           : C           =   primaryMap./:\(z)(op)
   def :\[C]                      (z: C)(op: (Tup, C) => C)                         : C           =   primaryMap.:\(z)(op)
   def aggregate[C]               (z: C)(seqop: (C, Tup) => C, combop: (C, C) => C) : C           =   primaryMap.aggregate(z)(seqop, combop)
+  def collectFirst[B]            (pf: PartialFunction[Tup, B])                     : Option[B]   =   primaryMap collectFirst pf
   def count                      (p: (Tup) => Boolean)                             : Int         =   primaryMap count p
   def exists                     (p: (Tup) => Boolean)                             : Boolean     =   primaryMap exists p
   def find                       (p: (Tup) => Boolean)                             : Option[Tup] =   primaryMap find p
@@ -53,9 +57,21 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: Map[X, Y]
   def reduceOption[C >: Tup]     (op: (C, C) => C)                                 : Option[C]   =   primaryMap reduceOption op
   def reduceRight[C >: Tup]      (op: (Tup, C) => C)                               : C           =   primaryMap reduceRight op
   def reduceRightOption[C >: Tup](op: (Tup, C) => C)                               : Option[C]   =   primaryMap reduceRightOption op
+  def withDefault                (d: X => Y)                                       : MMap[X, Y]  =   primaryMap withDefault d   //@ I'd love to do this with a better return type...
 
-  //@ `Repr`s:
-  // filter, map, mapResult, flatMap, collect, collectFirst, partition, scan, scanLeft, scanRight, span, withDefault, withFilter
+  //@ `Repr` Madness
+  private type FM = FilterMonadic
+
+  def collect[C, That]    (pf: PartialFunction[Tup, C])    (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap collect pf)
+  def filter              (p: Tup => Boolean)                                                          : Repr         =   reprMadness(primaryMap filter p)
+  def flatMap[C, That]    (f: Tup => GenTraversableOnce[C])(implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap flatMap f)
+  def map[C, That]        (f: Tup => C)                    (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap map f)
+  def partition           (p: Tup => Boolean)                                                          : (Repr, Repr) = { val (a, b) = primaryMap partition p; (reprMadness(a), reprMadness(b)) }
+  def scan[C >: Tup, That](z: C)(op: (C, C) => C)          (implicit cbf: CanBuildFrom[Repr, C, That]) : That         =   reprMadness(primaryMap.scan(z)(op))
+  def scanLeft[C, That]   (z: C)(op: (C, Tup) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap.scanLeft(z)(op))
+  def scanRight[C, That]  (z: C)(op: (Tup, C) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap.scanRight(z)(op))
+  def span                (p: Tup => Boolean)                                                          : (Repr, Repr) = { val (a, b) = primaryMap span p; (reprMadness(a), reprMadness(b)) }
+  def withFilter          (p: X => Boolean)                                                            : FM[X, Repr]  =   new WithFilter(p)  //@ I'm 12 and what is this...?  (need not be here in the implementation wrapper, if this is all there is...)
 
   // Miscellaneously-used methods
   def copyToArray[C >: Tup] (xs: Array[C], start: Int = 0, len: Int = primaryMap.size) { primaryMap.copyToArray(xs, start, len) }
@@ -80,5 +96,8 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: Map[X, Y]
     }
     removeY(y); remove(x)
   }
+
+  //@ Size hints got abandoned, since using them would make the design into a yucky mess.  They likely won't be missed....
+  private def reprMadness[C, That](that: Iterable[C])(implicit bf: CanBuildFrom[Repr, C, That]) : That = { val b = bf(repr); b ++= that; b.result() }
 
 }
