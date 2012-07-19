@@ -23,10 +23,10 @@ abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B,
   override def canEqual(other: Any) : Boolean
   override def equals(that: Any)    : Boolean  = {
     that match {
-      case b: Bijection[_, _, _, _, _] => (b canEqual this) &&
-                                          ( (b.abMap.equals(abMap) && b.baMap.equals(baMap)) ||
-                                            (b.abMap.equals(baMap) && b.baMap.equals(abMap)) )
-      case _                           => false
+      case b: Bijection[_, _, _, _, _, _] => (b canEqual this) &&
+                                             ( (b.abMap.equals(abMap) && b.baMap.equals(baMap)) ||
+                                               (b.abMap.equals(baMap) && b.baMap.equals(abMap)) )
+      case _                              => false
     }
   }
 
@@ -51,7 +51,7 @@ abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B,
   def bValues:   Iterable[B]
 
 
-  def sameElements[C >: ((A, B) || (B, A))#T](that: collection.GenIterable[C]) : Boolean = (abMap sameElements that) || (baMap sameElements that)
+  def sameElements[U : ((A, B) || (B, A))#T, C >: U](that: collection.GenIterable[C]) : Boolean = (abMap sameElements that) || (baMap sameElements that)
 
 
   //@ An algebraic turd...

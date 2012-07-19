@@ -13,6 +13,6 @@ object TypeWarfare {
   private type ~[X]     = X => Nothing
   private type |[X, Y]  = ~[~[X] with ~[Y]]
   private type ~~[X]    = ~[~[X]]
-  private type ||[X, Y] = { type T[L] = ~~[L] <:< (X | Y) }
+  type ||[X, Y] = { type T[L] = ~~[L] <:< (X | Y) }
 
 }
