@@ -71,7 +71,7 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: MMap[X, Y
   def scanLeft[C, That]   (z: C)(op: (C, Tup) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap.scanLeft(z)(op))
   def scanRight[C, That]  (z: C)(op: (Tup, C) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap.scanRight(z)(op))
   def span                (p: Tup => Boolean)                                                          : (Repr, Repr) = { val (a, b) = primaryMap span p; (reprMadness(a), reprMadness(b)) }
-  def withFilter          (p: X => Boolean)                                                            : FM[X, Repr]  =   new WithFilter(p)  //@ I'm 12 and what is this...?  (need not be here in the implementation wrapper, if this is all there is...)
+  def withFilter          (p: X => Boolean)                                                            : FM[X, Repr]  =   new WithFilter(p)
 
   // Miscellaneously-used methods
   def copyToArray[C >: Tup] (xs: Array[C], start: Int = 0, len: Int = primaryMap.size) { primaryMap.copyToArray(xs, start, len) }
