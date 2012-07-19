@@ -94,7 +94,7 @@ trait BiHashReverseOps[A, B] {
   def withDefault                (d: A => B)                                      (implicit ignore: DummyImplicit) : MMap[A, B]  =   implWrapper withDefault d   //@ I'd love to do this with a better return type...
 
   //@ `Repr` Madness
-  type FM = FilterMonadic
+  private type FM = FilterMonadic
 
   def collect[C, That]    (pf: PartialFunction[Tup, C])    (implicit bf: CanBuildFrom[Repr, C, That],  ignore: DummyImplicit) : That         = implWrapper collect pf
   def filter              (p: Tup => Boolean)                                                (implicit ignore: DummyImplicit) : Repr         = implWrapper filter p
