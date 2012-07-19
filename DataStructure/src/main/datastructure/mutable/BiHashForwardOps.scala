@@ -92,16 +92,16 @@ trait BiHashForwardOps[A, B] {
   //@ `Repr` Madness
   private type FM = FilterMonadic
 
-  def collect[C, That]    (pf: PartialFunction[Tup, C])    (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper collect pf
-  def filter              (p: Tup => Boolean)                                                          : Repr         = implWrapper filter p
-  def flatMap[C, That]    (f: Tup => GenTraversableOnce[C])(implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper flatMap f
-  def map[C, That]        (f: Tup => C)                    (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper map f
-  def partition           (p: Tup => Boolean)                                                          : (Repr, Repr) = implWrapper partition p
-  def scan[C >: Tup, That](z: C)(op: (C, C) => C)          (implicit cbf: CanBuildFrom[Repr, C, That]) : That         = implWrapper.scan(z)(op)
-  def scanLeft[C, That]   (z: C)(op: (C, Tup) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper.scanLeft(z)(op)
-  def scanRight[C, That]  (z: C)(op: (Tup, C) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper.scanRight(z)(op)
-  def span                (p: Tup => Boolean)                                                          : (Repr, Repr) = implWrapper span p
-  def withFilter          (p: A => Boolean)                                                            : FM[A, Repr]  = implWrapper withFilter p
+  override def collect[C, That]    (pf: PartialFunction[Tup, C])    (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper collect pf
+  override def filter              (p: Tup => Boolean)                                                          : Repr         = implWrapper filter p
+  override def flatMap[C, That]    (f: Tup => GenTraversableOnce[C])(implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper flatMap f
+  override def map[C, That]        (f: Tup => C)                    (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper map f
+  override def partition           (p: Tup => Boolean)                                                          : (Repr, Repr) = implWrapper partition p
+  override def scan[C >: Tup, That](z: C)(op: (C, C) => C)          (implicit cbf: CanBuildFrom[Repr, C, That]) : That         = implWrapper.scan(z)(op)
+  override def scanLeft[C, That]   (z: C)(op: (C, Tup) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper.scanLeft(z)(op)
+  override def scanRight[C, That]  (z: C)(op: (Tup, C) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper.scanRight(z)(op)
+  override def span                (p: Tup => Boolean)                                                          : (Repr, Repr) = implWrapper span p
+  override def withFilter          (p: A => Boolean)                                                            : FM[A, Repr]  = implWrapper withFilter p
 
   // Collection-morphing methods
   def aIterator : Iterator[A]             = implWrapper.keysIterator
