@@ -89,14 +89,15 @@ trait BiHashReverseOps[A, B] {
   def reduceOption[A1 >: Tup]    (op: (A1, A1) => A1)                             (implicit ignore: DummyImplicit) : Option[A1]  =   implWrapper reduceOption op
   def reduceRight[B >: Tup]      (op: (Tup, B) => B)                              (implicit ignore: DummyImplicit) : B           =   implWrapper reduceRight op
   def reduceRightOption[B >: Tup](op: (Tup, B) => B)                              (implicit ignore: DummyImplicit) : Option[B]   =   implWrapper reduceRightOption op
-  def retain                     (p: (A, B) => Boolean)                           (implicit ignore: DummyImplicit) : this.type   = { this.seq foreach { case (k, v) => if (!p(k, v)) this -= k }; this }
-  def transform                  (f: (A, B) => B)                                 (implicit ignore: DummyImplicit) : this.type   = { this.iterator foreach { case (k, v) => update(k, f(k, v)) }; this }
-  def withDefault                (d: A => B)                                      (implicit ignore: DummyImplicit) : MMap[A, B]  =   implWrapper withDefault d   //@ I'd love to do this with a better return type...
+  def retain                     (p: (B, A) => Boolean)                           (implicit ignore: DummyImplicit) : this.type   = { this.seq foreach { case (k: B, v: A) => if (!p(k, v)) this -= k }; this }
+  def transform                  (f: (B, A) => A)                                 (implicit ignore: DummyImplicit) : this.type   = { this.iterator foreach { case (k: B, v: A) => update(k, f(k, v)) }; this }
+  def withDefault                (d: B => A)                                      (implicit ignore: DummyImplicit) : MMap[B, A]  =   implWrapper withDefault d   //@ I'd love to do this with a better return type...
 
   //@ `Repr` Madness
   private type FM = FilterMonadic
 
   def collect[C, That]    (pf: PartialFunction[Tup, C])    (implicit bf: CanBuildFrom[Repr, C, That],  ignore: DummyImplicit) : That         = implWrapper collect pf
+  def dropWhile           (p: Tup => Boolean)                                                (implicit ignore: DummyImplicit) : Repr         = implWrapper dropWhile p
   def filter              (p: Tup => Boolean)                                                (implicit ignore: DummyImplicit) : Repr         = implWrapper filter p
   def flatMap[C, That]    (f: Tup => GenTraversableOnce[C])(implicit bf: CanBuildFrom[Repr, C, That],  ignore: DummyImplicit) : That         = implWrapper flatMap f
   def map[C, That]        (f: Tup => C)                    (implicit bf: CanBuildFrom[Repr, C, That],  ignore: DummyImplicit) : That         = implWrapper map f
@@ -105,6 +106,7 @@ trait BiHashReverseOps[A, B] {
   def scanLeft[C, That]   (z: C)(op: (C, Tup) => C)        (implicit bf: CanBuildFrom[Repr, C, That],  ignore: DummyImplicit) : That         = implWrapper.scanLeft(z)(op)
   def scanRight[C, That]  (z: C)(op: (Tup, C) => C)        (implicit bf: CanBuildFrom[Repr, C, That],  ignore: DummyImplicit) : That         = implWrapper.scanRight(z)(op)
   def span                (p: Tup => Boolean)                                                (implicit ignore: DummyImplicit) : (Repr, Repr) = implWrapper span p
+  def takeWhile           (p: Tup => Boolean)                                                (implicit ignore: DummyImplicit) : Repr         = implWrapper takeWhile p
   def withFilter          (p: B => Boolean)                                                  (implicit ignore: DummyImplicit) : FM[B, Repr]  = implWrapper withFilter p
 
   // Collection-morphing methods

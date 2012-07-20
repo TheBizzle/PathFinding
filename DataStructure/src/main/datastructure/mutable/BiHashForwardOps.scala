@@ -93,6 +93,7 @@ trait BiHashForwardOps[A, B] {
   private type FM = FilterMonadic
 
   override def collect[C, That]    (pf: PartialFunction[Tup, C])    (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper collect pf
+  override def dropWhile           (p: Tup => Boolean)                                                          : Repr         = implWrapper dropWhile p
   override def filter              (p: Tup => Boolean)                                                          : Repr         = implWrapper filter p
   override def flatMap[C, That]    (f: Tup => GenTraversableOnce[C])(implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper flatMap f
   override def map[C, That]        (f: Tup => C)                    (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper map f
@@ -101,6 +102,7 @@ trait BiHashForwardOps[A, B] {
   override def scanLeft[C, That]   (z: C)(op: (C, Tup) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper.scanLeft(z)(op)
   override def scanRight[C, That]  (z: C)(op: (Tup, C) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         = implWrapper.scanRight(z)(op)
   override def span                (p: Tup => Boolean)                                                          : (Repr, Repr) = implWrapper span p
+  override def takeWhile           (p: Tup => Boolean)                                                          : Repr         = implWrapper takeWhile p
   override def withFilter          (p: A => Boolean)                                                            : FM[A, Repr]  = implWrapper withFilter p
 
   // Collection-morphing methods

@@ -63,6 +63,7 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: MMap[X, Y
   private type FM = FilterMonadic
 
   def collect[C, That]    (pf: PartialFunction[Tup, C])    (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap collect pf)
+  def dropWhile           (p: Tup => Boolean)                                                          : Repr         =   reprMadness(primaryMap dropWhile p)
   def filter              (p: Tup => Boolean)                                                          : Repr         =   reprMadness(primaryMap filter p)
   def flatMap[C, That]    (f: Tup => GenTraversableOnce[C])(implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap flatMap f)
   def map[C, That]        (f: Tup => C)                    (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap map f)
@@ -71,6 +72,7 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: MMap[X, Y
   def scanLeft[C, That]   (z: C)(op: (C, Tup) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap.scanLeft(z)(op))
   def scanRight[C, That]  (z: C)(op: (Tup, C) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap.scanRight(z)(op))
   def span                (p: Tup => Boolean)                                                          : (Repr, Repr) = { val (a, b) = primaryMap span p; (reprMadness(a), reprMadness(b)) }
+  def takeWhile           (p: Tup => Boolean)                                                          : Repr         =   reprMadness(primaryMap takeWhile p)
   def withFilter          (p: X => Boolean)                                                            : FM[X, Repr]  =   new WithFilter(p)
 
   // Miscellaneously-used methods
