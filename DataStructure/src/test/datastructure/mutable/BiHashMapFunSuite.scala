@@ -413,14 +413,14 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     val aComparator = (a: A) => a < aAverage
     biHash collect { case (a: A, b: B) if (a == null) => b }           should equal (List())                                      // Match (none)
     biHash collect { case (a: A, b: B) if (a == abList.head._1) => b } should equal (List(abList.head._2))                        // Match (one)
-    biHash collect { case (a: A, b: B) if (aComparator(a)) => b }      should equal (List(abList filter (aComparator(_._1)): _*)) // Match (some)
+    biHash collect { case (a: A, b: B) if (aComparator(a)) => b }      should equal (List(abList filter (aComparator((_: AB)._1)).toSeq: _*)) // Match (some)
 
     val baList = baseList map (_.swap)
     val bAverage = (baList map (_._1.size) sum) / baList.size
     val bComparator = (b: B) => b.length < bAverage
     biHash collect { case (b: B, a: A) if (b == null) => a }           should equal (List())                                      // Match (none)
     biHash collect { case (b: B, a: A) if (b == baList.head._1) => a } should equal (List(baList.head._2))                        // Match (one)
-    biHash collect { case (b: B, a: A) if (bComparator(b)) => a }      should equal (List(baList filter (bComparator(_._1)): _*)) // Match (some)
+    biHash collect { case (b: B, a: A) if (bComparator(b)) => a }      should equal (List(baList filter (bComparator((_: BA)._1)).toSeq: _*)) // Match (some)
 
   }
 
@@ -432,14 +432,14 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     val aComparator = (a: A) => a < aAverage
     biHash collectFirst { case (a: A, b: B) if (a == null) => b }           should equal (None)                                         // Match (none)
     biHash collectFirst { case (a: A, b: B) if (a == abList.head._1) => b } should equal (Some(abList.head._2))                         // Match (one)
-    biHash collectFirst { case (a: A, b: B) if (aComparator(a)) => b }      should equal (Some(abList filter (aComparator(_._1)) head)) // Match (some)
+    biHash collectFirst { case (a: A, b: B) if (aComparator(a)) => b }      should equal (Some(abList filter (aComparator((_: AB)._1)) head)) // Match (some)
 
     val baList = baseList map (_.swap)
     val bAverage = (baList map (_._1.size) sum) / baList.size
     val bComparator = (b: B) => b.length < bAverage
     biHash collectFirst { case (b: B, a: A) if (b == null) => a }           should equal (None)                                         // Match (none)
     biHash collectFirst { case (b: B, a: A) if (b == baList.head._1) => a } should equal (Some(baList.head._2))                         // Match (one)
-    biHash collectFirst { case (b: B, a: A) if (bComparator(b)) => a }      should equal (Some(baList filter (bComparator(_._1)) head)) // Match (some)
+    biHash collectFirst { case (b: B, a: A) if (bComparator(b)) => a }      should equal (Some(baList filter (bComparator((_: BA)._1)) head)) // Match (some)
 
   }
 
@@ -1008,16 +1008,16 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     val abList = baseList
     val aAverage = (abList map (_._1) sum) / abList.size
     val abComparator = (ab: (A, B)) => (ab._1 < aAverage)
-    biHash.partition(_ == null)              should equal ((biHash.empty, biHash))                                                                        // Match (none, all)
-    biHash.partition(_._1 == abList.head._1) should equal ((BiHashMap(abList.head), BiHashMap(abList.tail: _*)))                                          // Match (one, rest)
-    biHash.partition(abComparator)           should equal ((BiHashMap(abList filter (abComparator): _*), BiHashMap(abList filterNot (abComparator): _*))) // Match (some, others)
+    biHash.partition((_: AB) == null)              should equal ((biHash.empty, biHash))                                                                        // Match (none, all)
+    biHash.partition((_: AB)._1 == abList.head._1) should equal ((BiHashMap(abList.head), BiHashMap(abList.tail: _*)))                                          // Match (one, rest)
+    biHash.partition(abComparator)                 should equal ((BiHashMap(abList filter (abComparator): _*), BiHashMap(abList filterNot (abComparator): _*))) // Match (some, others)
 
     val baList = baseList map (_.swap)
     val bAverage = (baList map (_._1.size) sum) / baList.size
     val baComparator = (ba: (B, A)) => (ba._1.length < bAverage)
-    biHash.partition(_ == null)              should equal ((biHash.empty, biHash))                                                                        // Match (none, all)
-    biHash.partition(_._1 == baList.head._1) should equal ((BiHashMap(baList.head), BiHashMap(baList.tail: _*)))                                          // Match (one, rest)
-    biHash.partition(baComparator)           should equal ((BiHashMap(baList filter (baComparator): _*), BiHashMap(baList filterNot (baComparator): _*))) // Match (some, others)
+    biHash.partition((_: BA) == null)              should equal ((biHash.empty, biHash))                                                                        // Match (none, all)
+    biHash.partition((_: BA)._1 == baList.head._1) should equal ((BiHashMap(baList.head), BiHashMap(baList.tail: _*)))                                          // Match (one, rest)
+    biHash.partition(baComparator)                 should equal ((BiHashMap(baList filter (baComparator): _*), BiHashMap(baList filterNot (baComparator): _*))) // Match (some, others)
 
   }
 
@@ -1207,8 +1207,8 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     val headMapAB = biHash.retain((a: A, b: B) => (a, b) == biHash.head)
     headMapAB should have ('sameElements (BiHashMap(biHash.head)))
 
-    val tailMapAB = biHash.retain{(a: A, b: B) => val x = (a, b); biHash.tail.exists(_ == x)}  //@ WHY IS THIS NECESSARY?!
-    tailMapAB should have ('sameElements (BiHashMap(biHash.tail: _*)))
+    val tailMapAB = biHash.retain{(a: A, b: B) => val x = (a, b); biHash.tail.exists((_: BA) == x)}  //@ WHY IS THIS NECESSARY?!
+    tailMapAB should have ('sameElements (BiHashMap(biHash.tail.toSeq: _*)))
 
     val allMapAB = biHash.retain((a: A, b: B) => true)
     allMapAB should have ('sameElements (biHash))
@@ -1216,8 +1216,8 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     val headMapBA = biHash.retain((b: B, a: A) => (b, a) == biHash.head.swap)
     headMapBA should have ('sameElements (BiHashMap(biHash.head.swap)))
 
-    val tailMapBA = biHash.retain{(b: B, a: A) => val x = (b, a); biHash.tail.map(_.swap).exists(_ == x)}  //@ WHY IS THIS NECESSARY?!
-    tailMapBA should have ('sameElements (BiHashMap(biHash.tail.map(_.swap): _*)))
+    val tailMapBA = biHash.retain{(b: B, a: A) => val x = (b, a); biHash.tail.map((_: AB).swap).exists((_: BA) == x)}  //@ WHY IS THIS NECESSARY?!
+    tailMapBA should have ('sameElements (BiHashMap(biHash.tail.map((_: AB).swap).toSeq: _*)))
 
     val allMapBA = biHash.retain((b: B, a: A) => true)
     allMapBA should have ('sameElements (biHash))
@@ -1276,21 +1276,21 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   test("slice(from, until)") {
     val slice = biHash.slice(1, 4)
     slice should have size (3)
-    slice foreach { baseList.contains(_) should equal (true) }
+    slice foreach (baseList.contains(_: AB) should equal (true))
   }
 
   test("sliding(size)") {
     val slider = biHash.sliding(2)
     val window = slider.next()
     window should have size (2)
-    window foreach (baseList.contains(_) should equal (true))
+    window foreach (baseList.contains(_: AB) should equal (true))
   }
 
   test("sliding(size, step)") {
     val slider = biHash.sliding(2, 2)
     val window = slider.next()
     window should have size (2)
-    window foreach (baseList.contains(_) should equal (true))
+    window foreach (baseList.contains(_: AB) should equal (true))
   }
 
   //@
@@ -1382,11 +1382,11 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   test("takeWhile(func)") {
 
-    val abTaken = biHash takeWhile (_._1 <= (baseList map (_._1) max))
+    val abTaken = biHash takeWhile ((_: AB)._1 <= (baseList map (_._1) max))
     abTaken.toList.distinct.size should equal (baseList.size)
     abTaken.size should equal (baseList.size)
 
-    val baTaken = biHash takeWhile (_._1.contains(""))
+    val baTaken = biHash takeWhile ((_: BA)._1.contains(""))
     baTaken.toList.distinct.size should equal (baseList.size)
     baTaken.size should equal (baseList.size)
 
@@ -1515,11 +1515,11 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     import collection.mutable.ListBuffer
 
     val abBuffer = new ListBuffer[(A, B)]()
-    biHash withFilter (_._1 < (baseList map (_._1) max)) foreach (abBuffer += _)
+    biHash withFilter ((_: AB)._1 < (baseList map (_._1) max)) foreach (abBuffer += _)
     abBuffer.toList.size should equal (baseList.size - 1)
 
     val baBuffer = new ListBuffer[(B, A)]()
-    biHash withFilter (_._1.contains("klajshfgkljadngkljangdkjlangdkljn")) foreach (baBuffer += _)
+    biHash withFilter ((_: BA)._1.contains("klajshfgkljadngkljangdkjlangdkljn")) foreach (baBuffer += _)
     baBuffer.toList.size should equal (0)
 
   }
