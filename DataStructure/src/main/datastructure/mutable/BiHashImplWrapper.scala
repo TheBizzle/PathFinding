@@ -1,7 +1,7 @@
 package datastructure.mutable
 
 import collection.generic.{FilterMonadic, CanBuildFrom}
-import collection.{GenTraversableOnce, Set}
+import collection.{mutable, GenTraversableOnce, Set}
 import collection.mutable.{Builder, Map => MMap}
 
 /**
@@ -35,47 +35,12 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: MMap[X, Y
   def compose[C]              (g: (C) => X)                   : (C) => Y                = primaryMap compose g
   def orElse[X1 <: X, Y1 >: Y](that: PartialFunction[X1, Y1]) : PartialFunction[X1, Y1] = primaryMap orElse that
 
-  // Lambda-operation methods
-  def /:[C]                      (z: C)(op: (C, Tup) => C)                         : C           =   primaryMap./:(z)(op)
-  def /:\[C >: Tup]              (z: C)(op: (C, C) => C)                           : C           =   primaryMap./:\(z)(op)
-  def :\[C]                      (z: C)(op: (Tup, C) => C)                         : C           =   primaryMap.:\(z)(op)
-  def aggregate[C]               (z: C)(seqop: (C, Tup) => C, combop: (C, C) => C) : C           =   primaryMap.aggregate(z)(seqop, combop)
-  def collectFirst[B]            (pf: PartialFunction[Tup, B])                     : Option[B]   =   primaryMap collectFirst pf
-  def count                      (p: (Tup) => Boolean)                             : Int         =   primaryMap count p
-  def exists                     (p: (Tup) => Boolean)                             : Boolean     =   primaryMap exists p
-  def find                       (p: (Tup) => Boolean)                             : Option[Tup] =   primaryMap find p
-  def fold[C >: Tup]             (z: C)(op: (C, C) => C)                           : C           =   primaryMap.fold(z)(op)
-  def foldLeft[C]                (z: C)(op: (C, Tup) => C)                         : C           =   primaryMap.foldLeft(z)(op)
-  def foldRight[C]               (z: C)(op: (Tup, C) => C)                         : C           =   primaryMap.foldRight(z)(op)
-  def forall                     (p: (Tup) => Boolean)                             : Boolean     =   primaryMap forall p
-  def foreach[C]                 (f: (Tup) => C)                                                   { primaryMap foreach f }
-  def minBy[C]                   (f: (Tup) => C)(implicit cmp: Ordering[C])        : Tup         =   primaryMap minBy f
-  def maxBy[C]                   (f: (Tup) => C)(implicit cmp: Ordering[C])        : Tup         =   primaryMap maxBy f
-  def reduce[C >: Tup]           (op: (C, C) => C)                                 : C           =   primaryMap reduce op
-  def reduceLeft[C >: Tup]       (op: (C, Tup) => C)                               : C           =   primaryMap reduceLeft op
-  def reduceLeftOption[C >: Tup] (op: (C, Tup) => C)                               : Option[C]   =   primaryMap reduceLeftOption op
-  def reduceOption[C >: Tup]     (op: (C, C) => C)                                 : Option[C]   =   primaryMap reduceOption op
-  def reduceRight[C >: Tup]      (op: (Tup, C) => C)                               : C           =   primaryMap reduceRight op
-  def reduceRightOption[C >: Tup](op: (Tup, C) => C)                               : Option[C]   =   primaryMap reduceRightOption op
-  def withDefault                (d: X => Y)                                       : MMap[X, Y]  =   primaryMap withDefault d   //@ I'd love to do this with a better return type...
-
-  //@ `Repr` Madness
-  private type FM = FilterMonadic
-
-  def collect[C, That]    (pf: PartialFunction[Tup, C])    (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap collect pf)
-  def dropWhile           (p: Tup => Boolean)                                                          : Repr         =   reprMadness(primaryMap dropWhile p)
-  def filter              (p: Tup => Boolean)                                                          : Repr         =   reprMadness(primaryMap filter p)
-  def flatMap[C, That]    (f: Tup => GenTraversableOnce[C])(implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap flatMap f)
-  def map[C, That]        (f: Tup => C)                    (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap map f)
-  def partition           (p: Tup => Boolean)                                                          : (Repr, Repr) = { val (a, b) = primaryMap partition p; (reprMadness(a), reprMadness(b)) }
-  def scan[C >: Tup, That](z: C)(op: (C, C) => C)          (implicit cbf: CanBuildFrom[Repr, C, That]) : That         =   reprMadness(primaryMap.scan(z)(op))
-  def scanLeft[C, That]   (z: C)(op: (C, Tup) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap.scanLeft(z)(op))
-  def scanRight[C, That]  (z: C)(op: (Tup, C) => C)        (implicit bf: CanBuildFrom[Repr, C, That])  : That         =   reprMadness(primaryMap.scanRight(z)(op))
-  def span                (p: Tup => Boolean)                                                          : (Repr, Repr) = { val (a, b) = primaryMap span p; (reprMadness(a), reprMadness(b)) }
-  def takeWhile           (p: Tup => Boolean)                                                          : Repr         =   reprMadness(primaryMap takeWhile p)
-  def withFilter          (p: X => Boolean)                                                            : FM[X, Repr]  =   new WithFilter(p)
+  def filterKeys(p: (X) => Boolean) : collection.Map[X, Y] = primaryMap filterKeys p
+  def mapValues[C](f: (Y) => C)     : collection.Map[X, C] = primaryMap mapValues f
 
   // Miscellaneously-used methods
+  def copyToArray[C >: Tup] (xs: Array[C])                                             { primaryMap.copyToArray(xs) }
+  def copyToArray[C >: Tup] (xs: Array[C], start: Int)                                 { primaryMap.copyToArray(xs, start) }
   def copyToArray[C >: Tup] (xs: Array[C], start: Int = 0, len: Int = primaryMap.size) { primaryMap.copyToArray(xs, start, len) }
   def copyToBuffer[C >: Tup](dest: collection.mutable.Buffer[C])                       { primaryMap.copyToBuffer(dest) }
 
@@ -100,6 +65,10 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: MMap[X, Y
   }
 
   //@ Size hints got abandoned, since using them would make the design into a yucky mess.  They likely won't be missed....
-  private def reprMadness[C, That](that: Iterable[C])(implicit bf: CanBuildFrom[Repr, C, That]) : That = { val b = bf(repr); b ++= that; b.result() }
+  private def reprMadness[C, That](that: Iterable[C])(implicit bf: CanBuildFrom[Repr, C, That]) : That = {
+    val b = bf(repr)
+    b ++= that
+    b.result()
+  }
 
 }
