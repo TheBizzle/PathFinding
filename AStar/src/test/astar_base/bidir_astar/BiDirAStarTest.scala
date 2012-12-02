@@ -1,8 +1,8 @@
 package astar_base.bidir_astar
 
 import pathfinding.testscript.TestScript
+import tester.criteria._
 import tester.testscript.dialect.TestCriteriaDialect._
-import tester.criteria.Talkative
 
 /**
  * Created by IntelliJ IDEA.

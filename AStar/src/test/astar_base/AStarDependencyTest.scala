@@ -3,7 +3,7 @@ package astar_base
 import suitereporter.AStarSuiteCoagulator
 import pathfinding.testscript.TestScript
 import tester.TestingCore
-import tester.criteria.{TestingFlag, RunBaseTests, TestCriteria}
+import tester.criteria._
 
 /**
  * Created by IntelliJ IDEA.

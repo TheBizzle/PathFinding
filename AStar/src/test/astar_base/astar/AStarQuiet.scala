@@ -1,6 +1,7 @@
 package astar_base.astar
 
 import pathfinding.testscript.TestScript
+import tester.criteria._
 import tester.testscript.dialect.TestCriteriaDialect._
 
 /**
