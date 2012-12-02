@@ -4,7 +4,6 @@ import org.scalatest.{BeforeAndAfterEach, FunSuite}
 import collection.GenTraversableOnce
 import org.scalatest.matchers.ShouldMatchers
 import collection.mutable.ListBuffer
-import utilitylib.typewarfare.TypeWarfare.||
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,9 +20,6 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   type AB = (A, B)
   type BA = (B, A)
-
-  type AOrB      = (A || B)#T
-  type AOrBTuple = ((A, B) || (B, A))#T
 
   val aList: List[A] = List(5, 17, 1, 9, 4)
   val bList: List[B] = List("five", "seventeen", "one", "nine", "four")
@@ -56,35 +52,30 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@
   test("+(elem)") {
-    def forwards(bhm: BHM, target: BHM, elems: (A, B)*) {
-      testFunc(bhm, target, elems: _*)
+    def forwards(bhm: BHM, target: BHM, elems: AB*) {
+      bhm + elems(0) should equal (target)
+      bhm + elems(1) should equal (target)
     }
-    def backwards(bhm: BHM, target: BHM, elems: (B, A)*) {
-      testFunc(bhm, target, elems: _*)
-    }
-    def testFunc[T, U](bhm: BHM, target: BHM, elems: (T, U)*) {
+    def backwards(bhm: BHM, target: BHM, elems: BA*) {
       bhm + elems(0) should equal (target)
       bhm + elems(1) should equal (target)
     }
     val myElems = Seq(9001 -> "nein tousend won", 4 -> "fier")
-    forwards (biHash.clone(), BiHashMap(baseList ++ myElems: _*), myElems: _*)
-    backwards(biHash.clone(), BiHashMap(baseList ++ myElems: _*), myElems map (_.swap): _*)
+    forwards (biHash.clone, BiHashMap(baseList ++ myElems: _*), myElems: _*)
+    backwards(biHash.clone, BiHashMap(baseList ++ myElems: _*), myElems map (_.swap): _*)
   }
 
   //@
   test("+(elem1, elem2, elems)") {
-    def forwards(bhm: BHM, target: BHM, elems: (A, B)*) {
-      testFunc(bhm, target, elems: _*)
+    def forwards(bhm: BHM, target: BHM, elems: AB*) {
+      bhm + (elems(0), elems(1), elems.splitAt(2)._2: _*) should equal (target)
     }
-    def backwards(bhm: BHM, target: BHM, elems: (B, A)*) {
-      testFunc(bhm, target, elems: _*)
-    }
-    def testFunc[T, U](bhm: BHM, target: BHM, elems: (T, U)*) {
+    def backwards(bhm: BHM, target: BHM, elems: BA*) {
       bhm + (elems(0), elems(1), elems.splitAt(2)._2: _*) should equal (target)
     }
     val myElems = Seq(9001 -> "nein tousend won", 4 -> "fier", 3 -> "shree, akchurry")
-    forwards (biHash.clone(), BiHashMap(baseList ++ myElems: _*), myElems: _*)
-    backwards(biHash.clone(), BiHashMap(baseList ++ myElems: _*), myElems map (_.swap): _*)
+    forwards (biHash.clone, BiHashMap(baseList ++ myElems: _*), myElems: _*)
+    backwards(biHash.clone, BiHashMap(baseList ++ myElems: _*), myElems map (_.swap): _*)
   }
 
   //@
@@ -101,8 +92,8 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
       bhm ++ appendee should equal (target)
     }
     val myList = List(100 -> "hundred", 1000 -> "thousand", 666 -> "satanry")
-    forwards (biHash.clone(), List(biHash.toSeq ++ myList: _*), myList)
-    backwards(biHash.clone(), List(biHash.toSeq ++ myList: _*), myList map (_.swap))
+    forwards (biHash.clone, List(biHash.toSeq ++ myList: _*), myList)
+    backwards(biHash.clone, List(biHash.toSeq ++ myList: _*), myList map (_.swap))
   }
 
   //@
@@ -120,157 +111,125 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
       bhm ++: appendee should equal (target)
     }
     val myList = List(100 -> "hundred", 1000 -> "thousand", 666 -> "satanry")
-    forwards (biHash.clone(), List(biHash.toSeq ++ myList: _*), myList)
-    backwards(biHash.clone(), List(biHash.toSeq ++ myList: _*), myList map (_.swap))
+    forwards (biHash.clone, List(biHash.toSeq ++ myList: _*), myList)
+    backwards(biHash.clone, List(biHash.toSeq ++ myList: _*), myList map (_.swap))
   }
 
   //@
   test("++=(traversableOnce[(A, B)])") {
-    def forwards(bhm: BHM, target: TraversableOnce[(A, B)], appendee: TraversableOnce[(A, B)]) {
-      testFunc(bhm, target, appendee)
-    }
-    def backwards(bhm: BHM, target: TraversableOnce[(A, B)], appendee: TraversableOnce[(B, A)]) {
-      testFunc(bhm, target, appendee)
-    }
-    def testFunc[T, U](bhm: BHM, target: TraversableOnce[(A, B)], appendee: TraversableOnce[(T, U)]) {
-      val orig = bhm.clone(); bhm ++= bhm; orig should equal (bhm)
-      bhm ++= appendee; bhm should equal (target)
-    }
+
+    val original = biHash.clone
+    original ++= original
+    original should equal (biHash) //@ Should it really?
+
     val myList = List(100 -> "hundred", 1000 -> "thousand", 666 -> "satanry")
-    forwards (biHash.clone(), List(biHash.toSeq ++ myList: _*), myList)
-    backwards(biHash.clone(), List(biHash.toSeq ++ myList: _*), myList map (_.swap))
+    (biHash.clone ++= myList)                should equal (List((biHash.toSeq ++ myList): _*))
+    (biHash.clone ++= (myList map (_.swap))) should equal (List((biHash.toSeq ++ myList): _*))
+
   }
 
+  // Cannot be `forwards`/`backwards`ized
   test("+=(elem)") {
-    def forwards(bhm: BHM, target: BHM, elem: (A, B)) {
-      testFunc(bhm, target, elem)
-    }
-    def backwards(bhm: BHM, target: BHM, elem: (B, A)) {
-      testFunc(bhm, target, elem)
-    }
-    def testFunc[T, U](bhm: BHM, target: BHM, elem: (T, U)) {
-      bhm += elem; bhm should equal (target)
-    }
     val myElem = 9001 -> "was?! mein thousand?!!?!?!?!"
-    forwards (biHash.clone(), BiHashMap(myElem :: baseList: _*), myElem)
-    backwards(biHash.clone(), BiHashMap(myElem :: baseList: _*), myElem.swap)
+    (biHash.clone += myElem)      should equal (BiHashMap(myElem :: baseList: _*))
+    (biHash.clone += myElem.swap) should equal (BiHashMap(myElem :: baseList: _*))
   }
 
   test("+=(elem1, elem2, elems)") {
-    def forwards(bhm: BHM, target: BHM, elems: (A, B)*) {
-      testFunc(bhm, target, elems: _*)
+    def forwards(bhm: BHM, target: BHM, elems: AB*) {
+      (bhm += (elems(0), elems(1), elems.splitAt(2)._2: _*)); bhm should equal (target)
     }
-    def backwards(bhm: BHM, target: BHM, elems: (B, A)*) {
-      testFunc(bhm, target, elems: _*)
-    }
-    def testFunc[T, U](bhm: BHM, target: BHM, elems: (T, U)*) {
+    def backwards(bhm: BHM, target: BHM, elems: BA*) {
       (bhm += (elems(0), elems(1), elems.splitAt(2)._2: _*)); bhm should equal (target)
     }
     val myElems = List(9001 -> "was?! mein thousand?!!?!?!?!", 9002 -> "ja, dein thousand!", 91124 -> "no wai!", 90210 -> "yahweh!")
-    forwards (biHash.clone(), BiHashMap(baseList ++ myElems: _*), myElems: _*)
-    backwards(biHash.clone(), BiHashMap(baseList ++ myElems: _*), myElems map (_.swap): _*)
+    forwards (biHash.clone, BiHashMap(baseList ++ myElems: _*), myElems: _*)
+    backwards(biHash.clone, BiHashMap(baseList ++ myElems: _*), myElems map (_.swap): _*)
   }
 
   //@
   test("-(elem)") {
-    def forwards(bhm: BHM, targetElemPairs: (BHM, (A, B))*) {
-      testFunc(bhm, targetElemPairs: _*)
+    def forwards(bhm: BHM, targetElemPairs: (BHM, A)*) {
+      targetElemPairs foreach { case (target, elem) => bhm - elem; bhm should equal (target) }
     }
-    def backwards(bhm: BHM, targetElemPairs: (BHM, (B, A))*) {
-      testFunc(bhm, targetElemPairs: _*)
-    }
-    def testFunc[T, U](bhm: BHM, targetElemPairs: (BHM, (T, U))*) {
+    def backwards(bhm: BHM, targetElemPairs: (BHM, B)*) {
       targetElemPairs foreach { case (target, elem) => bhm - elem; bhm should equal (target) }
     }
     val myPairs = baseList.tails.toSeq drop 1 map (BiHashMap[A, B](_: _*)) zip baseList
-    forwards (biHash.clone(), myPairs: _*)
-    backwards(biHash.clone(), myPairs map { case (target, elem) => (target, elem.swap) }: _*)
+    forwards (biHash.clone, myPairs map { case (target, elem) => (target, elem._1) }: _*)
+    backwards(biHash.clone, myPairs map { case (target, elem) => (target, elem._2) }: _*)
   }
 
   //@
   test("-(elem1, elem2, elems)") {
-    def forwards(bhm: BHM, target: BHM, elems: (A, B)*) {
-      testFunc(bhm, target, elems: _*)
+    def forwards(bhm: BHM, target: BHM, elems: A*) {
+      bhm - (elems(0), elems(1), elems.splitAt(2)._2: _*); bhm should equal (target)
     }
-    def backwards(bhm: BHM, target: BHM, elems: (B, A)*) {
-      testFunc(bhm, target, elems: _*)
-    }
-    def testFunc[T, U](bhm: BHM, target: BHM, elems: (T, U)*) {
+    def backwards(bhm: BHM, target: BHM, elems: B*) {
       bhm - (elems(0), elems(1), elems.splitAt(2)._2: _*); bhm should equal (target)
     }
     val (removables, pretarget) = baseList splitAt (baseList.size - 1)
-    forwards (biHash.clone(), BiHashMap(pretarget: _*), removables: _*)
-    backwards(biHash.clone(), BiHashMap(pretarget: _*), removables map (_.swap): _*)
+    forwards (biHash.clone, BiHashMap(pretarget: _*), removables map (_._1): _*)
+    backwards(biHash.clone, BiHashMap(pretarget: _*), removables map (_._2): _*)
   }
 
   //@
   //@ Refactor this and following test to call same code that generalizes over `GenTraversableOnce`
   test("--(that)") {
-    def forwards(bhm: BHM, target: GenTraversableOnce[(A, B)], removees: GenTraversableOnce[A]) {
-      testFunc(bhm, BiHashMap.empty, bhm)
-      testFunc(bhm, target, removees)
+    def forwards(bhm: BHM, target: TraversableOnce[(A, B)], removees: TraversableOnce[A]) {
+      (bhm -- bhm.aValues) should equal (BiHashMap.empty)
+      (bhm -- removees)    should equal (target)
     }
-    def backwards(bhm: BHM, target: GenTraversableOnce[(A, B)], removees: GenTraversableOnce[B]) {
-      testFunc(bhm, BiHashMap.empty, bhm.flip)
-      testFunc(bhm, target, removees)
-    }
-    def testFunc[T](bhm: BHM, target: GenTraversableOnce[(A, B)], removees: GenTraversableOnce[T]) {
-      bhm -- removees should equal (target)
+    def backwards(bhm: BHM, target: TraversableOnce[(A, B)], removees: TraversableOnce[B]) {
+      (bhm -- bhm.bValues) should equal (BiHashMap.empty)
+      (bhm -- removees)    should equal (target)
     }
     val myList = baseList dropRight 2
-    forwards (biHash.clone(), List(biHash.toSeq filterNot (myList contains): _*), myList map (_._1))
-    backwards(biHash.clone(), List(biHash.toSeq filterNot (myList contains): _*), myList map (_._2))
+    forwards (biHash.clone, List(biHash.toSeq filterNot (myList contains): _*), myList map (_._1))
+    backwards(biHash.clone, List(biHash.toSeq filterNot (myList contains): _*), myList map (_._2))
   }
 
   //@
+  //@ The behavior of `--=` is entirely wrong, even if the test passes.  The same goes for most of the other `x=` operators, I think.  They need to mutate the collection!
   test("--=(traversableOnce[A])") {
     def forwards(bhm: BHM, target: TraversableOnce[(A, B)], removees: TraversableOnce[A]) {
-      testFunc(bhm, BiHashMap.empty, bhm)
-      testFunc(bhm, target, removees)
+      (bhm --= bhm.aValues) should equal (BiHashMap.empty)
+      (bhm --= removees)    should equal (target)
     }
     def backwards(bhm: BHM, target: TraversableOnce[(A, B)], removees: TraversableOnce[B]) {
-      testFunc(bhm, BiHashMap.empty, bhm.flip)
-      testFunc(bhm, target, removees)
-    }
-    def testFunc[T](bhm: BHM, target: TraversableOnce[(A, B)], removees: TraversableOnce[T]) {
-      (bhm --= removees) should equal (target)
+      (bhm --= bhm.bValues) should equal (BiHashMap.empty)
+      (bhm --= removees)    should equal (target)
     }
     val myList = baseList dropRight 2
-    forwards (biHash.clone(), List(biHash.toSeq filterNot (myList contains): _*), myList map (_._1))
-    backwards(biHash.clone(), List(biHash.toSeq filterNot (myList contains): _*), myList map (_._2))
+    forwards (biHash.clone, List(biHash.toSeq filterNot (myList contains): _*), myList map (_._1))
+    backwards(biHash.clone, List(biHash.toSeq filterNot (myList contains): _*), myList map (_._2))
   }
 
   //@
   test("-=(elem)") {
     def forwards(bhm: BHM, target: BHM, elem: (A, B)) {
-      testFunc(bhm, target, elem)
+      (bhm -= elem._1); bhm should equal (target)
     }
     def backwards(bhm: BHM, target: BHM, elem: (B, A)) {
-      testFunc(bhm, target, elem)
-    }
-    def testFunc[T, U](bhm: BHM, target: BHM, elem: (T, U)) {
-      (bhm -= elem); bhm should equal (target)
+      (bhm -= elem._1); bhm should equal (target)
     }
     val myElem = baseList(1)
     val pretarget = baseList filterNot(_ == myElem)
-    forwards (biHash.clone(), BiHashMap(pretarget: _*), myElem)
-    backwards(biHash.clone(), BiHashMap(pretarget: _*), myElem.swap)
+    forwards (biHash.clone, BiHashMap(pretarget: _*), myElem)
+    backwards(biHash.clone, BiHashMap(pretarget: _*), myElem.swap)
   }
 
   //@
   test("-=(elem1, elem2, elems)") {
-    def forwards(bhm: BHM, target: BHM, elems: (A, B)*) {
-      testFunc(bhm, target, elems)
+    def forwards(bhm: BHM, target: BHM, elems: A*) {
+      (bhm -= (elems(0), elems(1), elems.splitAt(2)._2: _*)); bhm should equal (target)
     }
-    def backwards(bhm: BHM, target: BHM, elems: (B, A)*) {
-      testFunc(bhm, target, elems)
-    }
-    def testFunc[T, U](bhm: BHM, target: BHM, elems: (T, U)*) {
+    def backwards(bhm: BHM, target: BHM, elems: B*) {
       (bhm -= (elems(0), elems(1), elems.splitAt(2)._2: _*)); bhm should equal (target)
     }
     val (removables, pretarget) = baseList splitAt (baseList.size - 1)
-    forwards (biHash.clone(), BiHashMap(pretarget: _*), removables: _*)
-    backwards(biHash.clone(), BiHashMap(pretarget: _*), removables map (_.swap): _*)
+    forwards (biHash.clone, BiHashMap(pretarget: _*), removables map (_._1): _*)
+    backwards(biHash.clone, BiHashMap(pretarget: _*), removables map (_._2): _*)
   }
 
   test("->") {
@@ -282,17 +241,9 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@ Refactor to have this and `foldRight` pointing at the same test code
   // Cryptic symbol for "foldLeft"
   test("/:") {
-    def forwards(bhm: BHM, target: A, initializer: A, func: (A, (A, B)) => A) {
-      testFunc(bhm, target, initializer, func)
-    }
-    def backwards(bhm: BHM, target: B, initializer: B, func: (B, (B, A)) => B) {
-      testFunc(bhm, target, initializer, func)
-    }
-    def testFunc[T, U](bhm: BHM, target: T, initializer: T, func: (T, (T, U)) => T) {
-      (bhm./:(initializer)(func)) should equal (target)
-    }
-    forwards (biHash.clone(), biHash map ((_: AB)._1) product, 1, { case (acc, elem: (Int, String)) => acc * elem._1 })
-    backwards(biHash.clone(), biHash map ((_: BA)._2) mkString, "", { case (acc, elem: (String, Int)) => acc + elem._1 })
+    val f = (tup1: AB, tup2: AB) => (tup1._1 * tup2._1, tup1._2 + tup2._2)
+    val expected = (biHash map (_._1) product, biHash map (_._2) reduceLeft (_ + _))
+    biHash.clone./:((1, ""))(f) should equal (expected)
   }
 
   //@
@@ -300,19 +251,9 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@ Refactor to have this and `foldRight` pointing at the same test code
   // Cryptic symbol for "fold"
   test("""/:\"""") {
-    def forwards(bhm: BHM, target: (A, B), initializer: (A, B), func: ((A, B), (A, B)) => (A, B)) {
-      testFunc(bhm, target, initializer, func)
-    }
-    def backwards(bhm: BHM, target: (B, A), initializer: (B, A), func: ((B, A), (B, A)) => (B, A)) {
-      testFunc(bhm, target, initializer, func)
-    }
-    def testFunc[T](bhm: BHM, target: T, initializer: T, func: (T, T) => T) {
-      (bhm./:\(initializer)(func)) should equal (target)
-    }
-    val (aInit, aFunc, aRes) = (1,  (a1: A, a2: A) =>  a1 * a2, biHash map ((_: AB)._1) product)
-    val (bInit, bFunc, bRes) = ("", (b1: B, b2: B) => (b1 + b2).sorted, biHash.map((_: BA)._2).mkString.sorted)
-    forwards (biHash.clone(), (aRes, bRes), (aInit, bInit), { case (acc: (A, B), elem: (A, B)) => (aFunc(acc._1, elem._1), bFunc(acc._2, elem._2)) })
-    backwards(biHash.clone(), (bRes, aRes), (bInit, aInit), { case (acc: (B, A), elem: (B, A)) => (bFunc(acc._1, elem._1), aFunc(acc._2, elem._2)) })
+    val f = (tup1: AB, tup2: AB) => (tup1._1 * tup2._1, tup1._2 + tup2._2)
+    val expected = (biHash map (_._1) product, biHash map (_._2) reduce (_ + _))
+    biHash.clone./:\((1, ""))(f) should equal (expected)
   }
 
   //@
@@ -320,22 +261,14 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@ Refactor to have this and `foldRight` pointing at the same test code
   // Cryptic symbol for "foldRight"
   test(""":\""") {
-    def forwards(bhm: BHM, target: A, initializer: A, func: ((A, B), A) => A) {
-      testFunc(bhm, target, initializer, func)
-    }
-    def backwards(bhm: BHM, target: B, initializer: B, func: ((B, A), B) => B) {
-      testFunc(bhm, target, initializer, func)
-    }
-    def testFunc[T, U](bhm: BHM, target: T, initializer: T, func: ((U, T), T) => T) {
-      (bhm :\ (initializer)(func)) should equal (target)
-    }
-    forwards (biHash.clone(), biHash map ((_: AB)._1) product, 1,   { case (elem: (Int, String), acc) => acc * elem._1 })
-    backwards(biHash.clone(), biHash map ((_: BA)._2) mkString, "", { case (elem: (String, Int), acc) => acc + elem._1 })
+    val f = (tup1: AB, tup2: AB) => (tup1._1 * tup2._1, tup1._2 + tup2._2)
+    val expected = (biHash map (_._1) product, biHash map (_._2) reduceRight (_ + _))
+    biHash.clone.:\((1, ""))(f) should equal (expected)
   }
 
   //@ Can share with `bIterator`
   test("aIterator") {
-    (biHash.aIterator.toList sameElements baseList.map(_._1)) should equal (true)
+    biHash.aIterator.toList should have ('sameElements (baseList.map(_._1)))
   }
 
   //@ Can refactor
@@ -352,17 +285,10 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   //@ Can share code with the folds
   test("aggregate(b)(seqop, combop)") {
-    def forwards(bhm: BHM, target: A, initializer: A, seqFunc: (A, (A, B)) => A, comboFunc: (A, A) => A) {
-      testFunc(bhm, target, initializer, seqFunc, comboFunc)
-    }
-    def backwards(bhm: BHM, target: B, initializer: B, seqFunc: (B, (B, A)) => B, comboFunc: (B, B) => B) {
-      testFunc(bhm, target, initializer, seqFunc, comboFunc)
-    }
-    def testFunc[T, U](bhm: BHM, target: T, initializer: T, seqFunc: (T, U) => T, comboFunc: (T, T) => T) {
-      (bhm.aggregate(initializer)(seqFunc, comboFunc)) should equal (target)
-    }
-    forwards (biHash.clone(), biHash map ((_: AB)._1) product, 1,   { case (acc, elem: (Int, String)) => acc * elem._1 }, { case (a1: A, a2: A) => -1 })
-    backwards(biHash.clone(), biHash map ((_: BA)._2) mkString, "", { case (acc, elem: (String, Int)) => acc + elem._1 }, { case (b1: B, b2: B) => null })
+    val expected = biHash map (_._1) product
+    val seqF   = (acc: A, elem: AB) => acc * elem._1
+    val comboF = (_: A, _: A) => -1
+    biHash.clone.aggregate(1)(seqF, comboF) should equal (expected)
   }
 
   //@ Refactor
@@ -384,63 +310,45 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@ Can share with `bSet`
   test("aSet") {
-    (biHash.aSet sameElements baseList.map(_._1)) should equal (true)
+    biHash.aSet should have ('sameElements (baseList.map(_._1)))
   }
 
   test("bIterator") {
-    biHash.aIterator.toList should have ('sameElements (baseList.map(_._1)))
+    biHash.bIterator.toList should have ('sameElements (baseList.map(_._2)))
   }
 
   test("bSet") {
-    biHash.aSet should have ('sameElements (baseList.map(_._1)))
+    biHash.bSet should have ('sameElements (baseList.map(_._2)))
   }
 
   test("clear()") {
     biHash.clear() should equal (BiHashMap[A, B]())
   }
 
-  test("clone()") {
-    biHash.clone() should equal (biHash)
+  test("clone") {
+    biHash.clone should equal (biHash)
   }
 
   //@
   //@ Can share below
   //@ Refactor
   test("collect(pf)") {
-
     val abList = baseList
     val aAverage = (abList map (_._1) sum) / abList.size
     val aComparator = (a: A) => a < aAverage
-    biHash collect { case (a: A, b: B) if (a == null) => b }           should equal (List())                                      // Match (none)
-    biHash collect { case (a: A, b: B) if (a == abList.head._1) => b } should equal (List(abList.head._2))                        // Match (one)
-    biHash collect { case (a: A, b: B) if (aComparator(a)) => b }      should equal (List(abList filter (aComparator((_: AB)._1)).toSeq: _*)) // Match (some)
-
-    val baList = baseList map (_.swap)
-    val bAverage = (baList map (_._1.size) sum) / baList.size
-    val bComparator = (b: B) => b.length < bAverage
-    biHash collect { case (b: B, a: A) if (b == null) => a }           should equal (List())                                      // Match (none)
-    biHash collect { case (b: B, a: A) if (b == baList.head._1) => a } should equal (List(baList.head._2))                        // Match (one)
-    biHash collect { case (b: B, a: A) if (bComparator(b)) => a }      should equal (List(baList filter (bComparator((_: BA)._1)).toSeq: _*)) // Match (some)
-
+    biHash collect { case (a: A, b: B) if (a == null) => b }           should equal (List())                                                        // Match (none)
+    biHash collect { case (a: A, b: B) if (a == abList.head._1) => b } should equal (List(abList.head._2))                                          // Match (one)
+    biHash collect { case (a: A, b: B) if (aComparator(a)) => b }      should equal (List(abList.filter(entry => aComparator(entry._1)).toSeq: _*)) // Match (some)
   }
 
   //@
   test("collectFirst(pf)") {
-
     val abList = baseList
     val aAverage = (abList map (_._1) sum) / abList.size
     val aComparator = (a: A) => a < aAverage
-    biHash collectFirst { case (a: A, b: B) if (a == null) => b }           should equal (None)                                         // Match (none)
-    biHash collectFirst { case (a: A, b: B) if (a == abList.head._1) => b } should equal (Some(abList.head._2))                         // Match (one)
-    biHash collectFirst { case (a: A, b: B) if (aComparator(a)) => b }      should equal (Some(abList filter (aComparator((_: AB)._1)) head)) // Match (some)
-
-    val baList = baseList map (_.swap)
-    val bAverage = (baList map (_._1.size) sum) / baList.size
-    val bComparator = (b: B) => b.length < bAverage
-    biHash collectFirst { case (b: B, a: A) if (b == null) => a }           should equal (None)                                         // Match (none)
-    biHash collectFirst { case (b: B, a: A) if (b == baList.head._1) => a } should equal (Some(baList.head._2))                         // Match (one)
-    biHash collectFirst { case (b: B, a: A) if (bComparator(b)) => a }      should equal (Some(baList filter (bComparator((_: BA)._1)) head)) // Match (some)
-
+    biHash collectFirst { case (a: A, b: B) if (a == null) => b }           should equal (None)                                                      // Match (none)
+    biHash collectFirst { case (a: A, b: B) if (a == abList.head._1) => b } should equal (Some(abList.head._2))                                      // Match (one)
+    biHash collectFirst { case (a: A, b: B) if (aComparator(a)) => b }      should equal (Some(abList filter (entry => aComparator(entry._1)) head)) // Match (some)
   }
 
   //@
@@ -473,12 +381,12 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   test("copyToArray(arr)") {
 
-    val abArr = new Array[(A, B)](biHash.size)
-    biHash.copyToArray(abArr)
+    val abArr = new Array[AB](biHash.size)
+    biHash.copyToArray[AB](abArr)
     abArr should equal (biHash.toArray)
 
-    val baArr = new Array[(B, A)](biHash.size)
-    biHash.copyToArray(baArr)
+    val baArr = new Array[BA](biHash.size)
+    biHash.copyToArray[BA](baArr)
     baArr should equal (biHash.flip.toArray)
 
   }
@@ -487,12 +395,12 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
     val start = 2
 
-    val abArr = new Array[(A, B)](biHash.size - start)
-    biHash.copyToArray(abArr, start)
+    val abArr = new Array[AB](biHash.size - start)
+    biHash.copyToArray[AB](abArr, start)
     abArr should equal (biHash.toArray drop (start))
 
-    val baArr = new Array[(B, A)](biHash.size - start)
-    biHash.copyToArray(baArr, start)
+    val baArr = new Array[BA](biHash.size - start)
+    biHash.copyToArray[BA](baArr, start)
     baArr should equal (biHash.flip.toArray drop (start))
 
   }
@@ -501,12 +409,12 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
     val (start, len) = (2, 2)
 
-    val abArr = new Array[(A, B)](len)
-    biHash.copyToArray(abArr, start, len)
+    val abArr = new Array[AB](len)
+    biHash.copyToArray[AB](abArr, start, len)
     abArr should equal (biHash.toArray slice (start, start + len))
 
-    val baArr = new Array[(B, A)](len)
-    biHash.copyToArray(baArr, start, len)
+    val baArr = new Array[BA](len)
+    biHash.copyToArray[BA](baArr, start, len)
     baArr should equal (biHash.flip.toArray slice (start, start + len))
 
   }
@@ -514,12 +422,12 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@Refactor (along with the 3 above)
   test("copyToBuffer(buff)") {
 
-    val abBuff = new ListBuffer[(A, B)]()
-    biHash.copyToBuffer(abBuff)
+    val abBuff = new ListBuffer[AB]()
+    biHash.copyToBuffer[AB](abBuff) //@@ Note: Another place where this fails is when method type parameter annotations like `C >: (A, B)` and `C >: (B, A)` have to be used and it must decide which to pick
     abBuff.toList should equal (biHash.toList)
 
-    val baBuff = new ListBuffer[(B, A)]()
-    biHash.copyToBuffer(baBuff)
+    val baBuff = new ListBuffer[BA]()
+    biHash.copyToBuffer[BA](baBuff)
     baBuff.toList should equal (biHash.toList)
 
   }
@@ -527,15 +435,9 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   //@ Refactor
   test("count(func)") {
-
-    val abFunc = (ab: (A, B), a: A) => ab._1 < a
+    val abFunc = (ab: AB, a: A) => ab._1 < a
     val abList = baseList
     abList map (_._1) foreach (x => biHash count (abFunc(_, x)) should equal (abList count (abFunc(_, x))))
-
-    val baFunc = (ba: (B, A), b: B) => ba._1 < b
-    val baList = baseList map (_.swap)
-    baList map (_._1) foreach (x => biHash count (baFunc(_, x)) should equal (baList count (baFunc(_, x))))
-
   }
 
   //@
@@ -576,11 +478,8 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   test("dropWhile(func)") {
 
-    val abCleansed = biHash dropWhile { case (a: A, b: B) => a <= (baseList map (_._1) max) }
+    val abCleansed = biHash dropWhile (_._1 <= (baseList map (_._1) max))
     abCleansed.size should equal (0)
-
-    val baCleansed = biHash dropWhile { case (b: B, a: A) => b.contains("") }
-    baCleansed.size should equal (0)
 
     var counter = 0
     val cleansed = biHash takeWhile { case _ => counter += 1; counter < baseList.size }
@@ -594,12 +493,12 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@ Can share code with below
   test("ensuring(cond)") {
-    intercept [AssertionError] { biHash ensuring ({false}) }
-    biHash ensuring ({true}) should equal (biHash)
+    intercept[AssertionError] { biHash ensuring ({false}) }
+    biHash ensuring (true) should equal (biHash)
   }
 
   test("ensuring(bln)") {
-    intercept [AssertionError] { biHash ensuring (false) }
+    intercept[AssertionError] { biHash ensuring (false) }
     biHash ensuring (true) should equal (biHash)
   }
 
@@ -613,32 +512,16 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   //@ Refactor
   test("exists(func)") {
-
-    val badA = 3421
-    val badB = "I'm bad!  Let's go eat some cheeseburgers with President Ronnie!"
-
-    biHash.exists((_: A) == badA) should equal (false)
-    biHash.exists((_: B) == badB) should equal (false)
-
-    biHash.exists((_: A) == baseList.head._1) should equal (true)
-    biHash.exists((_: B) == baseList.head._2) should equal (true)
-
+    biHash.exists(_ == 3421) should equal (false)
+    biHash.exists(_ == baseList.head._1) should equal (true)
   }
 
   //@
   //@ Refactor
   //@ Share code with some below
   test("filter(func)") {
-
-    val badA = 3421
-    val badB = "I'm bad!  Let's go eat some cheeseburgers with President Ronnie!"
-
-    biHash filter { case (a: A, b: B) => a == badA } should equal (biHash)
-    biHash filter { case (b: B, a: A) => b == badB } should equal (biHash)
-
-    biHash filter { case (a: A, b: B) => a == baseList.head._1 } should equal (BiHashMap(baseList.head))
-    biHash filter { case (b: B, a: A) => b == baseList.head._2 } should equal (BiHashMap(baseList.head))
-
+    biHash filter (_._1 == 3421)             should equal (biHash)
+    biHash filter (_._1 == baseList.head._1) should equal (BiHashMap(baseList.head))
   }
 
   //@ Refactor
@@ -646,7 +529,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   test("filterAs(func)") {
     biHash filterAs (a => baseList map (_._2) contains (a)) should equal (biHash.empty)
     biHash filterAs (a => baseList map (_._1) contains (a)) should equal (biHash)
-    biHash filterAs (_ == baseList.head._1) should equal (BiHashMap(baseList.head))
+    biHash filterAs (_ == baseList.head._1)      should equal (BiHashMap(baseList.head))
     biHash filterAs (_ != baseList.tail.head._1) should equal (BiHashMap((baseList.head :: baseList.tail.tail): _*))
   }
 
@@ -654,51 +537,31 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   test("filterBs(func)") {
     biHash filterBs (b => baseList map (_._1) contains (b)) should equal (biHash.empty)
     biHash filterBs (b => baseList map (_._2) contains (b)) should equal (biHash)
-    biHash filterBs (_ == baseList.head._2) should equal (BiHashMap(baseList.head))
+    biHash filterBs (_ == baseList.head._2)      should equal (BiHashMap(baseList.head))
     biHash filterBs (_ != baseList.tail.head._2) should equal (BiHashMap((baseList.head :: baseList.tail.tail): _*))
   }
 
   //@
   //@ Refactor
   test("filterNot(func)") {
-
-    val badA = 3421
-    val badB = "I'm bad!  Let's go eat some cheeseburgers with President Ronnie!"
-
-    biHash filterNot { case (a: A, b: B) => a != badA } should equal (biHash)
-    biHash filterNot { case (b: B, a: A) => b != badB } should equal (biHash)
-
-    biHash filterNot { case (a: A, b: B) => a != baseList.head._1 } should equal (BiHashMap(baseList.head))
-    biHash filterNot { case (b: B, a: A) => b != baseList.head._2 } should equal (BiHashMap(baseList.head))
-
+    biHash filterNot (_._1 != 3421)             should equal (biHash)
+    biHash filterNot (_._1 != baseList.head._1) should equal (BiHashMap(baseList.head))
   }
 
   //@
   //@ Refactor
   //@ Share code with above
   test("find(func)") {
-
-    val badA = 3421
-    val badB = "I'm bad!  Let's go eat some cheeseburgers with President Ronnie!"
-
-    biHash find { case (a: A, b: B) => a != badA } should equal (None)
-    biHash find { case (b: B, a: A) => b != badB } should equal (None)
-
-    biHash find { case (a: A, b: B) => a != baseList.head._1 } should equal (Some(baseList.head))
-    biHash find { case (b: B, a: A) => b != baseList.head._2 } should equal (Some(baseList.head))
-
+    biHash find (_._1 != 3421)             should equal (None)
+    biHash find (_._1 != baseList.head._1) should equal (Some(baseList.head))
   }
 
   //@
   //@ Share code with `map`
   test("flatMap(func)") {
-
-    val abFunc = (ab: (A, B)) => BiHashMap((ab._1 * 6, ab._2))
-    (biHash flatMap abFunc) should equal (BiHashMap((baseList map abFunc): _*))
-
-    val baFunc = (ba: (B, A)) => BiHashMap((ba._1, ba._2 * 6))
-    (biHash flatMap baFunc) should equal (BiHashMap((baseList map (_.swap) map baFunc): _*))
-
+    val f = (entry: AB) => (entry._1 * 6, entry._2)
+    val g = (entry: AB) => BiHashMap(f(entry))
+    (biHash flatMap g) should equal (BiHashMap((baseList map f): _*))
   }
 
   test("flip") {
@@ -707,71 +570,31 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@
   test("fold(res)(func)") {
-
-    def forwards(bhm: BHM, target: (A, B), initializer: (A, B), func: ((A, B), (A, B)) => (A, B)) {
-      testFunc(bhm, target, initializer, func)
-    }
-
-    def backwards(bhm: BHM, target: (B, A), initializer: (B, A), func: ((B, A), (B, A)) => (B, A)) {
-      testFunc(bhm, target, initializer, func)
-    }
-
-    def testFunc[T](bhm: BHM, target: T, initializer: T, func: (T, T) => T) {
-      (bhm.fold(initializer)(func)) should equal (target)
-    }
-
-    val (aInit, aFunc, aRes) = (1,  (a1: A, a2: A) =>  a1 * a2, biHash map ((_: AB)._1) product)
-    val (bInit, bFunc, bRes) = ("", (b1: B, b2: B) => (b1 + b2).sorted, biHash.map((_: BA)._2).mkString.sorted)
-
-    forwards (biHash.clone(), (aRes, bRes), (aInit, bInit), { case (acc: (A, B), elem: (A, B)) => (aFunc(acc._1, elem._1), bFunc(acc._2, elem._2)) })
-    backwards(biHash.clone(), (bRes, aRes), (bInit, aInit), { case (acc: (B, A), elem: (B, A)) => (bFunc(acc._1, elem._1), aFunc(acc._2, elem._2)) })
-
+    val f = (tup1: AB, tup2: AB) => (tup1._1 * tup2._1, tup1._2 + tup2._2)
+    val expected = (biHash map (_._1) product, biHash map (_._2) reduce (_ + _))
+    biHash.clone.fold((1, ""))(f) should equal (expected)
   }
 
   //@
   test("foldLeft(res)(func)") {
-
-    def forwards(bhm: BHM, target: A, initializer: A, func: (A, (A, B)) => A) {
-      testFunc(bhm, target, initializer, func)
-    }
-    def backwards(bhm: BHM, target: B, initializer: B, func: (B, (B, A)) => B) {
-      testFunc(bhm, target, initializer, func)
-    }
-    def testFunc[T, U](bhm: BHM, target: T, initializer: T, func: (T, (T, U)) => T) {
-      (bhm.foldLeft(initializer)(func)) should equal (target)
-    }
-    forwards (biHash.clone(), biHash map ((_: AB)._1) product, 1,   { case (acc, elem: (Int, String)) => acc * elem._1 })
-    backwards(biHash.clone(), biHash map ((_: BA)._2) mkString, "", { case (acc, elem: (String, Int)) => acc + elem._1 })
-
+    val f = (tup1: AB, tup2: AB) => (tup1._1 * tup2._1, tup1._2 + tup2._2)
+    val expected = (biHash map (_._1) product, biHash map (_._2) reduceLeft (_ + _))
+    biHash.clone.foldLeft((1, ""))(f) should equal (expected)
   }
 
   //@
   test("foldRight(res)(func)") {
-    def forwards(bhm: BHM, target: A, initializer: A, func: ((A, B), A) => A) {
-      testFunc(bhm, target, initializer, func)
-    }
-    def backwards(bhm: BHM, target: B, initializer: B, func: ((B, A), B) => B) {
-      testFunc(bhm, target, initializer, func)
-    }
-    def testFunc[T, U](bhm: BHM, target: T, initializer: T, func: ((U, T), T) => T) {
-      (bhm.foldRight(initializer)(func)) should equal (target)
-    }
-    forwards (biHash.clone(), biHash map ((_: AB)._1) product, 1,   { case (elem: (Int, String), acc) => acc * elem._1 })
-    backwards(biHash.clone(), biHash map ((_: BA)._2) mkString, "", { case (elem: (String, Int), acc) => acc + elem._1 })
+    val f = (tup1: AB, tup2: AB) => (tup1._1 * tup2._1, tup1._2 + tup2._2)
+    val expected = (biHash map (_._1) product, biHash map (_._2) reduceRight (_ + _))
+    biHash.clone.foldRight((1, ""))(f) should equal (expected)
   }
 
   //@
   //@ Refactor
   test("forall(func)") {
-
-    biHash forall { case (k: A, v: B) => baseList.contains((k, v)) } should be (true)
-    biHash forall { case (k: A, v: B) => v == "five" } should be (false)
-    biHash forall { case (k: A, v: B) => v == "lkjhadskjhsadl" } should be (false)
-
-    biHash forall { case (k: B, v: A) => baseList map (_.swap) contains((k, v)) } should be (true)
-    biHash forall { case (k: B, v: A) => k == "five" } should be (false)
-    biHash forall { case (k: B, v: A) => k == "lkjhadskjhsadl" } should be (false)
-
+    biHash forall (baseList.contains(_))     should be (true)
+    biHash forall (_._2 == "five")           should be (false)
+    biHash forall (_._2 == "lkjhadskjhsadl") should be (false)
   }
 
   //@
@@ -780,15 +603,14 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
     val accInit = (0, "")
     var acc     = accInit
-    val aFunc   = (a: A) => acc._1 + (a * 2)
-    val bFunc   = (b: B) => acc._2 + b + "!"
+    val aOp     = (a: A) => a * 2
+    val aFunc   = (a: A) => acc._1 + aOp(a)
+    val bOp     = (b: B) => b + "!"
+    val bFunc   = (b: B) => acc._2 + bOp(b)
     val abFunc  = (ab: (A, B)) => (aFunc(ab._1), bFunc(ab._2))
 
     biHash foreach { case (a: A, b: B) => acc = abFunc((a, b)) }
-    acc should equal ()
-
-    acc = accInit
-    biHash foreach { case (b: B, a: A) => acc = abFunc((a, b)) }
+    acc should equal ((aList map aOp sum), (bList map bOp reduce (_ + _)))
 
   }
 
@@ -837,19 +659,16 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@
   //@ Refactor
+  // Yeah... try making sense of _this_ test
   test("groupBy(f)") {
-
-    val newKV: (A, B) = baseList.head._1 * 1000 -> baseList.head._2
+    val newKV = baseList.head._1 * 1000 -> baseList.head._2
     biHash += newKV
-
-    biHash groupBy { case (a: A, b: B) => b } should equal (Map(BiHashMap(baseList.head, newKV), baseList.tail map (BiHashMap(_): _*)))
-    biHash groupBy { case (b: B, a: A) => b } should equal (Map(BiHashMap(baseList.head.swap, newKV.swap), baseList.tail map (x => BiHashMap(x.swap): _*)))
-
+    biHash groupBy (_._2) should equal (Map(baseList.head._2 -> BiHashMap(baseList.head, newKV)) ++ (baseList.tail map (x => x._2 -> BiHashMap(x))))
   }
 
   test("grouped(int)") {
     intercept[IllegalArgumentException] { biHash grouped (0) }
-    (biHash grouped (1) toList) zip baseList foreach (_ should equal (BiHashMap(_)))
+    (biHash grouped (1) toList) zip baseList foreach { case (x, y) => x should equal (BiHashMap(y)) }
     (biHash grouped (2) toList) zip (baseList grouped (2) toList) foreach { case (bhg, blg) => bhg should equal (BiHashMap(blg: _*)) }
   }
 
@@ -903,15 +722,6 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@ Share code with below
-  test("aSet") {
-    biHash.aSet should equal (baseList map (_._1) toSet)
-  }
-
-  test("bSet") {
-    biHash.bSet should equal (baseList map (_._2) toSet)
-  }
-
-  //@ Share code with below
   test("last") {
     baseList should have ('exists (biHash.last))
   }
@@ -923,13 +733,8 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   //@ Refactor
   test("map(func)") {
-
-    val abFunc = (ab: (A, B)) => (ab._1 * 6, ab._2)
-    (biHash map abFunc) should equal (BiHashMap((baseList map abFunc): _*))
-
-    val baFunc = (ba: (B, A)) => (ba._1, ba._2 * 6)
-    (biHash map baFunc) should equal (BiHashMap((baseList map (_.swap) map baFunc): _*))
-
+    val func = (entry: (A, B)) => (entry._1 * 6, entry._2)
+    (biHash map func) should equal (BiHashMap((baseList map func): _*))
   }
 
   //@ Refactor
@@ -947,26 +752,19 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   //@ Refactor
   test("mapResult") {
-
-    val abFunc = (ab: (A, B)) => (ab._1, ab._2.getBytes)
-    biHash.mapResult(_ map abFunc).result() should equal (BiHashMap(baseList map abFunc: _*))
-
-    val baFunc = (ba: (B, A)) => (ba._1, ba._2.toDouble)
-    biHash.mapResult(_ map baFunc).result() should equal (BiHashMap(baseList map (_.swap) map baFunc: _*))
-
+    val func = (entry: (A, B)) => (entry._1, entry._2.getBytes)
+    biHash.mapResult(_ map func).result() should equal (BiHashMap(baseList map func: _*))
   }
 
   //@
   //@ Can be merged with `minBy`
   test("maxBy") {
-    biHash maxBy { case (a: A, b: B) => a } should equal (baseList maxBy (_._1))
-    biHash maxBy { case (b: B, a: A) => b.length } should equal (baseList maxBy (_._2.length))
+    biHash maxBy (_._1) should equal (baseList maxBy (_._1))
   }
 
   //@
   test("minBy") {
-    biHash minBy { case (a: A, b: B) => a } should equal (baseList.minBy(_._1))
-    biHash minBy { case (b: B, a: A) => b.length } should equal (baseList.minBy(_._2.length))
+    biHash minBy (_._1) should equal (baseList.minBy(_._1))
   }
 
   // All three variants
@@ -992,122 +790,64 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   test("orElse(pFunc)") {
 
     val errorResB = "NOOOOOOO!"
-    biHash.orElse(errorResB)(baseList.head._1) should equal (baseList.head._2)
-    biHash.orElse(errorResB)(1543289513) should equal (errorResB)
+    val orElseAB  = biHash.orElse[A, B]{ case _: A => errorResB }
+    orElseAB(baseList.head._1) should equal (baseList.head._2)
+    orElseAB(1543289513)       should equal (errorResB)
 
     val errorResA = 123123123
-    biHash.orElse(errorResA)(baseList.head._2) should equal (baseList.head._1)
-    biHash.orElse(errorResA)("alksjdfl;kasjflkasdj") should equal (errorResA)
+    val orElseBA = biHash.orElse[B, A]{ case _: B => errorResA }
+    orElseBA(baseList.head._2)       should equal (baseList.head._1)
+    orElseBA("alksjdfl;kasjflkasdj") should equal (errorResA)
 
   }
 
   //@
   //@ Refactor
   test("partition(func)") {
-
     val abList = baseList
     val aAverage = (abList map (_._1) sum) / abList.size
     val abComparator = (ab: (A, B)) => (ab._1 < aAverage)
-    biHash.partition((_: AB) == null)              should equal ((biHash.empty, biHash))                                                                        // Match (none, all)
-    biHash.partition((_: AB)._1 == abList.head._1) should equal ((BiHashMap(abList.head), BiHashMap(abList.tail: _*)))                                          // Match (one, rest)
-    biHash.partition(abComparator)                 should equal ((BiHashMap(abList filter (abComparator): _*), BiHashMap(abList filterNot (abComparator): _*))) // Match (some, others)
-
-    val baList = baseList map (_.swap)
-    val bAverage = (baList map (_._1.size) sum) / baList.size
-    val baComparator = (ba: (B, A)) => (ba._1.length < bAverage)
-    biHash.partition((_: BA) == null)              should equal ((biHash.empty, biHash))                                                                        // Match (none, all)
-    biHash.partition((_: BA)._1 == baList.head._1) should equal ((BiHashMap(baList.head), BiHashMap(baList.tail: _*)))                                          // Match (one, rest)
-    biHash.partition(baComparator)                 should equal ((BiHashMap(baList filter (baComparator): _*), BiHashMap(baList filterNot (baComparator): _*))) // Match (some, others)
-
+    biHash.partition(_ == null)              should equal ((biHash.empty, biHash))                                                                        // Match (none, all)
+    biHash.partition(_._1 == abList.head._1) should equal ((BiHashMap(abList.head), BiHashMap(abList.tail: _*)))                                          // Match (one, rest)
+    biHash.partition(abComparator)           should equal ((BiHashMap(abList filter (abComparator): _*), BiHashMap(abList filterNot (abComparator): _*))) // Match (some, others)
   }
 
   //@
   //@ Can probably share code with the += stuff
   test("put(elem)") {
-    def forwards(bhm: BHM, target: BHM, elem: (A, B)) {
-      testFunc(bhm, target, elem)
-    }
-    def backwards(bhm: BHM, target: BHM, elem: (B, A)) {
-      testFunc(bhm, target, elem)
-    }
-    def testFunc[T, U](bhm: BHM, target: BHM, elem: (T, U)) {
-      (bhm put elem).get should equal (elem._2)
-      bhm should equal (target)
-    }
-    val myElem = 9001 -> "was?! mein thousand?!!?!?!?!"
-    forwards (biHash.clone(), BiHashMap(myElem :: baseList: _*), myElem)
-    backwards(biHash.clone(), BiHashMap(myElem :: baseList: _*), myElem.swap)
+    val elem  = 9001 -> "was?! mein thousand?!!?!?!?!"
+    val myMap = biHash.clone
+    (myMap.put(elem._1, elem._2)).get should equal (elem._2) //@@ Note: Part of why my hack is broken: `myMap.put _` is a compiler error, since it doesn't know which to choose; essentially, tupling and currying are useless with most of these methods
+    myMap should equal (BiHashMap(elem :: baseList: _*))
   }
 
   //@
   test("reduce(func)") {
-
-    def forwards(bhm: BHM, target: (A, B), func: ((A, B), (A, B)) => (A, B)) {
-      testFunc(bhm, target, func)
-    }
-    def backwards(bhm: BHM, target: (B, A), func: ((B, A), (B, A)) => (B, A)) {
-      testFunc(bhm, target, func)
-    }
-    def testFunc[T](bhm: BHM, target: T, func: (T, T) => T) {
-      (bhm reduce func) should equal (target)
-    }
-    val (aFunc, aRes) = ((a1: A, a2: A) =>  a1 * a2, biHash map ((_: AB)._1) product)
-    val (bFunc, bRes) = ((b1: B, b2: B) => (b1 + b2).sorted, biHash.map((_: BA)._2).mkString.sorted)
-    forwards (biHash.clone(), (aRes, bRes), { case (acc: (A, B), elem: (A, B)) => (aFunc(acc._1, elem._1), bFunc(acc._2, elem._2)) })
-    backwards(biHash.clone(), (bRes, aRes), { case (acc: (B, A), elem: (B, A)) => (bFunc(acc._1, elem._1), aFunc(acc._2, elem._2)) })
-
+    val f = (tup1: AB, tup2: AB) => (tup1._1 * tup2._1, tup1._2 + tup2._2)
+    val expected = (biHash map (_._1) product, biHash map (_._2) reduce (_ + _))
+    biHash.clone reduce f should equal (expected)
   }
 
   //@
   test("reduceLeft(func)") {
-
-    def forwards(bhm: BHM, target: (A, B), func: ((A, B), (A, B)) => (A, B)) {
-      testFunc(bhm, target, func)
-    }
-
-    def backwards(bhm: BHM, target: (B, A), func: ((B, A), (B, A)) => (B, A)) {
-      testFunc(bhm, target, func)
-    }
-
-    def testFunc[T, U](bhm: BHM, target: T, func: (T, T) => T) {
-      (bhm reduceLeft func) should equal (target)
-    }
-
-    val (aFunc, aRes) = ((a1: A, a2: A) => a1 * a2, biHash map ((_: AB)._1) product)
-    val (bFunc, bRes) = ((b1: B, b2: B) => b1 + b2, biHash map ((_: BA)._2) mkString)
-    val abFunc = (acc: (A, B), elem: (A, B)) => (aFunc(acc._1, elem._1), bFunc(acc._2, elem._2))
-    val baFunc = (acc: (B, A), elem: (B, A)) => (bFunc(acc._1, elem._1), aFunc(acc._2, elem._2))
-
-    forwards (biHash.clone(), (aRes, bRes), abFunc)
-    backwards(biHash.clone(), (bRes, aRes), baFunc)
-
+    val f = (tup1: AB, tup2: AB) => (tup1._1 * tup2._1, tup1._2 + tup2._2)
+    val expected = (biHash map (_._1) product, biHash map (_._2) reduceLeft (_ + _))
+    biHash.clone reduceLeft f should equal (expected)
   }
 
   //@
   //@ Share with `reduceLeft`
   test("reduceLeftOption(func)") {
 
-    def forwards(bhm: BHM, target: Option[(A, B)], func: ((A, B), (A, B)) => (A, B)) {
-      testFunc(bhm, target, func)
-    }
-
-    def backwards(bhm: BHM, target: Option[(B, A)], func: ((B, A), (B, A)) => (B, A)) {
-      testFunc(bhm, target, func)
-    }
-
-    def testFunc[T, U](bhm: BHM, target: Option[T], func: (T, T) => T) {
+    def testFunc(bhm: BHM, target: Option[AB], func: (AB, AB) => AB) {
       (bhm reduceLeftOption func) should equal (target)
     }
 
-    val (aFunc, aRes) = ((a1: A, a2: A) => a1 * a2, biHash map ((_: AB)._1) product)
-    val (bFunc, bRes) = ((b1: B, b2: B) => b1 + b2, biHash map ((_: BA)._2) mkString)
-    val abFunc = (acc: (A, B), elem: (A, B)) => (aFunc(acc._1, elem._1), bFunc(acc._2, elem._2))
-    val baFunc = (acc: (B, A), elem: (B, A)) => (bFunc(acc._1, elem._1), aFunc(acc._2, elem._2))
+    val f = (tup1: AB, tup2: AB) => (tup1._1 * tup2._1, tup1._2 + tup2._2)
+    val expectedSome = Option((biHash map (_._1) product, biHash map (_._2) reduceLeft (_ + _)))
 
-    forwards (biHash.clone(), Option(aRes, bRes), abFunc)
-    forwards (biHash.empty,   None,               abFunc)
-    backwards(biHash.clone(), Option(bRes, aRes), baFunc)
-    backwards(biHash.empty,   None,               baFunc)
+    testFunc(biHash.clone, expectedSome, f)
+    testFunc(biHash.empty, None,         f)
 
   }
 
@@ -1115,79 +855,37 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@ Share code with `reduce`
   test("reduceOption(func)") {
 
-    def forwards(bhm: BHM, target: Option[(A, B)], func: ((A, B), (A, B)) => (A, B)) {
-      testFunc(bhm, target, func)
-    }
-
-    def backwards(bhm: BHM, target: Option[(B, A)], func: ((B, A), (B, A)) => (B, A)) {
-      testFunc(bhm, target, func)
-    }
-
-    def testFunc[T](bhm: BHM, target: Option[T], func: (T, T) => T) {
+    def testFunc(bhm: BHM, target: Option[AB], func: (AB, AB) => AB) {
       (bhm reduceOption func) should equal (target)
     }
 
-    val (aFunc, aRes) = ((a1: A, a2: A) =>  a1 * a2, biHash map ((_: AB)._1) product)
-    val (bFunc, bRes) = ((b1: B, b2: B) => (b1 + b2).sorted, biHash.map((_: BA)._2).mkString.sorted)
-    val abFunc = (acc: (A, B), elem: (A, B)) => (aFunc(acc._1, elem._1), bFunc(acc._2, elem._2))
-    val baFunc = (acc: (B, A), elem: (B, A)) => (bFunc(acc._1, elem._1), aFunc(acc._2, elem._2))
+    val f = (tup1: AB, tup2: AB) => (tup1._1 * tup2._1, tup1._2 + tup2._2)
+    val expectedSome = Option((biHash map (_._1) product, biHash map (_._2) reduce (_ + _)))
 
-    forwards (biHash.clone(), Option(aRes, bRes), abFunc)
-    forwards (biHash.empty,   None,               abFunc)
-    backwards(biHash.clone(), Option(bRes, aRes), baFunc)
-    backwards(biHash.empty,   None,               baFunc)
+    testFunc(biHash.clone, expectedSome, f)
+    testFunc(biHash.empty, None,         f)
 
   }
 
   //@
   test("reduceRight(func)") {
-
-    def forwards(bhm: BHM, target: (A, B), func: ((A, B), (A, B)) => (A, B)) {
-      testFunc(bhm, target, func)
-    }
-
-    def backwards(bhm: BHM, target: (B, A), func: ((B, A), (B, A)) => (B, A)) {
-      testFunc(bhm, target, func)
-    }
-
-    def testFunc[T, U](bhm: BHM, target: T, func: (T, T) => T) {
-      (bhm reduceRight func) should equal (target)
-    }
-
-    val (aFunc, aRes) = ((a1: A, a2: A) => a1 * a2, biHash map ((_: AB)._1) product)
-    val (bFunc, bRes) = ((b1: B, b2: B) => b1 + b2, biHash map ((_: BA)._2) mkString)
-    val abFunc = (acc: (A, B), elem: (A, B)) => (aFunc(acc._1, elem._1), bFunc(acc._2, elem._2))
-    val baFunc = (acc: (B, A), elem: (B, A)) => (bFunc(acc._1, elem._1), aFunc(acc._2, elem._2))
-
-    forwards (biHash.clone(), (aRes, bRes), abFunc)
-    backwards(biHash.clone(), (bRes, aRes), baFunc)
-
+    val f = (tup1: AB, tup2: AB) => (tup1._1 * tup2._1, tup1._2 + tup2._2)
+    val expected = (biHash map (_._1) product, biHash map (_._2) reduceRight (_ + _))
+    biHash.clone reduceRight f should equal (expected)
   }
 
   //@
   test("reduceRightOption(func)") {
 
-    def forwards(bhm: BHM, target: Option[(A, B)], func: ((A, B), (A, B)) => (A, B)) {
-      testFunc(bhm, target, func)
+    def testFunc(bhm: BHM, target: Option[AB], func: (AB, AB) => AB) {
+      (bhm reduceRightOption func) should equal (target)
     }
 
-    def backwards(bhm: BHM, target: Option[(B, A)], func: ((B, A), (B, A)) => (B, A)) {
-      testFunc(bhm, target, func)
-    }
+    val f = (tup1: AB, tup2: AB) => (tup1._1 * tup2._1, tup1._2 + tup2._2)
+    val expectedSome = Option((biHash map (_._1) product, biHash map (_._2) reduceRight (_ + _)))
 
-    def testFunc[T, U](bhm: BHM, target: Option[T], func: (T, T) => T) {
-      (bhm reduceRight func) should equal (target)
-    }
-
-    val (aFunc, aRes) = ((a1: A, a2: A) => a1 * a2, biHash map ((_: AB)._1) product)
-    val (bFunc, bRes) = ((b1: B, b2: B) => b1 + b2, biHash map ((_: BA)._2) mkString)
-    val abFunc = (acc: (A, B), elem: (A, B)) => (aFunc(acc._1, elem._1), bFunc(acc._2, elem._2))
-    val baFunc = (acc: (B, A), elem: (B, A)) => (bFunc(acc._1, elem._1), aFunc(acc._2, elem._2))
-
-    forwards (biHash.clone(), Option(aRes, bRes), abFunc)
-    forwards (biHash.empty,   None,               abFunc)
-    backwards(biHash.clone(), Option(bRes, aRes), baFunc)
-    backwards(biHash.empty,   None,               baFunc)
+    testFunc(biHash.clone, expectedSome, f)
+    testFunc(biHash.empty, None,         f)
 
   }
 
@@ -1204,23 +902,14 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@ Refactor within self
   test("retain(func)") {
 
-    val headMapAB = biHash.retain((a: A, b: B) => (a, b) == biHash.head)
+    val headMapAB = biHash.retain { case (a, b) => (a, b) == biHash.head }
     headMapAB should have ('sameElements (BiHashMap(biHash.head)))
 
-    val tailMapAB = biHash.retain{(a: A, b: B) => val x = (a, b); biHash.tail.exists((_: BA) == x)}  //@ WHY IS THIS NECESSARY?!
+    val tailMapAB = biHash.retain { case (a, b) => biHash.tail.exists(_ == (a, b)) }
     tailMapAB should have ('sameElements (BiHashMap(biHash.tail.toSeq: _*)))
 
-    val allMapAB = biHash.retain((a: A, b: B) => true)
+    val allMapAB = biHash.retain((_, _) => true)
     allMapAB should have ('sameElements (biHash))
-
-    val headMapBA = biHash.retain((b: B, a: A) => (b, a) == biHash.head.swap)
-    headMapBA should have ('sameElements (BiHashMap(biHash.head.swap)))
-
-    val tailMapBA = biHash.retain{(b: B, a: A) => val x = (b, a); biHash.tail.map((_: AB).swap).exists((_: BA) == x)}  //@ WHY IS THIS NECESSARY?!
-    tailMapBA should have ('sameElements (BiHashMap(biHash.tail.map((_: AB).swap).toSeq: _*)))
-
-    val allMapBA = biHash.retain((b: B, a: A) => true)
-    allMapBA should have ('sameElements (biHash))
 
   }
 
@@ -1236,35 +925,20 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   //@ Share code with the two below
   test("scan(res)(func)") {
-
     val (abBase, abFunc) = ((0, ""), (x: (A, B), y: (A, B)) => (x._1 + y._1, x._2 + y._2))
     biHash.scan(abBase)(abFunc) should have ('sameElements (baseList.scan(abBase)(abFunc)))
-
-    val (baBase, baFunc) = (("", 0), (x: (B, A), y: (B, A)) => (x._1 + y._1, x._2 + y._2))
-    biHash.scan(baBase)(baFunc) should have ('sameElements (baseList.map(_.swap).scan(baBase)(baFunc)))
-
   }
 
   //@
   test("scanLeft(res)(func)") {
-
     val (abBase, abFunc) = ((0, ""), (x: (A, B), y: (A, B)) => (x._1 + y._1, x._2 + y._2))
     biHash.scanLeft(abBase)(abFunc) should have ('sameElements (baseList.scanLeft(abBase)(abFunc)))
-
-    val (baBase, baFunc) = (("", 0), (x: (B, A), y: (B, A)) => (x._1 + y._1, x._2 + y._2))
-    biHash.scanLeft(baBase)(baFunc) should have ('sameElements (baseList.map(_.swap).scanLeft(baBase)(baFunc)))
-
   }
 
   //@
   test("scanRight(res)(func)") {
-
     val (abBase, abFunc) = ((0, ""), (x: (A, B), y: (A, B)) => (x._1 + y._1, x._2 + y._2))
     biHash.scanRight(abBase)(abFunc) should have ('sameElements (baseList.scanRight(abBase)(abFunc)))
-
-    val (baBase, baFunc) = (("", 0), (x: (B, A), y: (B, A)) => (x._1 + y._1, x._2 + y._2))
-    biHash.scanRight(baBase)(baFunc) should have ('sameElements (baseList.map(_.swap).scanRight(baBase)(baFunc)))
-
   }
 
   test("size") {
@@ -1276,59 +950,45 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   test("slice(from, until)") {
     val slice = biHash.slice(1, 4)
     slice should have size (3)
-    slice foreach (baseList.contains(_: AB) should equal (true))
+    slice foreach (baseList.contains(_) should equal (true))
   }
 
   test("sliding(size)") {
     val slider = biHash.sliding(2)
     val window = slider.next()
     window should have size (2)
-    window foreach (baseList.contains(_: AB) should equal (true))
+    window foreach (baseList.contains(_) should equal (true))
   }
 
   test("sliding(size, step)") {
     val slider = biHash.sliding(2, 2)
     val window = slider.next()
     window should have size (2)
-    window foreach (baseList.contains(_: AB) should equal (true))
+    window foreach (baseList.contains(_) should equal (true))
   }
 
   //@
   //@ Refactor for code sharing within self
   test("span(func)") {
 
-    val (preAB1, postAB1) = biHash.span(baseList.contains((_: (A, B))))
+    val (preAB1, postAB1) = biHash.span(baseList.contains(_))
     preAB1 should have ('sameElements (baseList))
     postAB1 should have size (0)
 
-    val (preAB2, postAB2) = biHash.span(!baseList.contains((_: (A, B))))
+    val (preAB2, postAB2) = biHash.span(!baseList.contains(_))
     preAB2 should have size (0)
     postAB2 should have ('sameElements (baseList))
 
-    val (preAB3, postAB3) = biHash.span((_: (A, B)) == biHash.head)
+    val (preAB3, postAB3) = biHash.span(_ == biHash.head)
     preAB3 should have size (1)
     preAB3.head should equal (biHash.head)
     postAB3 should have size (biHash.size - 1)
-
-    val (preBA1, postBA1) = biHash.span(baseList.contains((_: (B, A))))
-    preBA1 should have ('sameElements (baseList))
-    postBA1 should have size (0)
-
-    val (preBA2, postBA2) = biHash.span(!baseList.contains((_: (B, A))))
-    preBA2 should have size (0)
-    postBA2 should have ('sameElements (baseList))
-
-    val (preBA3, postBA3) = biHash.span((_: (B, A)) == biHash.head.swap)
-    preBA3 should have size (1)
-    preBA3.head should equal (biHash.head)
-    postBA3 should have size (biHash.size - 1)
 
   }
 
   test("splitAt(n)") {
     val (before, after) = biHash.splitAt(baseList.length / 2)
-    before forall (after.get((_: AB)._1) should equal (None))
-    after forall (before.get((_: AB)._1) should equal (None))
+    before forall (entry => after.get(entry._1) == None) should be (true)
     (before.size + after.size) should equal (baseList.size)
     before.size should equal (baseList.length / 2)
     after.size should equal (baseList.length - (baseList.length / 2))
@@ -1382,13 +1042,9 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   test("takeWhile(func)") {
 
-    val abTaken = biHash takeWhile ((_: AB)._1 <= (baseList map (_._1) max))
+    val abTaken = biHash takeWhile (_._1 <= (baseList map (_._1) max))
     abTaken.toList.distinct.size should equal (baseList.size)
     abTaken.size should equal (baseList.size)
-
-    val baTaken = biHash takeWhile ((_: BA)._1.contains(""))
-    baTaken.toList.distinct.size should equal (baseList.size)
-    baTaken.size should equal (baseList.size)
 
     var counter = 0
     val taken = biHash takeWhile { case _ => counter += 1; counter < baseList.size }
@@ -1415,11 +1071,11 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@ Why doesn't `should` work here?
   test("toIterator") {
-    baseList.toIterator should have ('sameElements (biHash.toIterator))
+    baseList.toIterator.sameElements(biHash.toIterator) should be (true)
   }
 
   test("toList") {
-    baseList.sameElements(biHash.toList) should equal (true)
+    baseList.sameElements(biHash.toList) should be (true)
   }
 
   test("toMap") {
@@ -1444,15 +1100,9 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@
   test("transform(func)") {
-
     val abFunc: (A, B) => B = (k: A, v: B) => v + "_" + k.toString
     val abTransformed = biHash transform abFunc
     abTransformed should equal (BiHashMap((baseList map { case (k, v) => (k, (abFunc(k, v))) }): _*))
-
-    val baFunc: (B, A) => A = (k: B, v: A) => k.size + v
-    val baTransformed = biHash transform baFunc
-    baTransformed should equal (BiHashMap((baseList map (_.swap) map { case (k, v) => (k, (baFunc(k, v))) }): _*))
-
   }
 
   test("unzip") {
@@ -1484,10 +1134,15 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@ Refactor
   //@ Can share code with above
   test("updated(a, b)") {
-    val aElem = baseList(0)._1 + 987
+
     val bElem = baseList(0)._2 + "!"
-    (biHash updated (baseList(0)._1, bElem))(baseList(0)._1) should equal (bElem)
-    (biHash updated (baseList(0)._2, aElem))(baseList(0)._2) should equal (aElem)
+    val updatedAB = biHash updated (baseList(0)._1, bElem)
+    updatedAB(baseList(0)._1) should equal (bElem)
+
+    val aElem = baseList(0)._1 + 987
+    val updatedBA = biHash updated (baseList(0)._2, aElem)
+    updatedBA(baseList(0)._2) should equal (aElem)
+
   }
 
   //@ Refactor
@@ -1511,32 +1166,25 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@
   test("withFilter(func)") {
-
     import collection.mutable.ListBuffer
-
     val abBuffer = new ListBuffer[(A, B)]()
-    biHash withFilter ((_: AB)._1 < (baseList map (_._1) max)) foreach (abBuffer += _)
+    biHash withFilter ((entry: (A, B)) => entry._1 < (baseList map (_._1) max)) foreach (abBuffer += _)
     abBuffer.toList.size should equal (baseList.size - 1)
-
-    val baBuffer = new ListBuffer[(B, A)]()
-    biHash withFilter ((_: BA)._1.contains("klajshfgkljadngkljangdkjlangdkljn")) foreach (baBuffer += _)
-    baBuffer.toList.size should equal (0)
-
   }
 
   //@ Can share code with below
   test("zip(that)") {
     val zipped = (biHash zip (0 to baseList.size))
     zipped.size should equal (baseList.size)
-    zipped should equal (BiHashMap[(A, B), Int](baseList.zipWithIndex))
+    zipped should equal (BiHashMap[(A, B), Int](baseList.zipWithIndex: _*))
   }
 
   test("zipAll(that)") {
     val elem = 15 -> "Beedrill"
     val zipped = (biHash zipAll (0 to baseList.size, elem, -1))
     zipped.size should equal (baseList.size + 1)
-    zipped should not equal (BiHashMap[(A, B), Int](baseList.zipWithIndex))
-    zipped should equal (BiHashMap[(A, B), Int]((elem :: baseList).zipWithIndex))
+    zipped should not equal (BiHashMap[(A, B), Int](baseList.zipWithIndex: _*))
+    zipped should equal (BiHashMap[(A, B), Int]((elem :: baseList).zipWithIndex: _*))
   }
 
   test("zipWithIndex") {
