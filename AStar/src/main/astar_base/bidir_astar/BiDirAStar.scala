@@ -35,12 +35,12 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
 
   }
 
-  override protected def goalIsFound(stepData: BiDirStepData, freshLoc: Coordinate) : Boolean = {
+  override protected def goalIsFound(stepData: BiDirStepData, freshLoc: Coordinate2D) : Boolean = {
     (freshLoc overlaps stepData.goal) || (stepData hasInOthersBreadcrumbs freshLoc)
   }
 
-  override protected def makeNewStepData(stepData: BiDirStepData, freshLoc: Coordinate) : BiDirStepData = {
-    BiDirStepData(freshLoc, stepData)
+  override protected def makeNewStepData(stepData: BiDirStepData, freshLoc: Coordinate2D = BadCoordinate2D, isIncingIters: Boolean = false) : BiDirStepData = {
+    BiDirStepData(freshLoc, stepData, isIncingIters)
   }
 
 }

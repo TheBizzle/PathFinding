@@ -5,13 +5,13 @@ import pathfinding.pathingmap.PathingMap
 import tester.testcluster.TestCluster
 import pathfinding.statuses.{Failure, Success, PathingStatus}
 import pathfinding.StepData
-import pathfinding.coordinate.Coordinate
+import pathfinding.coordinate.Coordinate2D
 import tester.testanalyzer.TestAnalyzer
-import tester.exceptions.{MysteriousDataException}
+import tester.exceptions.MysteriousDataException
 import java.lang.reflect.Field
 import tester.criteria.Talkative
-import pathfinding.testanalyzer.{PathingAnalysisResultBundle, PathingAnalysisFlagBundle}
-import testfunction.{PathingTestFunction, PTFConstructionBundle}
+import pathfinding.testanalyzer.{ PathingAnalysisResultBundle, PathingAnalysisFlagBundle }
+import testfunction.{ PathingTestFunction, PTFConstructionBundle }
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,13 +27,8 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
 
   lazy val tests = generateTests
 
-  def getTestsToRun(testNums: List[Int]) : List[PathingTestFunction] = {
-    tests.zipWithIndex collect { case (x, y) if (testNums.contains(y + 1)) => x }
-  }
-
-  def getSize : Int = {
-    tests.length
-  }
+  def getTestsToRun(testNums: List[Int]) : List[PathingTestFunction] = tests.zipWithIndex collect { case (x, y) if (testNums.contains(y + 1)) => x }
+  def getSize = tests.length
 
   protected def analyze(status: PathingStatus[StepData], flags: PathingAnalysisFlagBundle) : PathingAnalysisResultBundle = {
 
@@ -46,14 +41,15 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
       case Failure(_) =>
         if (isTalkative) println("\n\nFailed to find a solution....")
         (false, Nil)
-      case _          => throw new MysteriousDataException("Unexpected ExecutionStatus!")
+      case x          =>
+        throw new MysteriousDataException("Unexpected ExecutionStatus!  Received: " + x)
     }
 
     new PathingAnalysisResultBundle(result._1, result._2)
 
   }
 
-  private def retracePath(breadcrumbs: Array[Array[Coordinate]], goal: Coordinate, pathingMap: PathingMap, isTalkative: Boolean) : List[Coordinate] = {
+  private def retracePath(breadcrumbs: Array[Array[Coordinate2D]], goal: Coordinate2D, pathingMap: PathingMap, isTalkative: Boolean) : List[Coordinate2D] = {
 
     val pathTaken = eatBreadcrumbsForPath(breadcrumbs, goal)
 
@@ -74,14 +70,11 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
 
   }
 
-  private def eatBreadcrumbsForPath(breadcrumbs: Array[Array[Coordinate]], goal: Coordinate) : List[Coordinate] = {
-    def breadcrumbsHelper(breadcrumbs: Array[Array[Coordinate]], current: Coordinate) : List[Coordinate] = {
+  private def eatBreadcrumbsForPath(breadcrumbs: Array[Array[Coordinate2D]], goal: Coordinate2D) : List[Coordinate2D] = {
+    def breadcrumbsHelper(breadcrumbs: Array[Array[Coordinate2D]], current: Coordinate2D) : List[Coordinate2D] = {
       current :: {
         val next = breadcrumbs(current.x)(current.y)
-        next match {
-          case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => Nil
-          case _                                                            => breadcrumbsHelper(breadcrumbs, next)
-        }
+        if (next.isValid) breadcrumbsHelper(breadcrumbs, next) else Nil
       }
     }
     (goal :: breadcrumbsHelper(breadcrumbs, breadcrumbs(goal.x)(goal.y))).reverse
@@ -102,22 +95,26 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
     new PathingTestFunction(subject, analyze, testNumber, shouldPass, bundle.expectedPathLength)
   }
 
-  // \=============================/--------------------------------------------\=================================/
-  // ------------------------------|   Code for test map strings starts here    |----------------------------------
-  // /=============================\--------------------------------------------/=================================\
-  // |                                                                                                            |
-  // | Look... there's no pleasant way to handle this scenario.  I want to be able to nicely draw a map in ASCII. |
-  // |   Before, I tied each map string into a TestFunction-extending singleton, but I also had to pass in the    |
-  // |     desired pass/fail effect and the test number.  It ate up a lot of space and was pretty redundant.      |
-  // |    I could wrap the PathingMapStrings and their metadata inside a list, effectively avoiding spacewaste    |
-  // |  issues, but... then readability suffers, and I feel that readability is very important when it comes to   |
-  // |   drawing ASCII maps.  So... I'm leaving the collection of PathingMapStrings here as it is.  I will use    |
-  // |  reflection to scrape info from the name of each PathingMapString, which must take on the regex-matchable  |
-  // |   form of "TestMapString([0-9]+)((_L([0-9]+))?)"  =>                                                       |
-  // |    $1: The test number (which will get passed as an argument to the TestFunction).                         |
-  // |    $2: The length of path that the tester should find.  If unspecified, the test will be expected to fail  |
-  // |                                                                                                            |
-  // \============================================================================================================/
+  /*
+
+  \=============================/--------------------------------------------\=================================/
+  ------------------------------|   Code for test map strings starts here    |----------------------------------
+  /=============================\--------------------------------------------/=================================\
+  |                                                                                                            |
+  | Look... there's no pleasant way to handle this scenario.  I want to be able to nicely draw a map in ASCII. |
+  |   Before, I tied each map string into a TestFunction-extending singleton, but I also had to pass in the    |
+  |     desired pass/fail effect and the test number.  It ate up a lot of space and was pretty redundant.      |
+  |    I could wrap the PathingMapStrings and their metadata inside a list, effectively avoiding spacewaste    |
+  |  issues, but... then readability suffers, and I feel that readability is very important when it comes to   |
+  |   drawing ASCII maps.  So... I'm leaving the collection of PathingMapStrings here as it is.  I will use    |
+  |  reflection to scrape info from the name of each PathingMapString, which must take on the regex-matchable  |
+  |   form of "TestMapString([0-9]+)((_L([0-9]+))?)"  =>                                                       |
+  |    $1: The test number (which will get passed as an argument to the TestFunction).                         |
+  |    $2: The length of path that the tester should find.  If unspecified, the test will be expected to fail  |
+  |                                                                                                            |
+  \============================================================================================================/
+
+  */
 
   private val TestMapString1_L14 = new PathingMapString("*_____________G", "akjshdkjashldjaksdhljakds")
 

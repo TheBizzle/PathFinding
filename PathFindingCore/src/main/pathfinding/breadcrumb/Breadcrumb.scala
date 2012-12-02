@@ -1,6 +1,6 @@
 package pathfinding.breadcrumb
 
-import pathfinding.coordinate.Coordinate
+import pathfinding.coordinate.Coordinate2D
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,4 +9,4 @@ import pathfinding.coordinate.Coordinate
  * Time: 8:55 PM
  */
 
-case class Breadcrumb(to: Coordinate, from: Coordinate)
+case class Breadcrumb(to: Coordinate2D, from: Coordinate2D)

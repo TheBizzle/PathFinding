@@ -1,8 +1,8 @@
 package pathfinding.pathingmap.pathingmapdata
 
 import pathfinding.pathingmap.terrain._
-import pathfinding.coordinate.Coordinate
-import pathfinding.pathingmap.exceptions.{InvalidMapStringException}
+import pathfinding.coordinate.{ Coordinate, Coordinate2D }
+import pathfinding.pathingmap.exceptions.InvalidMapStringException
 import collection.mutable.ListBuffer
 
 /**
@@ -50,10 +50,10 @@ object PathingMapStringInterpreter {
 
   }
 
-  private def findStartAndGoal(arr: Array[Array[Terrain]], cols: Int, rows: Int) : (Coordinate, Coordinate) = {
+  private def findStartAndGoal(arr: Array[Array[Terrain]], cols: Int, rows: Int) : (Coordinate2D, Coordinate2D) = {
 
-    val selfList = new ListBuffer[Coordinate]()
-    val goalList = new ListBuffer[Coordinate]()
+    val selfList = new ListBuffer[Coordinate2D]()
+    val goalList = new ListBuffer[Coordinate2D]()
 
     for (x <- (0 until cols)) {
       for (y <- (0 until rows)) {

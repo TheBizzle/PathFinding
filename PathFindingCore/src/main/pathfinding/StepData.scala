@@ -1,6 +1,6 @@
 package pathfinding
 
-import coordinate.Coordinate
+import coordinate.{ BadCoordinate2D, Coordinate2D }
 import pathingmap.PathingMap
 
 /**
@@ -10,22 +10,11 @@ import pathingmap.PathingMap
  * Time: 5:27 PM
  */
 
-abstract class StepData(currentLocation: Coordinate,
-                        goalLocation: Coordinate,
-                        pMap: PathingMap,
-                        breadcrumbs: Array[Array[Coordinate]],
-                        endGoalLocation: Coordinate = null) {
-
-  val loc = currentLocation
-  val goal = goalLocation
-  val pathingMap = pMap
-  val breadcrumbArr = breadcrumbs
-  val endGoal = if (null == endGoalLocation) goalLocation else endGoalLocation    // This is a variable that is useful for pathing algorithms that
-                                                                                  // might have multiple intermediary goals,
-                                                                                  // or for the backwards-moving track of bidirectional A*
-
-}
+// `endGoal` is a variable that is useful for pathing algorithms that might have multiple intermediary goals,
+// or for things like the backwards-moving agent in bidirectional A*
+abstract class StepData(val loc: Coordinate2D, val goal: Coordinate2D, val pathingMap: PathingMap,
+                        val breadcrumbArr: Array[Array[Coordinate2D]], val endGoal: Coordinate2D = BadCoordinate2D)
 
 trait StepDataSingleton[T] {
-  def apply(freshLoc: Coordinate, stepData: T) : T
+  def apply(freshLoc: Coordinate2D, stepData: T, isIncingIters: Boolean = false) : T
 }

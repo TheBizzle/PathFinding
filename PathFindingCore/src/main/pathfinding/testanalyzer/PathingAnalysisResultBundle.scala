@@ -1,7 +1,7 @@
 package pathfinding.testanalyzer
 
 import tester.testanalyzer.TestAnalysisResultBundle
-import pathfinding.coordinate.Coordinate
+import pathfinding.coordinate.Coordinate2D
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,4 +10,4 @@ import pathfinding.coordinate.Coordinate
  * Time: 5:25 PM
  */
 
-class PathingAnalysisResultBundle(val wasSuccess: Boolean, val path: List[Coordinate]) extends TestAnalysisResultBundle
+class PathingAnalysisResultBundle(val wasSuccess: Boolean, val path: List[Coordinate2D]) extends TestAnalysisResultBundle

@@ -2,7 +2,7 @@ package astar_base.bidir_astar.concurrency
 
 import astar_base.bidir_astar.BiDirStepData
 import pathfinding.statuses._
-import pathfinding.coordinate.Coordinate
+import pathfinding.coordinate.Coordinate2D
 import annotation.tailrec
 import astar_base.exceptions.UnexpectedDataException
 import pathfinding.breadcrumb.Breadcrumb
@@ -57,16 +57,16 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
     Success(mergeBreadcrumbs(backwardsData, forwardData, backwardsData.loc, backwardsData.goal, false))
   }
 
-  def mergeBreadcrumbs(myData: T, thatData: T, startLoc: Coordinate, endLoc: Coordinate, isForwards: Boolean) : T = {
-    @tailrec def mergeHelper(holder: Coordinate, myCrumbs: Array[Array[Coordinate]], thoseCrumbs: Array[Array[Coordinate]]) {
-      holder match {
-        case Coordinate(Coordinate.InvalidValue, Coordinate.InvalidValue) => throw new UnexpectedDataException(holder.toString)
-        case _ =>
-          val crumb = thoseCrumbs(holder.x)(holder.y)
-          val (indexer, updater) = if (isForwards) (crumb, holder) else (holder, crumb)
-          myCrumbs(indexer.x)(indexer.y) = updater
-          if (!(crumb overlaps endLoc)) mergeHelper(crumb, myCrumbs, thoseCrumbs)
+  def mergeBreadcrumbs(myData: T, thatData: T, startLoc: Coordinate2D, endLoc: Coordinate2D, isForwards: Boolean) : T = {
+    @tailrec def mergeHelper(holder: Coordinate2D, myCrumbs: Array[Array[Coordinate2D]], thoseCrumbs: Array[Array[Coordinate2D]]) {
+      if (holder.isValid) {
+        val crumb = thoseCrumbs(holder.x)(holder.y)
+        val (indexer, updater) = if (isForwards) (crumb, holder) else (holder, crumb)
+        myCrumbs(indexer.x)(indexer.y) = updater
+        if (!crumb.overlaps(endLoc)) mergeHelper(crumb, myCrumbs, thoseCrumbs)
       }
+      else
+        throw new UnexpectedDataException(holder.toString)
     }
     mergeHelper(startLoc, myData.breadcrumbArr, thatData.breadcrumbArr)
     myData

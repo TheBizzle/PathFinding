@@ -1,10 +1,10 @@
 package pathfinding.pathingmap
 
 import direction._
-import exceptions.{UnknownSubclassException, InvalidParameterException}
+import exceptions.{ UnknownSubclassException, InvalidParameterException }
 import terrain._
-import pathingmapdata.{PathingMapStringInterpreter, PathingMapString}
-import pathfinding.coordinate.Coordinate
+import pathingmapdata.{ PathingMapStringInterpreter, PathingMapString }
+import pathfinding.coordinate.{ Coordinate, Coordinate2D }
 import collection.mutable.ListBuffer
 
 /**
@@ -20,7 +20,7 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
   val rowCount = rows
   private val pathingMap = inArr
 
-  def getTerrain(coord: Coordinate) : Terrain = {
+  def getTerrain(coord: Coordinate2D) : Terrain = {
 
     import coord._
 
@@ -31,16 +31,16 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
 
   }
 
-  def neighborsOf(loc: Coordinate) : List[Direction] = {
+  def neighborsOf(loc: Coordinate2D) : List[Direction] = {
     PathingMap.DirList.filter (x => getTerrain(PathingMap.findNeighborCoord(loc, x)).isPassable)
   }
 
-  def step(start: Coordinate, end: Coordinate) {
+  def step(start: Coordinate2D, end: Coordinate2D) {
     pathingMap(start.x)(start.y) = Query
     pathingMap(end.x)(end.y) = Self
   }
 
-  def markAsGoal(coordinate: Coordinate) {
+  def markAsGoal(coordinate: Coordinate2D) {
     pathingMap(coordinate.x)(coordinate.y) = Goal
   }
 
@@ -69,8 +69,8 @@ object PathingMap {
 
   val DirList = List(North, East, South, West)
 
-  def apply(mapString: PathingMapString) : (Coordinate, Coordinate, PathingMap) = {
-    val pathingData = PathingMapStringInterpreter(mapString);   import pathingData._
+  def apply(mapString: PathingMapString) : (Coordinate2D, Coordinate2D, PathingMap) = {
+    val pathingData = PathingMapStringInterpreter(mapString); import pathingData._
     (start, goal, new PathingMap(cols, rows, arr))
   }
 
@@ -78,7 +78,7 @@ object PathingMap {
     TerrainCharConverter(terrain).get
   }
 
-  def findNeighborCoord(loc: Coordinate, dir: Direction) : Coordinate = {
+  def findNeighborCoord(loc: Coordinate2D, dir: Direction) : Coordinate2D = {
     dir match {
       case North => Coordinate(loc.x, loc.y + 1)
       case South => Coordinate(loc.x, loc.y - 1)
@@ -88,7 +88,7 @@ object PathingMap {
     }
   }
 
-  def findDirection(start: Coordinate, end: Coordinate) : Direction = {
+  def findDirection(start: Coordinate2D, end: Coordinate2D) : Direction = {
     if      (end.y == start.y + 1) North
     else if (end.y == start.y - 1) South
     else if (end.x == start.x + 1) East
@@ -96,7 +96,7 @@ object PathingMap {
     else throw new InvalidParameterException(start.toString + " or " + end.toString + " is/are invalid")
   }
 
-  def generateCloneWithPath(path: List[Coordinate], inMap: PathingMap) : PathingMap = {
+  def generateCloneWithPath(path: List[Coordinate2D], inMap: PathingMap) : PathingMap = {
     val outMap = inMap.clone()
     path foreach (coord => outMap.pathingMap(coord.x)(coord.y) = Path)
     outMap

@@ -1,6 +1,6 @@
 package pathfinding.pathingmap.pathingmapdata
 
-import pathfinding.coordinate.Coordinate
+import pathfinding.coordinate.Coordinate2D
 import pathfinding.pathingmap.terrain.Terrain
 
 /**
@@ -10,4 +10,4 @@ import pathfinding.pathingmap.terrain.Terrain
  * Time: 10:51 PM
  */
 
-case class PathingMapData(start: Coordinate, goal: Coordinate, cols: Int, rows: Int, arr: Array[Array[Terrain]])
+case class PathingMapData(start: Coordinate2D, goal: Coordinate2D, cols: Int, rows: Int, arr: Array[Array[Terrain]])

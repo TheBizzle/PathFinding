@@ -1,5 +1,7 @@
 package pathfinding.coordinate
 
+import annotation.tailrec
+
 /**
  * Created by IntelliJ IDEA.
  * User: Jason
@@ -7,47 +9,90 @@ package pathfinding.coordinate
  * Time: 12:25 AM
  */
 
-class Coordinate(val x: Int = Coordinate.InvalidValue, val y: Int = Coordinate.InvalidValue) extends Equals {
+//@ Unit tests!
+sealed trait Coordinate extends Equals {
 
-  override def toString : String = {
-    "(" + x + "," + y + ")"
+  self: DimensionSet =>
+
+  protected type CoordType <: Coordinate
+
+  def copy : CoordType
+
+  def isValid = true
+  def overlaps(that: Coordinate with DimensionSet) = that.isInstanceOf[CoordType] && this.axisCollection == that.axisCollection
+
+  override def toString : String    = axisCollection.mkString("(", ",", ")")
+  override def hashCode             = {
+    @tailrec def calculateHash(hash: Int, tail: Seq[Int], isFirst: Boolean = false) : Int = {
+      tail.toList match {
+        case Nil               => hash
+        case h :: t if isFirst => calculateHash(hash + h, t)
+        case h :: t            => calculateHash(41 * hash + h, t)
+      }
+    }
+    calculateHash(4111, axisCollection, true)
   }
 
-  override def clone() : Coordinate = {
-    Coordinate(x, y)
-  }
-
-  /**
-   * This is the same as equals() HERE IN THE COORDINATE CLASS, but subclasses will
-   * have their own implementations of equals() without their definition of overlappingness
-   * changing, so a universal method for determining overlappingness of of all Coordinates
-   * should be defined here.
-   */
-  def overlaps(that: Any) : Boolean = {
+  override def canEqual(that: Any) = that.isInstanceOf[CoordType]
+  override def equals  (that: Any) = {
     that match {
-      case thatCoord: Coordinate => (x == thatCoord.x) && (y == thatCoord.y)
+      case thatCoord: Coordinate => (thatCoord canEqual this) && (thatCoord overlaps this)
       case _                     => false
     }
-  }
-
-  override def equals(that: Any) : Boolean = {
-    that match {
-      case thatCoord: Coordinate => (thatCoord canEqual this) && (x == thatCoord.x) && (y == thatCoord.y)
-      case _                     => false
-    }
-  }
-
-  override def hashCode : Int = {
-    41 * (4111 + x) + y
-  }
-
-  def canEqual(that: Any) : Boolean = {
-    that.isInstanceOf[Coordinate]
   }
 
 }
 
+trait DimensionSet {
+  def axisCollection = Seq[Int]()
+}
+
+trait OneD extends DimensionSet {
+  def x: Int
+  override def axisCollection = super.axisCollection :+ x
+}
+
+trait TwoD extends OneD {
+  def y: Int
+  override def axisCollection = super.axisCollection :+ y
+}
+
+trait ThreeD extends TwoD {
+  def z: Int
+  override def axisCollection = super.axisCollection :+ z
+}
+
+// Boy... I think I see why `TupleN` is such a pile of crap...
+trait Coordinate1D extends Coordinate with OneD {
+  override protected type CoordType = Coordinate1D
+  override def copy = Coordinate(x)
+}
+
+trait Coordinate2D extends Coordinate with TwoD {
+  override protected type CoordType = Coordinate2D
+  override def copy = Coordinate(x, y)
+}
+
+trait Coordinate3D extends Coordinate with ThreeD {
+  override protected type CoordType = Coordinate3D
+  override def copy = Coordinate(x, y, z)
+}
+
+object BadCoordinate2D extends Coordinate2D with BadCoordinate {
+  override val (x, y) = (-1, -1)
+}
+
+//@ Make this whole class generic on units (i.e. Should all coordinates really have to use `Int`s?)
 object Coordinate {
-  val InvalidValue = -1    // Invalid (initial) X/Y values for Coordinates
-  def apply(x: Int = Coordinate.InvalidValue, y: Int = Coordinate.InvalidValue) = new Coordinate(x, y)
+  def apply(_x: Int)                   = new Coordinate1D { override val x = _x }
+  def apply(_x: Int, _y: Int)          = new Coordinate2D { override val (x, y) = (_x, _y) }
+  def apply(_x: Int, _y: Int, _z: Int) = new Coordinate3D { override val (x, y, z) = (_x, _y, _z) }
+}
+
+//@ This can work really nicely with dynamic mixins; can do the same kind of thing with mixing in `PriorityCoordinate`, as well
+sealed trait BadCoordinate {
+  self: Coordinate =>
+  override def isValid                                       = false
+  override def overlaps(that: Coordinate with DimensionSet)  = false
+  override def canEqual(other: Any)                          = other.isInstanceOf[CoordType with BadCoordinate]
 }

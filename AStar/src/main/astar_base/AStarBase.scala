@@ -17,29 +17,23 @@ import collection.mutable.ListBuffer
 
 abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicFunc: HeuristicBundle => Int) extends AStarLike[T] with AStarGruntwork[T] with PathFinder[T] {
 
-  protected val scalingFactor = branchingFactor        // How much of the map you're willing to query (from 0 to 1)
-  protected val heuristic = heuristicFunc              // The heuristic function that A* will be using
+  protected val scalingFactor = branchingFactor // How much of the map you're willing to query (from 0 to 1)
+  protected val heuristic = heuristicFunc       // The heuristic function that A* will be using
 
   override protected def decide(stepData: T, maxIters: Int) : PathingStatus[T] = {
-
     import stepData._
-
-    if (!queue.isEmpty && (iters < maxIters)) {
-
-      val freshLoc = getFreshLoc(queue, beenThereArr).getOrElse(return Failure(stepData))   // Exit point (failure)
-      pathingMap.step(loc, freshLoc)
-
-      if (goalIsFound(stepData, freshLoc))
-        return Success(makeNewStepData(stepData, freshLoc))                               // Exit point (success)
-
-      stepData.incIters()
-      beenThereArr(freshLoc.x)(freshLoc.y) = true
-      Continue(makeNewStepData(stepData, freshLoc))                                         // Exit point (only to return again soon)
-
-    }
+    if (!queue.isEmpty && (iters < maxIters))
+      (for (freshLoc <- getFreshLoc(queue, beenThereArr)) yield {
+        pathingMap.step(loc, freshLoc)
+        if (goalIsFound(stepData, freshLoc))
+          Success(makeNewStepData(stepData, freshLoc))
+        else {
+          beenThereArr(freshLoc.x)(freshLoc.y) = true
+          Continue(makeNewStepData(stepData, freshLoc, true))
+        }
+      }) getOrElse Failure(stepData)
     else
-      Failure(makeNewStepData(stepData, Coordinate()))                                      // Exit point (failure)
-
+      Failure(makeNewStepData(stepData))
   }
 
   override protected def step(stepData: T) : (T, List[Breadcrumb]) = {
@@ -51,8 +45,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
       n =>
 
         val neighbor = PathingMap.findNeighborCoord(loc, n)
-        val x = neighbor.x
-        val y = neighbor.y
+        import neighbor.{x, y}
 
         if (!beenThereArr(x)(y)) {
 

@@ -7,42 +7,28 @@ package pathfinding.coordinate
  * Time: 1:52 AM
  */
 
-class PriorityCoordinate(private val xLoc: Int, private val yLoc: Int, priority: Int) extends Coordinate(xLoc, yLoc) with Equals {
-
-  def this(coord: Coordinate, priorityVal: Int) {
-    this(coord.x, coord.y, priorityVal)
-  }
-
-  def asCoordinate : Coordinate = {
-    Coordinate(x, y)
-  }
-
-  override def toString : String = {
-    super.toString + ":" + priority
-  }
-
-  override def clone() : PriorityCoordinate = {
-    PriorityCoordinate(x, y, priority)
-  }
-
-  override def equals(that: Any) : Boolean = {
+//@ This stuff should be in the 'datastructure' package...
+trait PriorityCoordinate {
+  self: Coordinate =>
+  def priority: Int
+  override def hashCode             = 41 * super.hashCode + priority
+  override def toString             = "%s:%s".format(super.toString, priority)
+  override def canEqual(other: Any) = other.isInstanceOf[this.type]
+  override def equals  (that: Any)  = {
     that match {
-      case thatCoord: PriorityCoordinate => super.equals(that) && (priority == thatCoord.priority)
-      case _                             => false
+      case thatCoord: this.type => super.equals(thatCoord) && (priority == thatCoord.priority)
+      case _                    => false
     }
   }
-
-  override def hashCode : Int = {
-    41 * super.hashCode + priority
-  }
-
-  override def canEqual(other: Any) : Boolean = {
-    other.isInstanceOf[PriorityCoordinate]
-  }
-
 }
 
 object PriorityCoordinate {
-  def apply(xLoc: Int, yLoc: Int, priority: Int) = new PriorityCoordinate(xLoc, yLoc, priority)
-  def apply(coord: Coordinate, priority: Int) = new PriorityCoordinate(coord.x, coord.y, priority)
+  protected type Cor2  = Coordinate2D
+  protected type PCor2 = Coordinate2D with PriorityCoordinate
+  def apply(coord: Cor2, priority: Int)       : PCor2 = apply(coord.x, coord.y, priority)
+  def apply(_x: Int, _y: Int, _priority: Int) : PCor2 = new Coordinate2D with PriorityCoordinate {
+    override val (x, y, priority) = (_x, _y, _priority)
+    override def copy = apply(x, y, priority)
+  }
 }
+
