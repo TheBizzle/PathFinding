@@ -66,7 +66,6 @@ trait BijectionReverseOps[A, B, M[X, Y] <: MMap[X, Y], R[X, Y] <: Bijection[X, Y
   def mapAs[C](f: (A) => C)       : collection.Map[C, B] = bImplWrapper mapValues  f map (_.swap)
 
   // Collection-morphing methods
-  //@ Should `Bijection` have base implementations of these things?  Seems probable
   def bIterator : Iterator[B]       = bImplWrapper.keysIterator
   def bSet      : collection.Set[B] = bImplWrapper.keySet
   def bValues   : Iterable[B]       = bImplWrapper.keys
