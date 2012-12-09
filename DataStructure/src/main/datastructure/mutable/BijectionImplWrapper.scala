@@ -10,8 +10,7 @@ import collection.mutable.{ Map => MMap }
  * Time: 9:45 PM
  */
 
-//@ All of these pointless `repr`s and `Repr`s laying around...
-private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: MMap[X, Y], secondaryMap: MMap[Y, X], repr: Repr) {
+private[datastructure] class BijectionImplWrapper[X, Y, R[I, J] <: MMap[I, J]](primaryMap: R[X, Y], secondaryMap: R[Y, X]) {
 
   private type Tup = (X, Y)
 

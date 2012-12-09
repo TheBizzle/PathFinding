@@ -1,7 +1,7 @@
 package datastructure.mutable
 
 import scala.deprecated
-import collection.mutable.{ Map => MMap }
+import collection.mutable.{ Map => MMap, MapLike }
 
 import utilitylib.typewarfare.TypeWarfare.||
 
@@ -12,24 +12,33 @@ import utilitylib.typewarfare.TypeWarfare.||
  * Time: 11:33 PM
  */
 
-trait Bijection[A, B, M[X, Y] <: MMap[X, Y], MAB <: M[A, B], MBA <: M[B, A], Rpr <: MMap[A, B]] extends MMap[A, B] with Equals {
+trait Bijection[A, B, M[X, Y] <: MMap[X, Y], Rpr[X, Y] <: Bijection[X, Y, M, Rpr]]
+  extends MMap[A, B]
+    with MapLike[A, B, Rpr[A, B]]
+    with BijectionForwardOps[A, B, M, Rpr]
+    with BijectionReverseOps[A, B, M, Rpr]
+    with Equals
+{
 
-  protected type Repr = Rpr
+  protected type MAB  = M[A, B]
+  protected type MBA  = M[B, A]
+  protected type Repr = Rpr[A, B]
   private   type Tup  = (A, B)
 
-  protected def abMap: MAB
-  protected def baMap: MBA
+  protected def abMap:   MAB
+  protected def baMap:   MBA
+  protected def myEmpty: Repr  //@ Yuck!  Let's find a way around this one day!  Done because, in this trait, I don't see how we can provide a base implementation of `empty`.
+                               // If we don't give one, though, `MapLike` and `MMap` get us an implementation that is incompatible with `Rpr`.
 
-  override def hashCode() : Int                =   abMap.hashCode() ^ baMap.hashCode()   // XOR the hashcodes of the two maps
-  override def clear()                           { abMap.clear(); baMap.clear() }
-  override def size       : Int                = { require (abMap.size == baMap.size); abMap.size }
+  override def clear()             { abMap.clear(); baMap.clear() }
+  override def empty      : Repr =   myEmpty
+  override def hashCode() : Int  =   abMap.hashCode() ^ baMap.hashCode()   // XOR the hashcodes of the two maps
+  override def size       : Int  = { require (abMap.size == baMap.size); abMap.size }
 
   override def canEqual(other: Any) : Boolean
   override def equals(that: Any)    : Boolean  = {
     that match {
-      case b: Bijection[_, _, _, _, _, _] => (b canEqual this) &&
-                                               ((b.abMap.equals(abMap) && b.baMap.equals(baMap)) ||
-                                                (b.abMap.equals(baMap) && b.baMap.equals(abMap)))
+      case b: Bijection[_, _, _, _] => (b canEqual this) && ((b.abMap.equals(abMap) && b.baMap.equals(baMap)) || (b.abMap.equals(baMap) && b.baMap.equals(abMap)))
       case _                              => false
     }
   }
@@ -61,23 +70,6 @@ trait Bijection[A, B, M[X, Y] <: MMap[X, Y], MAB <: M[A, B], MBA <: M[B, A], Rpr
   override def retain                     (p: (A, B) => Boolean)                             : this.type   = { this.seq foreach { case (k, v) => if (!p(k, v)) this -= k }; this }
   override def transform                  (f: (A, B) => B)                                   : this.type   = { this.iterator foreach { case (k, v) => update(k, f(k, v)) }; this }
   override def withDefault                (d: A => B)                                        : MMap[A, B]  =   abMap withDefault d   //@ I'd love to do this with a better return type...
-
-  // Abstracts for As
-  def filterAs(p: (A) => Boolean) : collection.Map[A, B]
-  def mapAs[C](f: (A) => C)       : collection.Map[C, B]  //@ I'd like to return essentially `this.type[C, B]`, but that'll require some `Repr` magic, I think
-
-  def aIterator: Iterator[A]
-  def aSet:      collection.Set[A]
-  def aValues:   Iterable[A]
-
-
-  // Abstracts for Bs
-  def filterBs(p: (B) => Boolean) : collection.Map[A, B]
-  def mapBs[C](f: (B) => C)       : collection.Map[A, C]  //@ I'd like to return essentially `this.type[A, C]`, but that'll require some `Repr` magic, I think
-
-  def bIterator: Iterator[B]
-  def bSet:      collection.Set[B]
-  def bValues:   Iterable[B]
 
   def sameElements[U : ((A, B) || (B, A))#T, C >: U](that: collection.GenIterable[C]) : Boolean = (abMap sameElements that) || (baMap sameElements that)
 

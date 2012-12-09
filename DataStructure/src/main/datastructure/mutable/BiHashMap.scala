@@ -1,7 +1,7 @@
 package datastructure.mutable
 
 import collection.{ CustomParallelizable, generic, mutable }
-import mutable.{ HashMap, MapLike }
+import mutable.HashMap
 import generic.{ CanBuildFrom, MutableMapFactory }
 
 import datastructure.parallel.mutable.ParBiHashMap
@@ -16,8 +16,7 @@ import datastructure.parallel.mutable.ParBiHashMap
 //@ Should probably implement `toString` correctly; currently claims this to be a `Map`
 //@ Should add `<->` as a tuple-building operator
 class BiHashMap[A, B] private[datastructure](override protected val abMap: HashMap[A, B], override protected val baMap: HashMap[B, A])
-    extends Bijection[A, B, HashMap, HashMap[A, B], HashMap[B, A], BiHashMap[A, B]]
-    with MapLike[A, B, BiHashMap[A, B]]
+    extends Bijection[A, B, HashMap, BiHashMap]
     with CustomParallelizable[(A, B), ParBiHashMap[A, B]]
     with BiHashForwardOps[A, B]
     with BiHashReverseOps[A, B] {
@@ -28,13 +27,13 @@ class BiHashMap[A, B] private[datastructure](override protected val abMap: HashM
   }
 
   // Toggles whether a size map is used to track hash map statistics for the child maps.
+  def flip                   : BiHashMap[B, A] =   new BiHashMap(baMap.clone(), abMap.clone())
+  def swap                   : BiHashMap[B, A] =   flip
   def useSizeMap(t: Boolean)                     { abMap.useSizeMap(t); baMap.useSizeMap(t) }
-  def swap                   : BiHashMap[B, A] =   new BiHashMap(baMap.clone(), abMap.clone())
-  def flip                   : BiHashMap[B, A] =   swap
 
   override def clone() : BiHashMap[A, B]      = new BiHashMap(abMap.toSeq: _*)
   override def par     : ParBiHashMap[A, B]   = throw new UnsupportedOperationException("`ParBiHashMap` is not yet in an operable state.") //@
-  override def empty   : BiHashMap[A, B]      = BiHashMap.empty[A, B]
+  override def myEmpty   : BiHashMap[A, B]    = BiHashMap.empty[A, B]
   override def canEqual(other: Any) : Boolean = other.isInstanceOf[BiHashMap[A, B]]  // Might pay to do "|| other.isInstanceOf[BiHashMap[B, A]]"... if not for type erasure
 
 }
