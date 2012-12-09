@@ -28,7 +28,26 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: MMap[X, Y
   def keys                                       : Iterable[X] =   primaryMap.keys
   def keysIterator                               : Iterator[X] =   primaryMap.keysIterator
   def keySet                                     : Set[X]      =   primaryMap.keySet
-  def put               (key: X, value: Y)       : Option[Y]   = { clearBinds(key, value); secondaryMap.put(value, key); primaryMap.put(key, value) }
+
+  def put(key: X, value: Y) : Option[Y] = {
+    val x = primaryMap.get(key)
+    clearBinds(key, value)
+    secondaryMap.put(value, key)
+    primaryMap.put(key, value)
+    x
+  }
+
+  def remove(key: X) : Option[Y] = {
+    get(key) foreach (secondaryMap.remove(_))
+    primaryMap.remove(key)
+  }
+
+  def update(x: X, y: Y) {
+    val hold = primaryMap.get(x)
+    primaryMap.update(x, y)
+    hold foreach (secondaryMap.remove(_))
+    secondaryMap.put(y, x)
+  }
 
   // Function-chaining methods
   def andThen[C]              (k: (Y) => C)                   : PartialFunction[X, C]   = primaryMap andThen k
@@ -43,18 +62,6 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: MMap[X, Y
   def copyToArray[C >: Tup] (xs: Array[C], start: Int)                                 { primaryMap.copyToArray(xs, start) }
   def copyToArray[C >: Tup] (xs: Array[C], start: Int = 0, len: Int = primaryMap.size) { primaryMap.copyToArray(xs, start, len) }
   def copyToBuffer[C >: Tup](dest: collection.mutable.Buffer[C])                       { primaryMap.copyToBuffer(dest) }
-
-  def remove(key: X) : Option[Y] = {
-    get(key) foreach (secondaryMap.remove(_))
-    primaryMap.remove(key)
-  }
-
-  def update(x: X, y: Y) {
-    val hold = primaryMap.get(x)
-    primaryMap.update(x, y)
-    hold foreach (secondaryMap.remove(_))
-    secondaryMap.put(y, x)
-  }
 
   private def clearBinds(x: X, y: Y) {
     def removeY(y: Y) {
