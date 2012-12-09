@@ -31,7 +31,6 @@ trait BiHashReverseOps[A, B] {
   def --         (bKeys: GenTraversableOnce[B])             (implicit ignore: DummyImplicit) : Repr             = clone() --= bKeys.seq
 
   // Satanry
-  //@ There is no `That`!
   def ++:[C >: BTup, That](that: TraversableOnce[C])(implicit bf: CanBuildFrom[Repr, C, That], ignore: DummyImplicit) : That = {
     val b = bf(repr)
     if (that.isInstanceOf[collection.IndexedSeqLike[_, _]]) b.sizeHint(this, that.size)
@@ -80,8 +79,5 @@ trait BiHashReverseOps[A, B] {
   def copyToArray[C >: BTup] (xs: Array[C], start: Int)          (implicit ignore: DummyImplicit) { implWrapper.copyToArray(xs, start) }
   def copyToArray[C >: BTup] (xs: Array[C], start: Int, len: Int)(implicit ignore: DummyImplicit) { implWrapper.copyToArray(xs, start, len) }
   def copyToBuffer[C >: BTup](dest: collection.mutable.Buffer[C])(implicit ignore: DummyImplicit) { implWrapper.copyToBuffer(dest) }
-
-  //@ Maybe I'll need this; maybe I won't.
-  private def forwardize[C](f: (B, A) => C) : (A, B) => C = (a: A, b: B) => f(b, a)
 
 }

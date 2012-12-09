@@ -1,8 +1,7 @@
 package datastructure.mutable
 
-import collection.generic.{FilterMonadic, CanBuildFrom}
-import collection.{mutable, GenTraversableOnce, Set}
-import collection.mutable.{Builder, Map => MMap}
+import collection.Set
+import collection.mutable.{ Map => MMap }
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,6 +10,7 @@ import collection.mutable.{Builder, Map => MMap}
  * Time: 9:45 PM
  */
 
+//@ All of these pointless `repr`s and `Repr`s laying around...
 private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: MMap[X, Y], secondaryMap: MMap[Y, X], repr: Repr) {
 
   private type Tup = (X, Y)
