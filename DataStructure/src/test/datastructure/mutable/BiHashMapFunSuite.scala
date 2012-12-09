@@ -15,7 +15,6 @@ import org.scalatest.{ BeforeAndAfterEach, FunSuite, matchers }, matchers.Should
 // The `sorted` method gets called a lot throughout here, since I want to keep tests general and flexible, but a `HashMap`'s ordering is largely unpredictable
 class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatchers {
 
-  //@ Make fuller use of these five aliases!
   type A = Int
   type B = String
   type BHM = BiHashMap[A, B]
@@ -25,7 +24,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   val aList: List[A] = List(5, 17, 1, 9, 4)
   val bList: List[B] = List("five", "seventeen", "one", "nine", "four")
-  val baseList: List[(A, B)] = aList zip bList
+  val baseList: List[AB] = aList zip bList
   val biHash = BiHashMap[A, B]()
 
   override def beforeEach() {
@@ -37,7 +36,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   test("==") {
     (biHash == BiHashMap[Double, B]()) should equal (false)
     (biHash == BiHashMap((aList tail) zip (bList tail) map { case (i, s) => (i.toDouble, s) }: _*)) should equal (false)
-    (biHash == BiHashMap[A, B]()) should equal (false)
+    (biHash == BiHashMap()) should equal (false)
     (biHash == BiHashMap((aList tail) zip (bList tail): _*)) should equal (false)
     (biHash == BiHashMap(baseList: _*)) should equal (true)
   }
@@ -81,12 +80,12 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  test("++(genTraversableOnce[(A, B)])") {
-    def forwards(bhm: BHM, target: GenTraversableOnce[(A, B)], appendee: GenTraversableOnce[(A, B)]) {
+  test("++(genTraversableOnce[AB])") {
+    def forwards(bhm: BHM, target: GenTraversableOnce[AB], appendee: GenTraversableOnce[AB]) {
       testSameElems(bhm ++ bhm toList,      bhm toList)
       testSameElems(bhm ++ appendee toList, target toList)
     }
-    def backwards(bhm: BHM, target: GenTraversableOnce[(A, B)], appendee: GenTraversableOnce[(B, A)]) {
+    def backwards(bhm: BHM, target: GenTraversableOnce[AB], appendee: GenTraversableOnce[BA]) {
       testSameElems(bhm ++ bhm.flip toList, bhm toList)
       testSameElems(bhm ++ appendee toList, target toList)
     }
@@ -97,12 +96,12 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@
   //@ Can share with above
-  test("++:(traversableOnce[(A, B)])") {
-    def forwards(bhm: BHM, target: Traversable[(A, B)], appendee: Traversable[(A, B)]) {
+  test("++:(traversableOnce[AB])") {
+    def forwards(bhm: BHM, target: Traversable[AB], appendee: Traversable[AB]) {
       testSameElems(bhm ++: bhm toList,      bhm toList)
       testSameElems(bhm ++: appendee toList, target toList)
     }
-    def backwards(bhm: BHM, target: Traversable[(A, B)], appendee: Traversable[(B, A)]) {
+    def backwards(bhm: BHM, target: Traversable[AB], appendee: Traversable[BA]) {
       testSameElems(bhm.flip ++: bhm.flip map (_.swap) toList, bhm toList)
       testSameElems(bhm.flip ++: appendee map (_.swap) toList, target toList)
     }
@@ -112,7 +111,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   //@
-  test("++=(traversableOnce[(A, B)])") {
+  test("++=(traversableOnce[AB])") {
 
     val original = biHash.clone
     original ++= original
@@ -174,11 +173,11 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   //@ Refactor this and following test to call same code that generalizes over `GenTraversableOnce`
   test("--(that)") {
-    def forwards(bhm: BHM, target: TraversableOnce[(A, B)], removees: TraversableOnce[A]) {
+    def forwards(bhm: BHM, target: TraversableOnce[AB], removees: TraversableOnce[A]) {
       (bhm -- bhm.aValues) should equal (BiHashMap.empty)
       testSameElems(bhm -- removees, target)
     }
-    def backwards(bhm: BHM, target: TraversableOnce[(A, B)], removees: TraversableOnce[B]) {
+    def backwards(bhm: BHM, target: TraversableOnce[AB], removees: TraversableOnce[B]) {
       (bhm -- bhm.bValues) should equal (BiHashMap.empty)
       testSameElems(bhm -- removees, target)
     }
@@ -190,11 +189,11 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   //@ The behavior of `--=` is entirely wrong, even if the test passes.  The same goes for most of the other `x=` operators, I think.  They need to mutate the collection!
   test("--=(traversableOnce[A])") {
-    def forwards(bhm: BHM, target: TraversableOnce[(A, B)], removees: TraversableOnce[A]) {
+    def forwards(bhm: BHM, target: TraversableOnce[AB], removees: TraversableOnce[A]) {
       (bhm.clone --= bhm.aValues) should equal (BiHashMap.empty)
       testSameElems(bhm.clone --= removees, target)
     }
-    def backwards(bhm: BHM, target: TraversableOnce[(A, B)], removees: TraversableOnce[B]) {
+    def backwards(bhm: BHM, target: TraversableOnce[AB], removees: TraversableOnce[B]) {
       (bhm.clone --= bhm.bValues) should equal (BiHashMap.empty)
       testSameElems(bhm.clone --= removees, target)
     }
@@ -205,10 +204,10 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   //@
   test("-=(elem)") {
-    def forwards(bhm: BHM, target: BHM, elem: (A, B)) {
+    def forwards(bhm: BHM, target: BHM, elem: AB) {
       (bhm -= elem._1); testSameElems(bhm, target)
     }
-    def backwards(bhm: BHM, target: BHM, elem: (B, A)) {
+    def backwards(bhm: BHM, target: BHM, elem: BA) {
       (bhm -= elem._1); testSameElems(bhm, target)
     }
     val myElem = baseList(1)
@@ -366,7 +365,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     intercept[NoSuchElementException] { biHash compose aFunc apply baseList.minBy(_._1)._1 }
     (biHash compose aFunc apply baseList.minBy(_._1)._1 - 1) should equal (baseList.minBy(_._1)._2)
 
-    val bFunc: (B) => B = (b: B) => new String(b.getBytes map (x => (x ^ 2).toByte))
+    val bFunc: (B) => B = (b: B) => new B(b.getBytes map (x => (x ^ 2).toByte))
     intercept[NoSuchElementException] { biHash compose bFunc apply baseList.head._2 }
     biHash compose bFunc apply bFunc(baseList.head._2) should equal (baseList.head._1)
 
@@ -451,7 +450,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   test("copyToBuffer(buff)") {
 
     val abBuff = new ListBuffer[AB]()
-    biHash.copyToBuffer[AB](abBuff) //@@ Note: Another place where this fails is when method type parameter annotations like `C >: (A, B)` and `C >: (B, A)` have to be used and it must decide which to pick
+    biHash.copyToBuffer[AB](abBuff) //@@ Note: Another place where this fails is when method type parameter annotations like `C >: AB` and `C >: BA` have to be used and it must decide which to pick
     abBuff.toList.sorted should equal (biHash.toList.sorted)
 
     val baBuff = new ListBuffer[BA]()
@@ -635,7 +634,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     val aFunc   = (a: A) => acc._1 + aOp(a)
     val bOp     = (b: B) => b + "!"
     val bFunc   = (b: B) => acc._2 + bOp(b)
-    val abFunc  = (ab: (A, B)) => (aFunc(ab._1), bFunc(ab._2))
+    val abFunc  = (ab: AB) => (aFunc(ab._1), bFunc(ab._2))
 
     biHash foreach { case (a: A, b: B) => acc = abFunc((a, b)) }
     acc = (acc._1, acc._2.sorted)
@@ -719,7 +718,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   test("inits") {
-    def checkInits(bhm: BiHashMap[A, B], inits: Iterator[BiHashMap[A, B]]) {
+    def checkInits(bhm: BHM, inits: Iterator[BHM]) {
       inits.next should equal (bhm)
       if (bhm.nonEmpty) checkInits(bhm.init, inits)
     }
@@ -761,7 +760,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   //@ Refactor
   test("map(func)") {
-    val func = (entry: (A, B)) => (entry._1 * 6, entry._2)
+    val func = (entry: AB) => (entry._1 * 6, entry._2)
     (biHash map func) should equal (BiHashMap((baseList map func): _*))
   }
 
@@ -784,7 +783,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   //@ Refactor
   test("mapResult") {
-    val func = (entry: (A, B)) => (entry._1, new String(entry._2.getBytes))
+    val func = (entry: AB) => (entry._1, new B(entry._2.getBytes))
     testSameElems(biHash.mapResult(_ map func).result(), BiHashMap(baseList map func: _*))
   }
 
@@ -841,7 +840,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   test("partition(func)") {
     val abList = baseList
     val aAverage = (abList map (_._1) sum) / abList.size
-    val abComparator = (ab: (A, B)) => (ab._1 < aAverage)
+    val abComparator = (ab: AB) => (ab._1 < aAverage)
     biHash.partition(_ == null)              should equal ((biHash.empty, biHash))                                                                        // Match (none, all)
     biHash.partition(_._1 == abList.head._1) should equal ((BiHashMap(abList.head), BiHashMap(abList.tail: _*)))                                          // Match (one, rest)
     biHash.partition(abComparator)           should equal ((BiHashMap(abList filter (abComparator): _*), BiHashMap(abList filterNot (abComparator): _*))) // Match (some, others)
@@ -961,19 +960,19 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   //@ Share code with the two below
   test("scan(res)(func)") {
-    val (abBase, abFunc) = ((0, ""), (x: (A, B), y: (A, B)) => (x._1 + y._1, x._2 + y._2))
+    val (abBase, abFunc) = ((0, ""), (x: AB, y: AB) => (x._1 + y._1, x._2 + y._2))
     testSameElems(biHash.scan(abBase)(abFunc), biHash.toList.scan(abBase)(abFunc))
   }
 
   //@
   test("scanLeft(res)(func)") {
-    val (abBase, abFunc) = ((0, ""), (x: (A, B), y: (A, B)) => (x._1 + y._1, x._2 + y._2))
+    val (abBase, abFunc) = ((0, ""), (x: AB, y: AB) => (x._1 + y._1, x._2 + y._2))
     testSameElems(biHash.scanLeft(abBase)(abFunc), biHash.toList.scanLeft(abBase)(abFunc))
   }
 
   //@
   test("scanRight(res)(func)") {
-    val (abBase, abFunc) = ((0, ""), (x: (A, B), y: (A, B)) => (x._1 + y._1, x._2 + y._2))
+    val (abBase, abFunc) = ((0, ""), (x: AB, y: AB) => (x._1 + y._1, x._2 + y._2))
     testSameElems(biHash.scanRight(abBase)(abFunc), biHash.toList.scanRight(abBase)(abFunc))
   }
 
@@ -1041,7 +1040,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   test("tails") {
-    def checkTails(bhm: BiHashMap[A, B], tails: Iterator[BiHashMap[A, B]]) {
+    def checkTails(bhm: BHM, tails: Iterator[BHM]) {
       tails.next should equal (bhm)
       if (bhm.nonEmpty) checkTails(bhm.tail, tails)
     }
@@ -1168,7 +1167,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   //@ Refactor
   //@ Can share code with above
-  test("updated(a, b)") {
+  test("updatedAB") {
 
     val bElem = baseList(0)._2 + "!"
     val updatedAB = biHash updated (baseList(0)._1, bElem)
@@ -1196,8 +1195,8 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   //@
   test("withFilter(func)") {
     import collection.mutable.ListBuffer
-    val abBuffer = new ListBuffer[(A, B)]()
-    biHash withFilter ((entry: (A, B)) => entry._1 < (baseList map (_._1) max)) foreach (abBuffer += _)
+    val abBuffer = new ListBuffer[AB]()
+    biHash withFilter ((entry: AB) => entry._1 < (baseList map (_._1) max)) foreach (abBuffer += _)
     abBuffer.toList.size should equal (baseList.size - 1)
   }
 
