@@ -10,7 +10,7 @@ import collection.mutable.{ Map => MMap }
  * Time: 9:45 PM
  */
 
-private[datastructure] class BijectionImplWrapper[X, Y, R[I, J] <: MMap[I, J]](primaryMap: R[X, Y], secondaryMap: R[Y, X]) {
+private[datastructure] class BijectionImplWrapper[X, Y, M[I, J] <: MMap[I, J]](primaryMap: M[X, Y], secondaryMap: M[Y, X]) {
 
   private type Tup = (X, Y)
 
