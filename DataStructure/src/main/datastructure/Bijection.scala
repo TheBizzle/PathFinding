@@ -12,10 +12,13 @@ import utilitylib.typewarfare.TypeWarfare.||
  * Time: 11:33 PM
  */
 
-abstract class Bijection[A, B, M[X, Y] <: MMap[X, Y], MAB <: M[A, B], MBA <: M[B, A], Rpr <: MMap[A, B]](protected val abMap: MAB, protected val baMap: MBA) extends MMap[A, B] with Equals {
+trait Bijection[A, B, M[X, Y] <: MMap[X, Y], MAB <: M[A, B], MBA <: M[B, A], Rpr <: MMap[A, B]] extends MMap[A, B] with Equals {
 
   protected type Repr = Rpr
   private   type Tup  = (A, B)
+
+  protected def abMap: MAB
+  protected def baMap: MBA
 
   override def hashCode() : Int                =   abMap.hashCode() ^ baMap.hashCode()   // XOR the hashcodes of the two maps
   override def clear()                           { abMap.clear(); baMap.clear() }

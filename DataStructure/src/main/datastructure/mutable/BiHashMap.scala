@@ -17,12 +17,14 @@ import datastructure.parallel.mutable.ParBiHashMap
 //@ Should probably implement `toString` correctly; currently claims this to be a `Map`
 //@ Should I instantiate and fill the maps here, or should I instantiate here and leave the population of the maps to `Bijection`...?
 //@ Should add `<->` as a tuple-building operator
-class BiHashMap[A, B] private[datastructure](abm: HashMap[A, B], bam: HashMap[B, A])
-    extends Bijection[A, B, HashMap, HashMap[A, B], HashMap[B, A], BiHashMap[A, B]](abm, bam)
+class BiHashMap[A, B] private[datastructure](override protected val abMap: HashMap[A, B], override protected val baMap: HashMap[B, A])
+    extends Bijection[A, B, HashMap, HashMap[A, B], HashMap[B, A], BiHashMap[A, B]]
     with MapLike[A, B, BiHashMap[A, B]]
     with CustomParallelizable[(A, B), ParBiHashMap[A, B]]
     with BiHashForwardOps[A, B]
     with BiHashReverseOps[A, B] {
+
+
 
   def this(contents: (A, B)*)(implicit aToBMap: HashMap[A, B] = contents.foldRight(new HashMap[A, B]){ case (ab, m) => m += ab },
                                        bToAMap: HashMap[B, A] = contents.foldRight(new HashMap[B, A]){ case (ab, m) => m += ab._2 -> ab._1 }) {
