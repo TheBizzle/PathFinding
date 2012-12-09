@@ -9,6 +9,7 @@ import collection.{ generic, GenTraversableOnce }, generic.CanBuildFrom
  * Time: 9:47 PM
  */
 
+//@ I bet that a lot of this `Ops` stuff could be moved to a `BijectionForwardOps` trait and a `BijectionReverseOps` trait
 trait BiHashForwardOps[A, B] {
 
   self: BiHashMap[A, B] =>
