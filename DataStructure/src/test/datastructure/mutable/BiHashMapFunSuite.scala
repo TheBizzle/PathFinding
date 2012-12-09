@@ -113,25 +113,40 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
     val myList = List(100 -> "hundred", 1000 -> "thousand", 666 -> "satanry")
     val target = List((biHash.toSeq ++ myList): _*)
-    testSameElems(biHash.clone ++= myList, target)
-    testSameElems(biHash.clone ++= (myList map (_.swap)), target)
+
+    val subjectF = biHash.clone
+    testSameElems(subjectF ++= myList, target)
+    testSameElems(subjectF, target)
+
+    val subjectB = biHash.clone
+    testSameElems(subjectB ++= (myList map (_.swap)), target)
+    testSameElems(subjectB, target)
 
   }
 
-  // Cannot be `forwards`/`backwards`ized
   test("+=(elem)") {
+
     val myElem = 9001 -> "was?! mein thousand?!!?!?!?!"
     val target = BiHashMap(myElem :: baseList: _*)
-    testSameElems(biHash.clone += myElem, target)
-    testSameElems(biHash.clone += myElem.swap, target)
+
+    val subjectF = biHash.clone
+    testSameElems(subjectF += myElem, target)
+    testSameElems(subjectF, target)
+
+    val subjectB = biHash.clone
+    testSameElems(subjectB += myElem.swap, target)
+    testSameElems(subjectB, target)
+
   }
 
   test("+=(elem1, elem2, elems)") {
     def forwards(bhm: BHM, target: BHM, elems: AB*) {
-      (bhm += (elems(0), elems(1), elems.splitAt(2)._2: _*)); testSameElems(bhm, target)
+      testSameElems(bhm += (elems(0), elems(1), elems.splitAt(2)._2: _*), target)
+      testSameElems(bhm, target)
     }
     def backwards(bhm: BHM, target: BHM, elems: BA*) {
-      (bhm += (elems(0), elems(1), elems.splitAt(2)._2: _*)); testSameElems(bhm, target)
+      testSameElems(bhm += (elems(0), elems(1), elems.splitAt(2)._2: _*), target)
+      testSameElems(bhm, target)
     }
     val myElems = List(9001 -> "was?! mein thousand?!!?!?!?!", 9002 -> "ja, dein thousand!", 91124 -> "no wai!", 90210 -> "yahweh!")
     forwards (biHash.clone, BiHashMap(baseList ++ myElems: _*), myElems: _*)
@@ -176,15 +191,28 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
     backwards(biHash.clone, List(biHash.toSeq filterNot (myList contains): _*), myList map (_._2))
   }
 
-  //@! The behavior of `--=` is entirely wrong, even if the test passes.  The same goes for most of the other `x=` operators, I think.  They need to mutate the collection!
   test("--=(traversableOnce[A])") {
     def forwards(bhm: BHM, target: TraversableOnce[AB], removees: TraversableOnce[A]) {
-      (bhm.clone --= bhm.aValues) should equal (BiHashMap.empty)
-      testSameElems(bhm.clone --= removees, target)
+
+      val subjectEmpty = bhm.clone
+      (subjectEmpty --= bhm.aValues) should equal (BiHashMap.empty)
+      subjectEmpty should equal (BiHashMap.empty)
+
+      val subject = bhm.clone
+      testSameElems(subject --= removees, target)
+      testSameElems(subject, target)
+
     }
     def backwards(bhm: BHM, target: TraversableOnce[AB], removees: TraversableOnce[B]) {
-      (bhm.clone --= bhm.bValues) should equal (BiHashMap.empty)
-      testSameElems(bhm.clone --= removees, target)
+
+      val subjectEmpty = bhm.clone
+      (subjectEmpty --= bhm.bValues) should equal (BiHashMap.empty)
+      subjectEmpty should equal (BiHashMap.empty)
+
+      val subject = bhm.clone
+      testSameElems(subject --= removees, target)
+      testSameElems(subject, target)
+
     }
     val myList = baseList dropRight 2
     forwards (biHash.clone, List(biHash.toSeq filterNot (myList contains): _*), myList map (_._1))
@@ -193,10 +221,12 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   test("-=(elem)") {
     def forwards(bhm: BHM, target: BHM, elem: AB) {
-      (bhm -= elem._1); testSameElems(bhm, target)
+      testSameElems(bhm -= elem._1, target)
+      testSameElems(bhm, target)
     }
     def backwards(bhm: BHM, target: BHM, elem: BA) {
-      (bhm -= elem._1); testSameElems(bhm, target)
+      testSameElems(bhm -= elem._1, target)
+      testSameElems(bhm, target)
     }
     val myElem = baseList(1)
     val pretarget = baseList filterNot(_ == myElem)
@@ -206,10 +236,12 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   test("-=(elem1, elem2, elems)") {
     def forwards(bhm: BHM, target: BHM, elems: A*) {
-      (bhm -= (elems(0), elems(1), elems.splitAt(2)._2: _*)); testSameElems(bhm, target)
+      testSameElems(bhm -= (elems(0), elems(1), elems.splitAt(2)._2: _*), target)
+      testSameElems(bhm, target)
     }
     def backwards(bhm: BHM, target: BHM, elems: B*) {
-      (bhm -= (elems(0), elems(1), elems.splitAt(2)._2: _*)); testSameElems(bhm, target)
+      testSameElems(bhm -= (elems(0), elems(1), elems.splitAt(2)._2: _*), target)
+      testSameElems(bhm, target)
     }
     val (removables, pretarget) = baseList splitAt (baseList.size - 1)
     forwards (biHash.clone, BiHashMap(pretarget: _*), removables map (_._1): _*)
