@@ -20,13 +20,11 @@ trait Bijection[A, B, M[X, Y] <: MMap[X, Y], Rpr[X, Y] <: Bijection[X, Y, M, Rpr
     with Equals
 {
 
-  protected type MAB  = M[A, B]
-  protected type MBA  = M[B, A]
   protected type Repr = Rpr[A, B]
   private   type Tup  = (A, B)
 
-  protected def abMap:   MAB
-  protected def baMap:   MBA
+  protected def abMap:   M[A, B]
+  protected def baMap:   M[B, A]
   protected def myEmpty: Repr  //@ Yuck!  Let's find a way around this one day!  Done because, in this trait, I don't see how we can provide a base implementation of `empty`.
                                // If we don't give one, though, `MapLike` and `MMap` get us an implementation that is incompatible with `Rpr`.
 
