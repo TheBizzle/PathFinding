@@ -1,8 +1,9 @@
 package datastructure
 
 import scala.deprecated
+import collection.mutable.{ Map => MMap }
+
 import utilitylib.typewarfare.TypeWarfare.||
-import collection.mutable.Map
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,9 +12,10 @@ import collection.mutable.Map
  * Time: 11:33 PM
  */
 
-abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B, A], Rpr <: Map[A, B]](protected val abMap: MAB, protected val baMap: MBA) extends Map[A, B] with Equals {
+abstract class Bijection[A, B, M[X, Y] <: MMap[X, Y], MAB <: M[A, B], MBA <: M[B, A], Rpr <: MMap[A, B]](protected val abMap: MAB, protected val baMap: MBA) extends MMap[A, B] with Equals {
 
   protected type Repr = Rpr
+  private   type Tup  = (A, B)
 
   override def hashCode() : Int                =   abMap.hashCode() ^ baMap.hashCode()   // XOR the hashcodes of the two maps
   override def clear()                           { abMap.clear(); baMap.clear() }
@@ -31,6 +33,31 @@ abstract class Bijection[A, B, M[X, Y] <: Map[X, Y], MAB <: M[A, B], MBA <: M[B,
 
   def iterator : Iterator[(A, B)] = abMap.iterator
 
+  // Lambda-operation methods
+  override def /:[C]                      (z: C)(op: (C, Tup) => C)                          : C           =   abMap./:(z)(op)
+  override def /:\[A1 >: Tup]             (z: A1)(op: (A1, A1) => A1)                        : A1          =   abMap./:\(z)(op)
+  override def :\[C]                      (z: C)(op: (Tup, C) => C)                          : C           =   abMap.:\(z)(op)
+  override def aggregate[C]               (z: C)(seqop: (C, Tup) => C, combop: (C, C) => C)  : C           =   abMap.aggregate(z)(seqop, combop)
+  override def collectFirst[C]            (pf: PartialFunction[Tup, C])                      : Option[C]   =   abMap collectFirst pf
+  override def count                      (p: (Tup) => Boolean)                              : Int         =   abMap count p
+  override def exists                     (p: (Tup) => Boolean)                              : Boolean     =   abMap exists p
+  override def find                       (p: (Tup) => Boolean)                              : Option[Tup] =   abMap find p
+  override def fold[A1 >: Tup]            (z: A1)(op: (A1, A1) => A1)                        : A1          =   abMap.fold(z)(op)
+  override def foldLeft[C]                (z: C)(op: (C, Tup) => C)                          : C           =   abMap.foldLeft(z)(op)
+  override def foldRight[C]               (z: C)(op: (Tup, C) => C)                          : C           =   abMap.foldRight(z)(op)
+  override def forall                     (p: (Tup) => Boolean)                              : Boolean     =   abMap forall p
+  override def foreach[C]                 (f: (Tup) => C)                                                    { abMap.foreach(f) }
+  override def minBy[C]                   (f: (Tup) => C)(implicit cmp: Ordering[C])         : Tup         =   abMap.minBy(f)
+  override def maxBy[C]                   (f: (Tup) => C)(implicit cmp: Ordering[C])         : Tup         =   abMap.maxBy(f)
+  override def reduce[C >: Tup]           (op: (C, C) => C)                                  : C           =   abMap reduce op
+  override def reduceLeft[C >: Tup]       (op: (C, Tup) => C)                                : C           =   abMap reduceLeft op
+  override def reduceLeftOption[C >: Tup] (op: (C, Tup) => C)                                : Option[C]   =   abMap reduceLeftOption op
+  override def reduceOption[C >: Tup]     (op: (C, C) => C)                                  : Option[C]   =   abMap reduceOption op
+  override def reduceRight[C >: Tup]      (op: (Tup, C) => C)                                : C           =   abMap reduceRight op
+  override def reduceRightOption[C >: Tup](op: (Tup, C) => C)                                : Option[C]   =   abMap reduceRightOption op
+  override def retain                     (p: (A, B) => Boolean)                             : this.type   = { this.seq foreach { case (k, v) => if (!p(k, v)) this -= k }; this }
+  override def transform                  (f: (A, B) => B)                                   : this.type   = { this.iterator foreach { case (k, v) => update(k, f(k, v)) }; this }
+  override def withDefault                (d: A => B)                                        : MMap[A, B]  =   abMap withDefault d   //@ I'd love to do this with a better return type...
 
   // Abstracts for As
   def filterAs(p: (A) => Boolean) : collection.Map[A, B]
