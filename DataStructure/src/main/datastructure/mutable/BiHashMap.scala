@@ -4,7 +4,6 @@ import collection.{ CustomParallelizable, generic, mutable }
 import mutable.{ HashMap, MapLike }
 import generic.{ CanBuildFrom, MutableMapFactory }
 
-import datastructure.Bijection
 import datastructure.parallel.mutable.ParBiHashMap
 
 /**

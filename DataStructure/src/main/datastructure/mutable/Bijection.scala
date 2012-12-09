@@ -1,4 +1,4 @@
-package datastructure
+package datastructure.mutable
 
 import scala.deprecated
 import collection.mutable.{ Map => MMap }
@@ -28,13 +28,13 @@ trait Bijection[A, B, M[X, Y] <: MMap[X, Y], MAB <: M[A, B], MBA <: M[B, A], Rpr
   override def equals(that: Any)    : Boolean  = {
     that match {
       case b: Bijection[_, _, _, _, _, _] => (b canEqual this) &&
-                                             ( (b.abMap.equals(abMap) && b.baMap.equals(baMap)) ||
-                                               (b.abMap.equals(baMap) && b.baMap.equals(abMap)) )
+                                               ((b.abMap.equals(abMap) && b.baMap.equals(baMap)) ||
+                                                (b.abMap.equals(baMap) && b.baMap.equals(abMap)))
       case _                              => false
     }
   }
 
-  def iterator : Iterator[(A, B)] = abMap.iterator
+  def iterator : Iterator[Tup] = abMap.iterator
 
   // Lambda-operation methods
   override def /:[C]                      (z: C)(op: (C, Tup) => C)                          : C           =   abMap./:(z)(op)
