@@ -27,7 +27,6 @@ trait BiHashForwardOps[A, B] {
   override def --         (aKeys: GenTraversableOnce[A])              : Repr             = clone() --= aKeys.seq
 
   // Satanry
-  //@ There is no `That`!  (Dummy!  The CBF figures that out!)
   override def ++:[C >: FTup, That](that: TraversableOnce[C])(implicit bf: CanBuildFrom[Repr, C, That]) : That = {
     val b = bf(repr)
     if (that.isInstanceOf[collection.IndexedSeqLike[_, _]]) b.sizeHint(this, that.size)
@@ -45,15 +44,15 @@ trait BiHashForwardOps[A, B] {
   override def --=(abs: TraversableOnce[A])          : this.type = { abs.seq foreach -= ; this }
 
   // General methods
-  override def apply             (aKey: A)                 : B                =   implWrapper.apply(aKey)
-  override def contains          (aKey: A)                 : Boolean          =   implWrapper.contains(aKey)
-  override def default           (aKey: A)                 : B                =   implWrapper.default(aKey)
-  override def get               (aKey: A)                 : Option[B]        =   implWrapper.get(aKey)
-  override def getOrElse[B1 >: B](aKey: A, default: => B1) : B1               =   implWrapper.getOrElse(aKey, default)
-  override def getOrElseUpdate   (aKey: A, bOp: => B)      : B                =   implWrapper.getOrElseUpdate(aKey, bOp)
-  override def isDefinedAt       (aKey: A)                 : Boolean          =   implWrapper.isDefinedAt(aKey)
-  override def put               (aKey: A, bVal: B)        : Option[B]        =   implWrapper.put(aKey, bVal)
-  override def remove            (aKey: A)                 : Option[B]        =   implWrapper.remove(aKey)
+  override def apply             (aKey: A)                 : B                = implWrapper.apply(aKey)
+  override def contains          (aKey: A)                 : Boolean          = implWrapper.contains(aKey)
+  override def default           (aKey: A)                 : B                = implWrapper.default(aKey)
+  override def get               (aKey: A)                 : Option[B]        = implWrapper.get(aKey)
+  override def getOrElse[B1 >: B](aKey: A, default: => B1) : B1               = implWrapper.getOrElse(aKey, default)
+  override def getOrElseUpdate   (aKey: A, bOp: => B)      : B                = implWrapper.getOrElseUpdate(aKey, bOp)
+  override def isDefinedAt       (aKey: A)                 : Boolean          = implWrapper.isDefinedAt(aKey)
+  override def put               (aKey: A, bVal: B)        : Option[B]        = implWrapper.put(aKey, bVal)
+  override def remove            (aKey: A)                 : Option[B]        = implWrapper.remove(aKey)
   override def update            (aKey: A, bVal: B)                           { implWrapper.update(aKey, bVal) }
   override def updated[B1 >: B]  (aKey: A, bVal: B1)       : BiHashMap[A, B1] = this + ((aKey, bVal))
 

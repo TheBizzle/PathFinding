@@ -11,8 +11,6 @@ import collection.mutable.{Builder, Map => MMap}
  * Time: 9:45 PM
  */
 
-//@ Most of this should probably get abstracted out to a BijectionOpsImplWrapper that gets inherited from this class,
-//  and, here, we can override for the few unique behaviors about our particular case (BiHash: `put`, `remove`, `update`)
 private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: MMap[X, Y], secondaryMap: MMap[Y, X], repr: Repr) {
 
   private type Tup = (X, Y)
@@ -69,13 +67,6 @@ private[datastructure] class BiHashImplWrapper[X, Y, Repr](primaryMap: MMap[X, Y
       secondaryMap.remove(y)
     }
     removeY(y); remove(x)
-  }
-
-  //@ Size hints got abandoned, since using them would make the design into a yucky mess.  They likely won't be missed....
-  private def reprMadness[C, That](that: Iterable[C])(implicit bf: CanBuildFrom[Repr, C, That]) : That = {
-    val b = bf(repr)
-    b ++= that
-    b.result()
   }
 
 }

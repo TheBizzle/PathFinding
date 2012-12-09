@@ -49,15 +49,15 @@ trait BiHashReverseOps[A, B] {
   def --=(bas: TraversableOnce[B])         (implicit ignore: DummyImplicit) : this.type = { bas.seq foreach -= ; this }
 
   // General methods
-  def apply             (bKey: B)                (implicit ignore: DummyImplicit) : A                =   implWrapper.apply(bKey)
-  def contains          (bKey: B)                (implicit ignore: DummyImplicit) : Boolean          =   implWrapper.contains(bKey)
-  def default           (bKey: B)                (implicit ignore: DummyImplicit) : A                =   implWrapper.default(bKey)
-  def get               (bKey: B)                (implicit ignore: DummyImplicit) : Option[A]        =   implWrapper.get(bKey)
-  def getOrElse[A1 >: A](bKey: B, default: => A1)(implicit ignore: DummyImplicit) : A1               =   implWrapper.getOrElse(bKey, default)
-  def getOrElseUpdate   (bKey: B, aOp: => A)     (implicit ignore: DummyImplicit) : A                =   implWrapper.getOrElseUpdate(bKey, aOp)
-  def isDefinedAt       (bKey: B)                (implicit ignore: DummyImplicit) : Boolean          =   implWrapper.isDefinedAt(bKey)
-  def put               (bKey: B, aVal: A)       (implicit ignore: DummyImplicit) : Option[A]        =   implWrapper.put(bKey, aVal)
-  def remove            (bKey: B)                (implicit ignore: DummyImplicit) : Option[A]        =   implWrapper.remove(bKey)
+  def apply             (bKey: B)                (implicit ignore: DummyImplicit) : A                = implWrapper.apply(bKey)
+  def contains          (bKey: B)                (implicit ignore: DummyImplicit) : Boolean          = implWrapper.contains(bKey)
+  def default           (bKey: B)                (implicit ignore: DummyImplicit) : A                = implWrapper.default(bKey)
+  def get               (bKey: B)                (implicit ignore: DummyImplicit) : Option[A]        = implWrapper.get(bKey)
+  def getOrElse[A1 >: A](bKey: B, default: => A1)(implicit ignore: DummyImplicit) : A1               = implWrapper.getOrElse(bKey, default)
+  def getOrElseUpdate   (bKey: B, aOp: => A)     (implicit ignore: DummyImplicit) : A                = implWrapper.getOrElseUpdate(bKey, aOp)
+  def isDefinedAt       (bKey: B)                (implicit ignore: DummyImplicit) : Boolean          = implWrapper.isDefinedAt(bKey)
+  def put               (bKey: B, aVal: A)       (implicit ignore: DummyImplicit) : Option[A]        = implWrapper.put(bKey, aVal)
+  def remove            (bKey: B)                (implicit ignore: DummyImplicit) : Option[A]        = implWrapper.remove(bKey)
   def update            (bKey: B, aVal: A)       (implicit ignore: DummyImplicit)                    { implWrapper.update(bKey, aVal) }
   def updated[A1 >: A]  (bKey: B, aVal: A1)      (implicit ignore: DummyImplicit) : BiHashMap[A1, B] =   this + ((bKey, aVal))
 

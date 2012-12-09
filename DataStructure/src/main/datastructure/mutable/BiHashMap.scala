@@ -14,19 +14,9 @@ import datastructure.parallel.mutable.ParBiHashMap
  * Time: 11:15 PM
  */
 
-/*
-//@ No explicit support was added for any of the following (doesn't mean that it's broken--I simply haven't _tried_ to do anything for it):
--$init$
--synchronized
--tranpose
--product
--sum
--sizeHint [1-arg/2-arg]
--sizeHintBounded
--flatten (what the hell does this even DO on Maps, anyway?!)
-*/
-
+//@ Should probably implement `toString` correctly; currently claims this to be a `Map`
 //@ Should I instantiate and fill the maps here, or should I instantiate here and leave the population of the maps to `Bijection`...?
+//@ Should add `<->` as a tuple-building operator
 class BiHashMap[A, B] private[datastructure](abm: HashMap[A, B], bam: HashMap[B, A])
     extends Bijection[A, B, HashMap, HashMap[A, B], HashMap[B, A], BiHashMap[A, B]](abm, bam)
     with MapLike[A, B, BiHashMap[A, B]]
@@ -74,7 +64,7 @@ class BiHashMap[A, B] private[datastructure](abm: HashMap[A, B], bam: HashMap[B,
   override def withDefault                (d: A => B)                                        : MMap[A, B]  =   abMap withDefault d   //@ I'd love to do this with a better return type...
 
   override def clone() : BiHashMap[A, B]      = new BiHashMap(abMap.toSeq: _*)
-  override def par     : ParBiHashMap[A, B]   = throw new UnsupportedOperationException("`ParBiHashMap` is not yet in an operable state.")
+  override def par     : ParBiHashMap[A, B]   = throw new UnsupportedOperationException("`ParBiHashMap` is not yet in an operable state.") //@
   override def empty   : BiHashMap[A, B]      = BiHashMap.empty[A, B]
   override def canEqual(other: Any) : Boolean = other.isInstanceOf[BiHashMap[A, B]]  // Might pay to do "|| other.isInstanceOf[BiHashMap[B, A]]"... if not for type erasure
 
