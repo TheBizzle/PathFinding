@@ -27,14 +27,13 @@ class BiHashMap[A, B] private[datastructure](override protected val abMap: HashM
   }
 
   // Toggles whether a size map is used to track hash map statistics for the child maps.
-  def flip                   : BiHashMap[B, A] =   new BiHashMap(baMap.clone(), abMap.clone())
-  def swap                   : BiHashMap[B, A] =   flip
   def useSizeMap(t: Boolean)                     { abMap.useSizeMap(t); baMap.useSizeMap(t) }
 
-  override def clone() : BiHashMap[A, B]      = new BiHashMap(abMap.toSeq: _*)
-  override def par     : ParBiHashMap[A, B]   = throw new UnsupportedOperationException("`ParBiHashMap` is not yet in an operable state.") //@
-  override def myEmpty   : BiHashMap[A, B]    = BiHashMap.empty[A, B]
   override def canEqual(other: Any) : Boolean = other.isInstanceOf[BiHashMap[A, B]]  // Might pay to do "|| other.isInstanceOf[BiHashMap[B, A]]"... if not for type erasure
+  override def clone() : BiHashMap[A, B]      = new BiHashMap(abMap.toSeq: _*)
+  override def myEmpty : BiHashMap[A, B]      = BiHashMap.empty[A, B]
+  override def par     : ParBiHashMap[A, B]   = throw new UnsupportedOperationException("`ParBiHashMap` is not yet in an operable state.") //@
+  override def swap    : BiHashMap[B, A]      = new BiHashMap(baMap.clone(), abMap.clone())
 
 }
 

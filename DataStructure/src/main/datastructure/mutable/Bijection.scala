@@ -28,10 +28,12 @@ trait Bijection[A, B, M[X, Y] <: MMap[X, Y], Rpr[X, Y] <: Bijection[X, Y, M, Rpr
   protected def myEmpty: Repr  //@ Yuck!  Let's find a way around this one day!  Done because, in this trait, I don't see how we can provide a base implementation of `empty`.
                                // If we don't give one, though, `MapLike` and `MMap` get us an implementation that is incompatible with `Rpr`.
 
-  override def clear()             { abMap.clear(); baMap.clear() }
-  override def empty      : Repr =   myEmpty
-  override def hashCode() : Int  =   abMap.hashCode() ^ baMap.hashCode()   // XOR the hashcodes of the two maps
-  override def size       : Int  = { require (abMap.size == baMap.size); abMap.size }
+  override def clear()                  { abMap.clear(); baMap.clear() }
+  override def empty      : Repr      =   myEmpty
+  /*new!*/ def flip       : Rpr[B, A] =   this.swap
+  override def hashCode() : Int       =   abMap.hashCode() ^ baMap.hashCode()   // XOR the hashcodes of the two maps
+  override def size       : Int       = { require (abMap.size == baMap.size); abMap.size }
+  /*new!*/ def swap       : Rpr[B, A]
 
   override def canEqual(other: Any) : Boolean
   override def equals(that: Any)    : Boolean  = {
@@ -41,7 +43,7 @@ trait Bijection[A, B, M[X, Y] <: MMap[X, Y], Rpr[X, Y] <: Bijection[X, Y, M, Rpr
     }
   }
 
-  def iterator : Iterator[Tup] = abMap.iterator
+  override def iterator : Iterator[Tup] = abMap.iterator
 
   // Lambda-operation methods
   override def /:[C]                      (z: C)(op: (C, Tup) => C)                          : C           =   abMap./:(z)(op)
