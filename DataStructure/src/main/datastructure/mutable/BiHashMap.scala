@@ -16,7 +16,8 @@ import datastructure.parallel.mutable.ParBiHashMap
 //@ Should probably implement `toString` correctly; currently claims this to be a `Map`
 //@ Should add `<->` as a tuple-building operator
 class BiHashMap[A, B] private[datastructure](override protected val abMap: HashMap[A, B], override protected val baMap: HashMap[B, A])
-    extends Bijection[A, B, HashMap, BiHashMap]
+    extends HashMap[A, B]
+    with Bijection[A, B, HashMap, BiHashMap]
     with CustomParallelizable[(A, B), ParBiHashMap[A, B]]
     with BiHashForwardOps[A, B]
     with BiHashReverseOps[A, B] {
@@ -33,7 +34,7 @@ class BiHashMap[A, B] private[datastructure](override protected val abMap: HashM
   override def swap                 : BiHashMap[B, A]    = new BiHashMap(baMap.clone(), abMap.clone())
 
   // Toggles whether a size map is used to track hash map statistics for the child maps.
-  def useSizeMap(t: Boolean) {
+  override def useSizeMap(t: Boolean) {
     abMap.useSizeMap(t)
     baMap.useSizeMap(t)
   }

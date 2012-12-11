@@ -8,8 +8,8 @@ package mutable
 * Time: 10:12 PM
 */
 
-import collection.{GenTraversableOnce, GenIterable}
-import collection.parallel.mutable.{ParHashTable, ParMapLike, ParMap}
+import collection.{ GenIterable, GenTraversableOnce }
+import collection.parallel.mutable.{ ParHashMap, ParHashTable, ParMapLike, ParMap }
 import collection.parallel.Combiner
 import collection.generic._
 import collection.mutable.DefaultEntry
@@ -19,7 +19,8 @@ import collection.mutable.HashMap
 //@ Does not even come close to working right now.  And I do not really care (for the time being).
 @SerialVersionUID(1L)
 class ParBiHashMap[A, B] private[datastructure](abm: HashMap[A, B], bam: HashMap[B, A])
-extends ParMap[A, B]
+extends ParHashMap[A, B]
+   with ParMap[A, B]
    with GenericParMapTemplate[A, B, ParBiHashMap]
    with ParMapLike[A, B, ParBiHashMap[A, B], datastructure.mutable.BiHashMap[A, B]]
    with ParHashTable[A, DefaultEntry[A, B]] //@ Doubtful
@@ -29,23 +30,23 @@ extends ParMap[A, B]
   override def mapCompanion: GenericParMapCompanion[ParBiHashMap] = ParBiHashMap
   override def empty: ParBiHashMap[A, B] = new ParBiHashMap[A, B]
   protected[this] override def newCombiner = throw new UnsupportedOperationException("")
-  def size = throw new UnsupportedOperationException("")
+  override def size = throw new UnsupportedOperationException("")
   override def scan[Y >: (A, B), That](z: Y)(op: (Y, Y) => Y)(implicit cbf: CanBuildFrom[ParBiHashMap[A, B], Y, That]) = throw new UnsupportedOperationException("")
   override def scanLeft[Y, That](z: Y)(op: (Y, (A, B)) => Y)(implicit bf: CanBuildFrom[ParBiHashMap[A, B], Y, That]) = throw new UnsupportedOperationException("")
   override def scanRight[Y, That](z: Y)(op: ((A, B), Y) => Y)(implicit bf: CanBuildFrom[ParBiHashMap[A, B], Y, That]) = throw new UnsupportedOperationException("")
   override def map[Y, That](f: ((A, B)) => Y)(implicit bf: CanBuildFrom[ParBiHashMap[A, B], Y, That]) = throw new UnsupportedOperationException("")
-  def get(key: A) = throw new UnsupportedOperationException("")
+  override def get(key: A) = throw new UnsupportedOperationException("")
   override def collect[Y, That](pf: PartialFunction[(A, B), Y])(implicit bf: CanBuildFrom[ParBiHashMap[A, B], Y, That]) = throw new UnsupportedOperationException("")
   override def flatMap[Y, That](f: ((A, B)) => GenTraversableOnce[Y])(implicit bf: CanBuildFrom[ParBiHashMap[A, B], Y, That]) = throw new UnsupportedOperationException("")
   override def ++[Y >: (A, B), That](that: GenTraversableOnce[Y])(implicit bf: CanBuildFrom[ParBiHashMap[A, B], Y, That]) = throw new UnsupportedOperationException("")
   override def zip[X1 >: (A, B), Y, That](that: GenIterable[Y])(implicit bf: CanBuildFrom[ParBiHashMap[A, B], (X1, Y), That]) = throw new UnsupportedOperationException("")
   override def zipWithIndex[X1 >: (A, B), That](implicit bf: CanBuildFrom[ParBiHashMap[A, B], (X1, Int), That]) = throw new UnsupportedOperationException("")
   override def zipAll[Y, X1 >: (A, B), That](that: GenIterable[Y], thisElem: X1, thatElem: Y)(implicit bf: CanBuildFrom[ParBiHashMap[A, B], (X1, Y), That]) = throw new UnsupportedOperationException("")
-  def seq = throw new UnsupportedOperationException("")
-  def put(key: A, value: B) = throw new UnsupportedOperationException("")
-  def +=(kv: (A, B)) = throw new UnsupportedOperationException("")
-  def -=(key: A) = throw new UnsupportedOperationException("")
-  def clear() { throw new UnsupportedOperationException("") }
+  override def seq = throw new UnsupportedOperationException("")
+  override def put(key: A, value: B) = throw new UnsupportedOperationException("")
+  override def +=(kv: (A, B)) = throw new UnsupportedOperationException("")
+  override def -=(key: A) = throw new UnsupportedOperationException("")
+  override def clear() { throw new UnsupportedOperationException("") }
   override def splitter = throw new UnsupportedOperationException("")
 }
 
