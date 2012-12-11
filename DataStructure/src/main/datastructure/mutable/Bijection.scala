@@ -37,7 +37,7 @@ trait Bijection[A, B, M[X, Y] <: MMap[X, Y], Rpr[X, Y] <: Bijection[X, Y, M, Rpr
   override def equals(that: Any)    : Boolean  = {
     that match {
       case b: Bijection[_, _, _, _] => (b canEqual this) && ((b.abMap.equals(abMap) && b.baMap.equals(baMap)) || (b.abMap.equals(baMap) && b.baMap.equals(abMap)))
-      case _                              => false
+      case _                        => false
     }
   }
 
