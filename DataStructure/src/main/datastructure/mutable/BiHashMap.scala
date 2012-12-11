@@ -22,7 +22,7 @@ class BiHashMap[A, B] private[datastructure](override protected val abMap: HashM
     with BiHashReverseOps[A, B] {
 
   def this(contents: (A, B)*)(implicit aToBMap: HashMap[A, B] = contents.foldRight(new HashMap[A, B]){ case (ab, m) => m += ab },
-                                       bToAMap: HashMap[B, A] = contents.foldRight(new HashMap[B, A]){ case (ab, m) => m += ab._2 -> ab._1 }) {
+                                       bToAMap: HashMap[B, A] = contents.foldRight(new HashMap[B, A]){ case (ab, m) => m += ab.swap }) {
     this(aToBMap, bToAMap)
   }
 
