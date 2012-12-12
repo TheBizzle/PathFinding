@@ -11,4 +11,4 @@ import datastructure.bihashmap.BiHashMapSpec
  * Time: 10:58 PM
  */
 
-object DataStructureSuiteReporter extends SuiteReporter(List(new HeapSpec(), new BiHashMapSpec()))
+object DataStructureSuiteReporter extends SuiteReporter(Seq(new HeapSpec(), new BiHashMapSpec()))

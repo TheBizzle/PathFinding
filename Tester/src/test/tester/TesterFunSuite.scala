@@ -15,133 +15,133 @@ import tester.criteria._
 class TesterFunSuite extends FunSuite with ShouldMatchers {
 
   test("handleTestIntervals - Empty, one") {
-    val inValues = Nil
-    val inRanges = List(TestRunningnessRange(1, 2, RunTest))
-    val result = TestingCore.handleTestIntervals(inValues, inRanges, 6)
-    val expectedList = List(1, 2)
-    result should equal (expectedList)
+    val inValues  = Seq()
+    val inRanges  = Seq(TestRunningnessRange(1, 2, RunTest))
+    val result    = TestingCore.handleTestIntervals(inValues, inRanges, 6)
+    val expecteds = Seq(1, 2)
+    result should equal (expecteds)
   }
 
   test("handleTestIntervals - One, empty") {
-    val inValues = List(TestRunningnessValue(2, RunTest))
-    val inRanges = Nil
-    val result = TestingCore.handleTestIntervals(inValues, inRanges, 6)
-    val expectedList = List(2)
-    result should equal (expectedList)
+    val inValues  = Seq(TestRunningnessValue(2, RunTest))
+    val inRanges  = Seq()
+    val result    = TestingCore.handleTestIntervals(inValues, inRanges, 6)
+    val expecteds = Seq(2)
+    result should equal (expecteds)
   }
 
   test("handleTestIntervals - One, one") {
-    val inValues = List(TestRunningnessValue(2, RunTest))
-    val inRanges = List(TestRunningnessRange(4, 6, RunTest))
-    val result = TestingCore.handleTestIntervals(inValues, inRanges, 6)
-    val expectedList = List(2, 4, 5, 6)
-    result should equal (expectedList)
+    val inValues  = Seq(TestRunningnessValue(2, RunTest))
+    val inRanges  = Seq(TestRunningnessRange(4, 6, RunTest))
+    val result    = TestingCore.handleTestIntervals(inValues, inRanges, 6)
+    val expecteds = Seq(2, 4, 5, 6)
+    result should equal (expecteds)
   }
 
   test("handleTestIntervals - Many, many") {
-    val inValues = List(TestRunningnessValue(5, RunTest), TestRunningnessValue(1, SkipTest))
-    val inRanges = List(TestRunningnessRange(1, 4, RunTest), TestRunningnessRange(2, 3, SkipTest))
+    val inValues = Seq(TestRunningnessValue(5, RunTest), TestRunningnessValue(1, SkipTest))
+    val inRanges = Seq(TestRunningnessRange(1, 4, RunTest), TestRunningnessRange(2, 3, SkipTest))
     val result = TestingCore.handleTestIntervals(inValues, inRanges, 6)
-    val expectedList = List(4, 5)
-    result should equal (expectedList)
+    val expecteds = Seq(4, 5)
+    result should equal (expecteds)
   }
 
   test("assessPathingDesire - Empty map") {
-    val inMap = HashMap[String, List[TestCriteria]](TestingCore.ArgKeyValue  -> List[TestRunningnessValue](),
-    TestingCore.ArgKeyRange  -> List[TestRunningnessRange](),
-    TestingCore.ArgKeyToggle -> List[TestCriteriaToggleFlag]())
+    val inMap = HashMap[String, Seq[TestCriteria]](TestingCore.ArgKeyValue  -> Seq[TestRunningnessValue](),
+    TestingCore.ArgKeyRange  -> Seq[TestRunningnessRange](),
+    TestingCore.ArgKeyToggle -> Seq[TestCriteriaToggleFlag]())
     val result = TestingCore.assessExternalityDesire(inMap)
     result should equal (false)
   }
 
   test("assessPathingDesire - Map without values/ranges") {
-    val inMap = HashMap[String, List[TestCriteria]](TestingCore.ArgKeyValue  -> List[TestRunningnessValue](),
-    TestingCore.ArgKeyRange  -> List[TestRunningnessRange](),
-    TestingCore.ArgKeyToggle -> List[TestCriteriaToggleFlag](SkipExternalTests))
+    val inMap = HashMap[String, Seq[TestCriteria]](TestingCore.ArgKeyValue  -> Seq[TestRunningnessValue](),
+    TestingCore.ArgKeyRange  -> Seq[TestRunningnessRange](),
+    TestingCore.ArgKeyToggle -> Seq[TestCriteriaToggleFlag](SkipExternalTests))
     val result = TestingCore.assessExternalityDesire(inMap)
     result should equal (false)
   }
 
   test("assessPathingDesire - Map without ranges") {
-    val inMap = HashMap[String, List[TestCriteria]](TestingCore.ArgKeyValue  -> List[TestRunningnessValue](TestRunningnessValue(1, RunTest)),
-    TestingCore.ArgKeyRange  -> List[TestRunningnessRange](),
-    TestingCore.ArgKeyToggle -> List[TestCriteriaToggleFlag](SkipExternalTests))
+    val inMap = HashMap[String, Seq[TestCriteria]](TestingCore.ArgKeyValue  -> Seq[TestRunningnessValue](TestRunningnessValue(1, RunTest)),
+    TestingCore.ArgKeyRange  -> Seq[TestRunningnessRange](),
+    TestingCore.ArgKeyToggle -> Seq[TestCriteriaToggleFlag](SkipExternalTests))
     val result = TestingCore.assessExternalityDesire(inMap)
     result should equal (true)
   }
 
   test("assessPathingDesire - Map without values") {
-    val inMap = HashMap[String, List[TestCriteria]](TestingCore.ArgKeyValue  -> List[TestRunningnessValue](),
-    TestingCore.ArgKeyRange  -> List[TestRunningnessRange](TestRunningnessRange(1, 1, RunTest)),
-    TestingCore.ArgKeyToggle -> List[TestCriteriaToggleFlag](SkipExternalTests))
+    val inMap = HashMap[String, Seq[TestCriteria]](TestingCore.ArgKeyValue  -> Seq[TestRunningnessValue](),
+    TestingCore.ArgKeyRange  -> Seq[TestRunningnessRange](TestRunningnessRange(1, 1, RunTest)),
+    TestingCore.ArgKeyToggle -> Seq[TestCriteriaToggleFlag](SkipExternalTests))
     val result = TestingCore.assessExternalityDesire(inMap)
     result should equal (true)
   }
 
   test("assessPathingDesire - Mixed map") {
-    val inMap = HashMap[String, List[TestCriteria]](TestingCore.ArgKeyValue  -> List[TestRunningnessValue](TestRunningnessValue(3, RunTest)),
-    TestingCore.ArgKeyRange  -> List[TestRunningnessRange](TestRunningnessRange(1, 1, RunTest), TestRunningnessRange(2, 2, RunTest)),
-    TestingCore.ArgKeyToggle -> List[TestCriteriaToggleFlag]())
+    val inMap = HashMap[String, Seq[TestCriteria]](TestingCore.ArgKeyValue  -> Seq[TestRunningnessValue](TestRunningnessValue(3, RunTest)),
+    TestingCore.ArgKeyRange  -> Seq[TestRunningnessRange](TestRunningnessRange(1, 1, RunTest), TestRunningnessRange(2, 2, RunTest)),
+    TestingCore.ArgKeyToggle -> Seq[TestCriteriaToggleFlag]())
     val result = TestingCore.assessExternalityDesire(inMap)
     result should equal (true)
   }
 
   test("sortCriteria - Empty") {
-    val inList = Nil
-    val resultList = TestingCore.sortCriteria(inList)
-    val expected = Nil
-    resultList should equal (expected)
+    val crits = Seq()
+    val results = TestingCore.sortCriteria(crits)
+    val expected = Seq()
+    results should equal (expected)
   }
 
   test("sortCriteria - One value") {
-    val inList = List(TestRunningnessValue(1, RunTest))
-    val resultList = TestingCore.sortCriteria(inList)
-    val expected = inList
-    resultList should equal (expected)
+    val crits = Seq(TestRunningnessValue(1, RunTest))
+    val results = TestingCore.sortCriteria(crits)
+    val expected = crits
+    results should equal (expected)
   }
 
   test("sortCriteria - One range") {
-    val inList = List(TestRunningnessRange(1, 1, RunTest))
-    val resultList = TestingCore.sortCriteria(inList)
-    val expected = inList
-    resultList should equal (expected)
+    val crits = Seq(TestRunningnessRange(1, 1, RunTest))
+    val results = TestingCore.sortCriteria(crits)
+    val expected = crits
+    results should equal (expected)
   }
 
   test("sortCriteria - Many values (presorted)") {
-    val inList = List(TestRunningnessValue(1, RunTest), TestRunningnessValue(3, RunTest), TestRunningnessValue(17, RunTest))
-    val resultList = TestingCore.sortCriteria(inList)
-    val expected = inList
-    resultList should equal (expected)
+    val crits = Seq(TestRunningnessValue(1, RunTest), TestRunningnessValue(3, RunTest), TestRunningnessValue(17, RunTest))
+    val results = TestingCore.sortCriteria(crits)
+    val expected = crits
+    results should equal (expected)
   }
 
   test("sortCriteria - Many ranges (presorted)") {
-    val inList = List(TestRunningnessRange(1, 6, RunTest), TestRunningnessRange(7, 7, RunTest),
+    val crits = Seq(TestRunningnessRange(1, 6, RunTest), TestRunningnessRange(7, 7, RunTest),
     TestRunningnessRange(8, 9, RunTest), TestRunningnessRange(12, 17, RunTest))
-    val resultList = TestingCore.sortCriteria(inList)
-    val expected = inList
-    resultList should equal (expected)
+    val results = TestingCore.sortCriteria(crits)
+    val expected = crits
+    results should equal (expected)
   }
 
   test("sortCriteria - Many values (unsorted)") {
-    val inList = List(TestRunningnessValue(17, RunTest), TestRunningnessValue(1, RunTest), TestRunningnessValue(3, RunTest))
-    val resultList = TestingCore.sortCriteria(inList)
-    val expected = List(TestRunningnessValue(1, RunTest), TestRunningnessValue(3, RunTest), TestRunningnessValue(17, RunTest))
-    resultList should equal (expected)
+    val crits = Seq(TestRunningnessValue(17, RunTest), TestRunningnessValue(1, RunTest), TestRunningnessValue(3, RunTest))
+    val results = TestingCore.sortCriteria(crits)
+    val expected = Seq(TestRunningnessValue(1, RunTest), TestRunningnessValue(3, RunTest), TestRunningnessValue(17, RunTest))
+    results should equal (expected)
   }
 
   test("sortCriteria - Many ranges (reversed)") {
-    val inList = List(TestRunningnessRange(12, 17, RunTest), TestRunningnessRange(8, 9, RunTest),
+    val crits = Seq(TestRunningnessRange(12, 17, RunTest), TestRunningnessRange(8, 9, RunTest),
     TestRunningnessRange(7, 7, RunTest), TestRunningnessRange(1, 6, RunTest))
-    val resultList = TestingCore.sortCriteria(inList)
-    val expected = inList.reverse
-    resultList should equal (expected)
+    val results = TestingCore.sortCriteria(crits)
+    val expected = crits.reverse
+    results should equal (expected)
   }
 
   test("handleRanges - Empty") {
-    val inList = Nil
-    val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList, 6)
-    val expectedTests = Nil
-    val expectedSkips = Nil
+    val crits = Seq()
+    val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(crits, 6)
+    val expectedTests = Seq()
+    val expectedSkips = Seq()
     val expectedMax = 0
     resultTests should equal (expectedTests)
     resultSkips should equal (expectedSkips)
@@ -149,10 +149,10 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("handleRanges - One run") {
-    val inList = List(TestRunningnessRange(1, 3, RunTest))
-    val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList, 6)
-    val expectedTests = inList
-    val expectedSkips = Nil
+    val crits = Seq(TestRunningnessRange(1, 3, RunTest))
+    val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(crits, 6)
+    val expectedTests = crits
+    val expectedSkips = Seq()
     val expectedMax = 3
     resultTests should equal (expectedTests)
     resultSkips should equal (expectedSkips)
@@ -160,10 +160,10 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("handleRanges - One skip") {
-    val inList = List(TestRunningnessRange(1, 3, SkipTest))
-    val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList, 6)
-    val expectedTests = Nil
-    val expectedSkips = inList
+    val crits = Seq(TestRunningnessRange(1, 3, SkipTest))
+    val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(crits, 6)
+    val expectedTests = Seq()
+    val expectedSkips = crits
     val expectedMax = 0
     resultTests should equal (expectedTests)
     resultSkips should equal (expectedSkips)
@@ -171,10 +171,10 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("handleRanges - Many runs") {
-    val inList = List(TestRunningnessRange(1, 3, RunTest), TestRunningnessRange(4, 4, RunTest), TestRunningnessRange(5, 6, RunTest))
-    val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList, 6)
-    val expectedTests = inList
-    val expectedSkips = Nil
+    val crits = Seq(TestRunningnessRange(1, 3, RunTest), TestRunningnessRange(4, 4, RunTest), TestRunningnessRange(5, 6, RunTest))
+    val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(crits, 6)
+    val expectedTests = crits
+    val expectedSkips = Seq()
     val expectedMax = 6
     resultTests should equal (expectedTests)
     resultSkips should equal (expectedSkips)
@@ -182,10 +182,10 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("handleRanges - Many skips") {
-    val inList = List(TestRunningnessRange(1, 3, SkipTest), TestRunningnessRange(4, 4, SkipTest), TestRunningnessRange(5, 6, SkipTest))
-    val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList, 6)
-    val expectedTests = Nil
-    val expectedSkips = inList
+    val crits = Seq(TestRunningnessRange(1, 3, SkipTest), TestRunningnessRange(4, 4, SkipTest), TestRunningnessRange(5, 6, SkipTest))
+    val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(crits, 6)
+    val expectedTests = Seq()
+    val expectedSkips = crits
     val expectedMax = 0
     resultTests should equal (expectedTests)
     resultSkips should equal (expectedSkips)
@@ -193,10 +193,10 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("handleRanges - Many (mixed)") {
-    val inList = List(TestRunningnessRange(1, 3, SkipTest), TestRunningnessRange(4, 4, RunTest), TestRunningnessRange(5, 6, SkipTest))
-    val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(inList, 6)
-    val expectedTests = List(TestRunningnessRange(4, 4, RunTest))
-    val expectedSkips = List(TestRunningnessRange(1, 3, SkipTest), TestRunningnessRange(5, 6, SkipTest))
+    val crits = Seq(TestRunningnessRange(1, 3, SkipTest), TestRunningnessRange(4, 4, RunTest), TestRunningnessRange(5, 6, SkipTest))
+    val (resultTests, resultSkips, resultMax) = TestingCore.handleRanges(crits, 6)
+    val expectedTests = Seq(TestRunningnessRange(4, 4, RunTest))
+    val expectedSkips = Seq(TestRunningnessRange(1, 3, SkipTest), TestRunningnessRange(5, 6, SkipTest))
     val expectedMax = 4
     resultTests should equal (expectedTests)
     resultSkips should equal (expectedSkips)
@@ -204,10 +204,10 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("handleValues - Empty") {
-    val inList = Nil
-    val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList, 6)
-    val expectedTests = Nil
-    val expectedSkips = Nil
+    val crits = Seq()
+    val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(crits, 6)
+    val expectedTests = Seq()
+    val expectedSkips = Seq()
     val expectedMax = 0
     resultTests should equal (expectedTests)
     resultSkips should equal (expectedSkips)
@@ -215,10 +215,10 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("handleValues - One run") {
-    val inList = List(TestRunningnessValue(1, RunTest))
-    val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList, 6)
-    val expectedTests = inList
-    val expectedSkips = Nil
+    val crits = Seq(TestRunningnessValue(1, RunTest))
+    val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(crits, 6)
+    val expectedTests = crits
+    val expectedSkips = Seq()
     val expectedMax = 1
     resultTests should equal (expectedTests)
     resultSkips should equal (expectedSkips)
@@ -226,10 +226,10 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("handleValues - One skip") {
-    val inList = List(TestRunningnessValue(1, SkipTest))
-    val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList, 6)
-    val expectedTests = Nil
-    val expectedSkips = inList
+    val crits = Seq(TestRunningnessValue(1, SkipTest))
+    val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(crits, 6)
+    val expectedTests = Seq()
+    val expectedSkips = crits
     val expectedMax = 0
     resultTests should equal (expectedTests)
     resultSkips should equal (expectedSkips)
@@ -237,10 +237,10 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("handleValues - Many runs") {
-    val inList = List(TestRunningnessValue(1, RunTest), TestRunningnessValue(4, RunTest), TestRunningnessValue(5, RunTest))
-    val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList, 6)
-    val expectedTests = inList
-    val expectedSkips = Nil
+    val crits = Seq(TestRunningnessValue(1, RunTest), TestRunningnessValue(4, RunTest), TestRunningnessValue(5, RunTest))
+    val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(crits, 6)
+    val expectedTests = crits
+    val expectedSkips = Seq()
     val expectedMax = 5
     resultTests should equal (expectedTests)
     resultSkips should equal (expectedSkips)
@@ -248,10 +248,10 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("handleValues - Many skips") {
-    val inList = List(TestRunningnessValue(1, SkipTest), TestRunningnessValue(4, SkipTest),  TestRunningnessValue(5, SkipTest))
-    val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList, 6)
-    val expectedTests = Nil
-    val expectedSkips = inList
+    val crits = Seq(TestRunningnessValue(1, SkipTest), TestRunningnessValue(4, SkipTest),  TestRunningnessValue(5, SkipTest))
+    val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(crits, 6)
+    val expectedTests = Seq()
+    val expectedSkips = crits
     val expectedMax = 0
     resultTests should equal (expectedTests)
     resultSkips should equal (expectedSkips)
@@ -259,10 +259,10 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("handleValues - Many (mixed)") {
-    val inList = List(TestRunningnessValue(1, SkipTest), TestRunningnessValue(4, RunTest), TestRunningnessValue(5, SkipTest))
-    val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(inList, 6)
-    val expectedTests = List(TestRunningnessValue(4, RunTest))
-    val expectedSkips = List(TestRunningnessValue(1, SkipTest), TestRunningnessValue(5, SkipTest))
+    val crits = Seq(TestRunningnessValue(1, SkipTest), TestRunningnessValue(4, RunTest), TestRunningnessValue(5, SkipTest))
+    val (resultTests, resultSkips, resultMax) = TestingCore.handleValues(crits, 6)
+    val expectedTests = Seq(TestRunningnessValue(4, RunTest))
+    val expectedSkips = Seq(TestRunningnessValue(1, SkipTest), TestRunningnessValue(5, SkipTest))
     val expectedMax = 4
     resultTests should equal (expectedTests)
     resultSkips should equal (expectedSkips)
@@ -271,8 +271,8 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
   test("containsOverlaps - Empty") {
 
-    val inList = Nil
-    val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(inList)
+    val crits = Seq()
+    val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(crits)
 
     // The "should" notation is breaking again...
     result === false
@@ -283,8 +283,8 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
   test("containsOverlaps - One") {
 
-    val inList = List(TestRunningnessRange(1, 1, RunTest))
-    val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(inList)
+    val crits = Seq(TestRunningnessRange(1, 1, RunTest))
+    val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(crits)
 
     result === false
     offenderPart1 === None
@@ -294,8 +294,8 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
   test("containsOverlaps - Many (without overlap)") {
 
-    val inList = List(TestRunningnessRange(1, 1, RunTest), TestRunningnessRange(3, 7, RunTest), TestRunningnessRange(9, 9, RunTest))
-    val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(inList)
+    val crits = Seq(TestRunningnessRange(1, 1, RunTest), TestRunningnessRange(3, 7, RunTest), TestRunningnessRange(9, 9, RunTest))
+    val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(crits)
 
     result === false
     offenderPart1 === None
@@ -305,8 +305,8 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
   test("containsOverlaps - Many (with SOME overlap)") {
 
-    val inList = List(TestRunningnessRange(1, 1, RunTest), TestRunningnessRange(3, 7, RunTest), TestRunningnessRange(7, 9, RunTest))
-    val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(inList)
+    val crits = Seq(TestRunningnessRange(1, 1, RunTest), TestRunningnessRange(3, 7, RunTest), TestRunningnessRange(7, 9, RunTest))
+    val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(crits)
 
     result === true
     offenderPart1 === Option(TestRunningnessRange(3, 7, RunTest))
@@ -316,8 +316,8 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
 
   test("containsOverlaps - Many (with ALL overlaps)") {
 
-    val inList = List(TestRunningnessRange(1, 5, RunTest), TestRunningnessRange(3, 7, RunTest), TestRunningnessRange(7, 9, RunTest))
-    val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(inList)
+    val crits = Seq(TestRunningnessRange(1, 5, RunTest), TestRunningnessRange(3, 7, RunTest), TestRunningnessRange(7, 9, RunTest))
+    val (result, offenderPart1, offenderPart2) = TestingCore.containsOverlaps(crits)
 
     result === true
     offenderPart1 === Option(TestRunningnessRange(1, 5, RunTest))
@@ -326,53 +326,53 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("generateResultArray - Empty, empty, empty, empty, 10") {
-    val resultArr = TestingCore.generateResultArray(Nil, Nil, Nil, Nil, 10)
+    val resultArr = TestingCore.generateResultArray(Seq(), Seq(), Seq(), Seq(), 10)
     val expected = Array(false, false, false, false, false,
     false, false, false, false, false, false)
     resultArr should equal (expected)
   }
 
   test("generateResultArray - One, one, one, one, 10") {
-    val resultArr = TestingCore.generateResultArray(List(TestRunningnessRange(2, 8, RunTest)), List(TestRunningnessValue(10, RunTest)),
-    List(TestRunningnessRange(4, 5, SkipTest)), List(TestRunningnessValue(7, SkipTest)), 10)
+    val resultArr = TestingCore.generateResultArray(Seq(TestRunningnessRange(2, 8, RunTest)), Seq(TestRunningnessValue(10, RunTest)),
+    Seq(TestRunningnessRange(4, 5, SkipTest)), Seq(TestRunningnessValue(7, SkipTest)), 10)
     val expected = Array(false, false, true, true, false,
     false, true, false, true, false, true)
     resultArr should equal (expected)
   }
 
   test("sortArgLists - Empty list") {
-    val resultMap = TestingCore.sortArgLists(Nil)
+    val resultMap = TestingCore.sortArgLists(Seq())
     val (resultValues, resultRanges, resultToggles) = (resultMap(TestingCore.ArgKeyValue), resultMap(TestingCore.ArgKeyRange), resultMap(TestingCore.ArgKeyToggle))
-    resultValues should equal (Nil)
-    resultRanges should equal (Nil)
-    resultToggles should equal (Nil)
+    resultValues should equal (Seq())
+    resultRanges should equal (Seq())
+    resultToggles should equal (Seq())
   }
 
   test("sortArgLists - One value") {
     val inValue = TestRunningnessValue(1, RunTest)
-    val resultMap = TestingCore.sortArgLists(List(inValue))
+    val resultMap = TestingCore.sortArgLists(Seq(inValue))
     val (resultValues, resultRanges, resultToggles) = (resultMap(TestingCore.ArgKeyValue), resultMap(TestingCore.ArgKeyRange), resultMap(TestingCore.ArgKeyToggle))
-    resultValues should equal (List(inValue))
-    resultRanges should equal (Nil)
-    resultToggles should equal (Nil)
+    resultValues should equal (Seq(inValue))
+    resultRanges should equal (Seq())
+    resultToggles should equal (Seq())
   }
 
   test("sortArgLists - One range") {
     val inRange = TestRunningnessRange(1, 1, RunTest)
-    val resultMap = TestingCore.sortArgLists(List(inRange))
+    val resultMap = TestingCore.sortArgLists(Seq(inRange))
     val (resultValues, resultRanges, resultToggles) = (resultMap(TestingCore.ArgKeyValue), resultMap(TestingCore.ArgKeyRange), resultMap(TestingCore.ArgKeyToggle))
-    resultValues should equal (Nil)
-    resultRanges should equal (List(inRange))
-    resultToggles should equal (Nil)
+    resultValues should equal (Seq())
+    resultRanges should equal (Seq(inRange))
+    resultToggles should equal (Seq())
   }
 
   test("sortArgLists - One toggle") {
     val inToggle = TestCriteriaToggleFlag(SkipExternalTests)
-    val resultMap = TestingCore.sortArgLists(List(inToggle))
+    val resultMap = TestingCore.sortArgLists(Seq(inToggle))
     val (resultValues, resultRanges, resultToggles) = (resultMap(TestingCore.ArgKeyValue), resultMap(TestingCore.ArgKeyRange), resultMap(TestingCore.ArgKeyToggle))
-    resultValues should equal (Nil)
-    resultRanges should equal (Nil)
-    resultToggles should equal (List(inToggle))
+    resultValues should equal (Seq())
+    resultRanges should equal (Seq())
+    resultToggles should equal (Seq(inToggle))
   }
 
   test("sortArgLists - Many mixed") {
@@ -387,19 +387,19 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
     val inToggle1 = TestCriteriaToggleFlag(SkipExternalTests)
     val inToggle2 = TestCriteriaToggleFlag(SkipExternalTests)
 
-    val resultMap = TestingCore.sortArgLists(List(inValue1, inToggle1, inRange3, inRange1, inToggle2, inRange2, inValue2))
-    val (valueList, rangeList, toggleList) = (resultMap(TestingCore.ArgKeyValue), resultMap(TestingCore.ArgKeyRange), resultMap(TestingCore.ArgKeyToggle))
+    val resultMap = TestingCore.sortArgLists(Seq(inValue1, inToggle1, inRange3, inRange1, inToggle2, inRange2, inValue2))
+    val (values, ranges, toggles) = (resultMap(TestingCore.ArgKeyValue), resultMap(TestingCore.ArgKeyRange), resultMap(TestingCore.ArgKeyToggle))
 
     // Why isn't the "should" syntax working here...?
-    valueList.contains(inValue1) === true
-    valueList.contains(inValue2) === true
+    values.contains(inValue1) === true
+    values.contains(inValue2) === true
 
-    rangeList.contains(inRange1) === true
-    rangeList.contains(inRange2) === true
-    rangeList.contains(inRange3) === true
+    ranges.contains(inRange1) === true
+    ranges.contains(inRange2) === true
+    ranges.contains(inRange3) === true
 
-    toggleList.contains(inToggle1) === true
-    toggleList.contains(inToggle2) === true
+    toggles.contains(inToggle1) === true
+    toggles.contains(inToggle2) === true
 
   }
 

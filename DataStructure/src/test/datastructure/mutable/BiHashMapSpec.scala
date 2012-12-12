@@ -17,14 +17,15 @@ class BiHashMapSpec extends FlatSpec with BeforeAndAfterEach with GivenWhenThen 
   type B = String
   type BHM = BiHashMap[A, B]
 
-  val aList: List[A] = List(5, 17, 1, 9, 4)
-  val bList: List[B] = List("five", "seventeen", "one", "nine", "four")
-  val baseList: List[(A, B)] = aList zip bList
+  val As:  Seq[A]        = Seq(5, 17, 1, 9, 4)
+  val Bs:  Seq[B]       = Seq("five", "seventeen", "one", "nine", "four")
+  val ABs: Seq[(A, B)] = As zip Bs
+
   val biHash = BiHashMap[A, B]()
 
   override def beforeEach() {
     biHash.clear()
-    biHash ++= baseList
+    biHash ++= ABs
     super.beforeEach()
   }
 
@@ -39,13 +40,13 @@ class BiHashMapSpec extends FlatSpec with BeforeAndAfterEach with GivenWhenThen 
     val bSet = biHash.bSet
 
     then("the size should equal equal to the size of what was passed in")
-    size should equal (baseList.size)
+    size should equal (ABs.size)
 
     and("the set of As should hold all and only the As that were passed in")
-    aList.sorted.zipAll(aSet.toList.sorted, -1, "-1") map { case (x,y) => x should equal (y) }
+    As.sorted.zipAll(aSet.toSeq.sorted, -1, "-1") map { case (x,y) => x should equal (y) }
 
     and("the set of Bs should hold all and only the Bs that were passed in")
-    bList.sorted.zipAll(bSet.toList.sorted, -1, "-1") map { case (x,y) => x should equal (y) }
+    Bs.sorted.zipAll(bSet.toSeq.sorted, -1, "-1") map { case (x,y) => x should equal (y) }
 
   }
 
@@ -157,7 +158,7 @@ class BiHashMapSpec extends FlatSpec with BeforeAndAfterEach with GivenWhenThen 
   it should "be mutable correctly" in {
 
     given("an empty BHM")
-    var bhm = BiHashMap[Int, String]()
+    val bhm = BiHashMap[Int, String]()
 
     when("using it mutably")
 

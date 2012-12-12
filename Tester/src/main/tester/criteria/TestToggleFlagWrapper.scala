@@ -7,6 +7,6 @@ package tester.criteria
  * Time: 6:51 PM
  */
 
-class TestToggleFlagWrapper(toggles: List[TestCriteriaToggleFlag])
-                           (implicit passItOn: List[TestToggleFlag] = toggles map ( _.flag ))
+class TestToggleFlagWrapper(toggles: Seq[TestCriteriaToggleFlag])
+                           (implicit passItOn: Seq[TestToggleFlag] = toggles map ( _.flag ))
                             extends BaseToggleFlagWrapper(passItOn, TestingFlag.flags collect { case x: TestToggleFlag => x })

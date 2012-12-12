@@ -107,43 +107,30 @@ class TestRunningnessRange(testBounds: (Int, Int), testFlag: TestRunningnessFlag
 }
 
 object TestRunningnessRange {
-  def apply(guide: (Int, Int),  flag: TestRunningnessFlag) : TestRunningnessRange = {
-    new TestRunningnessRange(guide, flag)
-  }
-  def apply(guideStart: Int, guideEnd: Int,  flag: TestRunningnessFlag) : TestRunningnessRange = {
-    new TestRunningnessRange((guideStart, guideEnd), flag)
-  }
-  implicit def rangeTupleListToValueTupleListList(that: List[TestRunningnessRange]) : List[List[TestRunningnessValue]] = {
-    that map (rangeTupleToValueTupleList(_))
-  }
-  implicit def rangeTupleToValueTupleList(that: TestRunningnessRange) : List[TestRunningnessValue] = {
-    Range(that.guide._1, that.guide._2).inclusive map (TestRunningnessValue(_, that.flag)) toList
-  }
+
+  def apply(guide: (Int, Int),  flag: TestRunningnessFlag)              = new TestRunningnessRange(guide, flag)
+  def apply(guideStart: Int, guideEnd: Int,  flag: TestRunningnessFlag) = new TestRunningnessRange((guideStart, guideEnd), flag)
+
+  implicit def rangeTupleSeq2ValueTupleSeqSeq(ranges: Seq[TestRunningnessRange]) : Seq[Seq[TestRunningnessValue]] = ranges map (rangeTuple2ValueTupleSeq(_))
+  implicit def rangeTuple2ValueTupleSeq(range: TestRunningnessRange)             : Seq[TestRunningnessValue]      =
+    Range(range.guide._1, range.guide._2).inclusive map (TestRunningnessValue(_, range.flag)) toSeq
+
 }
 
 // ==========================================+-----------------------+============================================
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>|     Toggle tuple      |<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 // ==========================================+-----------------------+============================================
 
-class TestCriteriaToggleFlag(criteriaFlag: TestToggleFlag) extends TestFlagCriteria(criteriaFlag) {
-
-  override def equals(that: Any) : Boolean = {
+class TestCriteriaToggleFlag(criteriaFlag: TestToggleFlag) extends TestFlagCriteria(criteriaFlag) with Equals {
+  override def hashCode            = 4111 + flag.hashCode
+  override def canEqual(that: Any) = that.isInstanceOf[TestCriteriaToggleFlag]
+  override def equals(that: Any) =
     that match {
       case thatToggle: TestCriteriaToggleFlag => (thatToggle canEqual this) && (flag == thatToggle.flag)
       case _                                  => false
     }
-  }
-
-  override def hashCode : Int = {
-    (4111 + flag.hashCode())
-  }
-
-  def canEqual(that: Any) : Boolean = {
-    that.isInstanceOf[TestCriteriaToggleFlag]
-  }
-
 }
 
 object TestCriteriaToggleFlag {
-  def apply(flag: TestToggleFlag) : TestCriteriaToggleFlag = new TestCriteriaToggleFlag(flag)
+  def apply(flag: TestToggleFlag) = new TestCriteriaToggleFlag(flag)
 }

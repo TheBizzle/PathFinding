@@ -31,8 +31,8 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
 
   }
 
-  def neighborsOf(loc: Coordinate2D) : List[Direction] = {
-    PathingMap.DirList.filter (x => getTerrain(PathingMap.findNeighborCoord(loc, x)).isPassable)
+  def neighborsOf(loc: Coordinate2D) : Seq[Direction] = {
+    PathingMap.Directions filter (x => getTerrain(PathingMap.findNeighborCoord(loc, x)).isPassable)
   }
 
   def step(start: Coordinate2D, end: Coordinate2D) {
@@ -67,7 +67,7 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
 
 object PathingMap {
 
-  val DirList = List(North, East, South, West)
+  val Directions = Seq(North, East, South, West)
 
   def apply(mapString: PathingMapString) : (Coordinate2D, Coordinate2D, PathingMap) = {
     val pathingData = PathingMapStringInterpreter(mapString); import pathingData._
@@ -96,7 +96,7 @@ object PathingMap {
     else throw new InvalidParameterException(start.toString + " or " + end.toString + " is/are invalid")
   }
 
-  def generateCloneWithPath(path: List[Coordinate2D], inMap: PathingMap) : PathingMap = {
+  def generateCloneWithPath(path: Seq[Coordinate2D], inMap: PathingMap) : PathingMap = {
     val outMap = inMap.clone()
     path foreach (coord => outMap.pathingMap(coord.x)(coord.y) = Path)
     outMap

@@ -11,7 +11,7 @@ import pathfinding.testscript.TestScript
 
 abstract class OmniTestBase extends TestScript {
 
-  protected def tests: List[(TestScript, String)]
+  protected def tests: Seq[(TestScript, String)]
 
   def run() {
     tests foreach {

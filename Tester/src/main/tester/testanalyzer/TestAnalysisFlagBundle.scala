@@ -11,6 +11,6 @@ import tester.criteria.{BaseToggleFlagWrapper, Talkative, TestToggleFlag}
  */
 
 // I might spice that class up a bit more later.  I wanted it returning tuples, but found it too cumbersome....
-abstract class TestAnalysisFlagBundle(inToggles: List[TestToggleFlag], expandedSupportList: List[TestToggleFlag] = List())
-                                     (implicit passItOn: List[TestToggleFlag] = expandedSupportList ::: List(Talkative))
+abstract class TestAnalysisFlagBundle(inToggles: Seq[TestToggleFlag], extras: Seq[TestToggleFlag] = Seq())
+                                     (implicit passItOn: Seq[TestToggleFlag] = extras ++ Seq(Talkative))
                                       extends BaseToggleFlagWrapper(inToggles, passItOn)

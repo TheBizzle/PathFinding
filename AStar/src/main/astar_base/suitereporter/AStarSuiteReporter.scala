@@ -9,4 +9,4 @@ import tester.suitereporter.SuiteReporter
  * Time: 11:00 PM
  */
 
-object AStarSuiteReporter extends SuiteReporter(List())
+object AStarSuiteReporter extends SuiteReporter(Seq())

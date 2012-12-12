@@ -13,7 +13,7 @@ import tester.TestingCore
  */
 
 abstract class TestScript extends App {
-  def run(criteria: List[TestCriteria], pf: PathFinder[_ <: StepData]) {
+  def run(criteria: Seq[TestCriteria], pf: PathFinder[_ <: StepData]) {
     TestingCore(criteria, pf.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
   }
 }

@@ -151,9 +151,8 @@ class Heap[T : Manifest] protected[datastructure] (ordering: (T, T) => Int, elem
     tempArr foreach(f)
   }
 
-  def toList : List[T] = {
-    heapArr collect { case Some(x) => x } toList
-  }
+  def toSeq  = heapArr.flatten.toSeq
+  def toList = heapArr.flatten.toList
 
   override def clone() : Heap[T] = {
     new Heap[T](ordering, heapArr.clone())

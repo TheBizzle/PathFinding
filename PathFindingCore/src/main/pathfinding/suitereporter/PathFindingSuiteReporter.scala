@@ -10,4 +10,4 @@ import pathfinding.pathingmap.PathingMapSpec
  * Time: 10:57 PM
  */
 
-object PathFindingSuiteReporter extends SuiteReporter(List(new PathingMapSpec()))
+object PathFindingSuiteReporter extends SuiteReporter(Seq(new PathingMapSpec()))

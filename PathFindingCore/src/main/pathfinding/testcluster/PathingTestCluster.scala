@@ -23,33 +23,33 @@ import testfunction.{ PathingTestFunction, PTFConstructionBundle }
 object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapString, PTFConstructionBundle]
                              with TestAnalyzer[PathingStatus[StepData], PathingAnalysisFlagBundle, PathingAnalysisResultBundle] {
 
-  protected def TestFunctionRegex = "TestMapString([0-9]+)((_L([0-9]+))?)"
+  override protected def TestFunctionRegex = "TestMapString([0-9]+)((_L([0-9]+))?)"
 
   lazy val tests = generateTests
 
-  def getTestsToRun(testNums: List[Int]) : List[PathingTestFunction] = tests.zipWithIndex collect { case (x, y) if (testNums.contains(y + 1)) => x }
-  def getSize = tests.length
+  override def getTestsToRun(testNums: Seq[Int]) : Seq[PathingTestFunction] = tests.zipWithIndex collect { case (x, y) if (testNums.contains(y + 1)) => x }
+  override def getSize = tests.length
 
-  protected def analyze(status: PathingStatus[StepData], flags: PathingAnalysisFlagBundle) : PathingAnalysisResultBundle = {
+  override protected def analyze(status: PathingStatus[StepData], flags: PathingAnalysisFlagBundle) : PathingAnalysisResultBundle = {
 
     val isTalkative = flags.get(Talkative)
 
-    val result = status match {
+    val (wasSuccessful, path) = status match {
       case Success(x) =>
         if (isTalkative) println("\n\nFound a solution!")
         (true, retracePath(x.breadcrumbArr, x.endGoal, x.pathingMap, isTalkative))
       case Failure(_) =>
         if (isTalkative) println("\n\nFailed to find a solution....")
-        (false, Nil)
+        (false, Seq())
       case x          =>
         throw new MysteriousDataException("Unexpected ExecutionStatus!  Received: " + x)
     }
 
-    new PathingAnalysisResultBundle(result._1, result._2)
+    new PathingAnalysisResultBundle(wasSuccessful, path)
 
   }
 
-  private def retracePath(breadcrumbs: Array[Array[Coordinate2D]], goal: Coordinate2D, pathingMap: PathingMap, isTalkative: Boolean) : List[Coordinate2D] = {
+  private def retracePath(breadcrumbs: Array[Array[Coordinate2D]], goal: Coordinate2D, pathingMap: PathingMap, isTalkative: Boolean) : Seq[Coordinate2D] = {
 
     val pathTaken = eatBreadcrumbsForPath(breadcrumbs, goal)
 
@@ -70,17 +70,17 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
 
   }
 
-  private def eatBreadcrumbsForPath(breadcrumbs: Array[Array[Coordinate2D]], goal: Coordinate2D) : List[Coordinate2D] = {
-    def breadcrumbsHelper(breadcrumbs: Array[Array[Coordinate2D]], current: Coordinate2D) : List[Coordinate2D] = {
-      current :: {
+  private def eatBreadcrumbsForPath(breadcrumbs: Array[Array[Coordinate2D]], goal: Coordinate2D) : Seq[Coordinate2D] = {
+    def breadcrumbsHelper(breadcrumbs: Array[Array[Coordinate2D]], current: Coordinate2D) : Seq[Coordinate2D] = {
+      current +: {
         val next = breadcrumbs(current.x)(current.y)
-        if (next.isValid) breadcrumbsHelper(breadcrumbs, next) else Nil
+        if (next.isValid) breadcrumbsHelper(breadcrumbs, next) else Seq()
       }
     }
-    (goal :: breadcrumbsHelper(breadcrumbs, breadcrumbs(goal.x)(goal.y))).reverse
+    (goal +: breadcrumbsHelper(breadcrumbs, breadcrumbs(goal.x)(goal.y))).reverse
   }
 
-  protected def generateTestFunction(testField: (Field, String), regex: String) : Option[PathingTestFunction] = {
+  override protected def generateTestFunction(testField: (Field, String), regex: String) : Option[PathingTestFunction] = {
     if (testField._2.matches(regex)) {
       val Matcher = regex.r
       val Matcher(testNum, shouldPass, _, foundLength) = testField._2
@@ -91,7 +91,7 @@ object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapStr
     else None
   }
 
-  protected def construct(subject: PathingMapString, testNumber: Int, shouldPass: Boolean, bundle: PTFConstructionBundle) : PathingTestFunction = {
+  override protected def construct(subject: PathingMapString, testNumber: Int, shouldPass: Boolean, bundle: PTFConstructionBundle) : PathingTestFunction = {
     new PathingTestFunction(subject, analyze, testNumber, shouldPass, bundle.expectedPathLength)
   }
 

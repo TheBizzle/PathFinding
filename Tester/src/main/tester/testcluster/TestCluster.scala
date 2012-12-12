@@ -12,6 +12,6 @@ import testfunction.{TestFuncConstructionBundle, TestFunctionFactory, TestFuncti
 
 trait TestCluster[T <: TestFunction[_, U, _, _, _], U <: TestSubject, V <: TestFuncConstructionBundle] extends TestFunctionFactory[T, U, V] {
   protected def TestFunctionRegex : String
-  def getTestsToRun(testNums: List[Int]) : List[T]
+  def getTestsToRun(testNums: Seq[Int]) : Seq[T]
   def getSize : Int
 }

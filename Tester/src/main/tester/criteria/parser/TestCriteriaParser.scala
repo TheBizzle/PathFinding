@@ -16,40 +16,38 @@ object TestCriteriaParser extends RegexParsers {
 
   // ============== MISC ====================
 
-  val flags = TestingFlag.flags
+  val flags     = TestingFlag.flags
   val flagNames = flags.map(_.getClass.getName.replaceAll("""(\$$)|(.*\.)""", ""))  // (i.e. "tester.criteria.RunTest$" => "RunTest")
 
-  implicit private def not2Flag(not: Option[String]) : TestRunningnessFlag = {
-    not map (x => SkipTest) getOrElse (RunTest)
-  }
+  implicit private def not2Flag(not: Option[String]) : TestRunningnessFlag = not map (x => SkipTest) getOrElse (RunTest)
 
   // =============== PARSERS =================
 
-  val Not = """~|!""".r
-  val Sep = """;|&&""".r
-  val Num = """[1-9][0-9]*""".r
-  val RangeSep = """,|(->)|(>&>)|-|:""".r
+  val Not         = """~|!""".r
+  val Sep         = """;|&&""".r
+  val Num         = """[1-9][0-9]*""".r
+  val RangeSep    = """,|(->)|(>&>)|-|:""".r
   val NotRangeSep = """>!>""".r
 
-  def testingnessValue: Parser[TestRunningnessValue] = opt(Not) ~ Num ^^ {
+  def testingnessValue : Parser[TestRunningnessValue] = opt(Not) ~ Num ^^ {
     case not ~ num => TestRunningnessValue(num.toInt, not)
   }
 
-  def testingnessRange: Parser[TestRunningnessRange] = opt(Not) ~ Num ~ (RangeSep ~> Num) ^^ {
+  def testingnessRange : Parser[TestRunningnessRange] = opt(Not) ~ Num ~ (RangeSep ~> Num) ^^ {
     case not ~ start ~ end => TestRunningnessRange(start.toInt, end.toInt, not)
   }
 
   // Added for compatibility with TestCriteriaDialect
-  def testingnessNotRange: Parser[TestRunningnessRange] = Num ~ (NotRangeSep ~> Num) ^^ {
+  def testingnessNotRange : Parser[TestRunningnessRange] = Num ~ (NotRangeSep ~> Num) ^^ {
     case start ~ end => TestRunningnessRange(start.toInt, end.toInt, SkipTest)
   }
 
-  def otherFlag: Parser[TestCriteriaToggleFlag] = ("(?i)" + flagNames.map("(%s)".format(_)).mkString("|")).r ^^ {
+  def otherFlag : Parser[TestCriteriaToggleFlag] = ("(?i)" + flagNames.map("(%s)".format(_)).mkString("|")).r ^^ {
     case name => TestCriteriaToggleFlag(flags.zip(flagNames).find(_._2.compareToIgnoreCase(name) == 0).get._1)
   }
 
-  def criteria: Parser[List[TestCriteria]] =  rep1sep(testingnessNotRange | testingnessRange | testingnessValue | otherFlag, Sep) ^^ {
-    case criteria: List[TestCriteria] => criteria
+  def criteria : Parser[Seq[TestCriteria]] = rep1sep(testingnessNotRange | testingnessRange | testingnessValue | otherFlag, Sep) ^^ {
+    case criteria: Seq[TestCriteria] => criteria
   }
 
 }

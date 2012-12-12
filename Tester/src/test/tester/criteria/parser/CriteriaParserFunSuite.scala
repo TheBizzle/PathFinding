@@ -232,10 +232,10 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
 
   implicit def not2Flag(not: String) : TestRunningnessFlag = if (not.isEmpty) RunTest else SkipTest
 
-  private val num = """[1-9][0-9]*"""
-  private val ValueTuple = "(~?)(%s)".format(num).r
+  private val num           = "[1-9][0-9]*"
+  private val ValueTuple    = "(~?)(%s)".format(num).r
   private val NotRangeTuple = "(%s)>!>(%s)".format(Stream.continually(num) take 2: _*).r
-  private val RangeTuple = "(~?)(%s)->(%s)".format(Stream.continually(num) take 2: _*).r
+  private val RangeTuple    = "(~?)(%s)->(%s)".format(Stream.continually(num) take 2: _*).r
   
   // ======================== UTILITIES - PIMPED SEQS ============================
 
@@ -247,18 +247,19 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
 
     private def string2TestCriteria(str: String) : TestCriteria = {
 
-      def matchesTuple(r: Regex)(s: String) : Boolean = r.matches(s)
+      def matchesTuple(r: Regex)(s: String) = r matches s
+
       def getAsValue(s: String)    : TestRunningnessValue = { val ValueTuple(not, value) = s; TestRunningnessValue(value.toInt, not) }
       def getAsNotRange(s: String) : TestRunningnessRange = { val NotRangeTuple(start, end) = s; TestRunningnessRange(start.toInt, end.toInt, SkipTest) }
       def getAsRange(s: String)    : TestRunningnessRange = { val RangeTuple(not, start, end) = s; TestRunningnessRange(start.toInt, end.toInt, not) }
-      val tupleFuncs = List((ValueTuple, getAsValue(_)), (NotRangeTuple, getAsNotRange(_)), (RangeTuple, getAsRange(_))) map { case (rgx, func) => (matchesTuple(rgx)(_), func) }
+      val tuplesAndFuncs = Seq((ValueTuple, getAsValue(_)), (NotRangeTuple, getAsNotRange(_)), (RangeTuple, getAsRange(_))) map { case (rgx, func) => (matchesTuple(rgx)(_), func) }
 
-      def matchesFlag(name: String)(s: String) : Boolean = s == name
+      def matchesFlag(name: String)(s: String) = s == name
       def getAsFlag(flag: TestToggleFlag)(s: String) : TestCriteriaToggleFlag = TestCriteriaToggleFlag(flag)
-      val flagFuncs = flagNames.map(name => matchesFlag(name)(_)) zip flags.map(flag => getAsFlag(flag)(_))
+      val flagsAndFuncs = flagNames.map(name => matchesFlag(name)(_)) zip flags.map(flag => getAsFlag(flag)(_))
 
       // I wish this could all be done more smoothly and/or readably with `Option`-juggling...
-      tupleFuncs ++ flagFuncs collectFirst { case (condFunc, resultFunc) if (condFunc(str)) => resultFunc(str) } getOrElse
+      tuplesAndFuncs ++ flagsAndFuncs collectFirst { case (condFunc, resultFunc) if (condFunc(str)) => resultFunc(str) } getOrElse
               (throw new Exception("Failed to convert %s to any `TestCriteria` subclass".format(str)))
       
     }

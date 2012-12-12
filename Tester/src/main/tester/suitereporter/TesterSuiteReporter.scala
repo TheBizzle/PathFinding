@@ -11,4 +11,4 @@ import tester.testscript.dialect.CriteriaDialectFunSuite
  * Time: 10:51 PM
  */
 
-object TesterSuiteReporter extends SuiteReporter(List(new TesterFunSuite(), new TesterSpec(), new CriteriaParserFunSuite(), new CriteriaDialectFunSuite()))
+object TesterSuiteReporter extends SuiteReporter(Seq(new TesterFunSuite(), new TesterSpec(), new CriteriaParserFunSuite(), new CriteriaDialectFunSuite()))

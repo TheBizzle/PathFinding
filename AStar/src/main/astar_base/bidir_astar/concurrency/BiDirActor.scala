@@ -14,13 +14,13 @@ import pathfinding.breadcrumb.Breadcrumb
 
 sealed abstract class BiDirActor[T <: BiDirStepData](es: PathingStatus[T],
                                                      dFunc: T => PathingStatus[T],
-                                                     sFunc: T => (T, List[Breadcrumb])) extends Actor {
+                                                     sFunc: T => (T, Seq[Breadcrumb])) extends Actor {
 
-  var status = es           // 6... 6, 6: The Number of the Bug
+  var status = es
   val decide = dFunc
-  val step = sFunc
+  val step   = sFunc
 
-  protected def moveAndMutate() : (PathingStatus[T], List[Breadcrumb]) = {
+  protected def moveAndMutate() : (PathingStatus[T], Seq[Breadcrumb]) = {
     val (neoStepData, neoCrumbs) = step(status.stepData)
     status = decide(neoStepData)
     (status, neoCrumbs)
@@ -29,27 +29,28 @@ sealed abstract class BiDirActor[T <: BiDirStepData](es: PathingStatus[T],
   def act() {
     loop {
       react {
-        case (BiDirActor.AssimilateMessageStr, crumbList: List[Breadcrumb]) => status.stepData.assimilateBreadcrumbs(crumbList)
-        case  BiDirActor.StartMessageStr                                    => reply(moveAndMutate())
-        case  BiDirActor.StopMessageStr                                     => exit()
+        case (BiDirActor.AssimilateMessageStr, crumbs: Seq[Breadcrumb]) => status.stepData.assimilateBreadcrumbs(crumbs)
+        case  BiDirActor.StartMessageStr                                => reply(moveAndMutate())
+        case  BiDirActor.StopMessageStr                                 => exit()
       }
     }
   }
 
 }
 
+//@ Oh, wow.  This is terrible and archaic.
 private[concurrency] object BiDirActor {
   val StartMessageStr = "start"
   val AssimilateMessageStr = "assimilate"
   val StopMessageStr = "stop"
 }
 
-case class StartToGoal[T <: BiDirStepData](exeStatus: PathingStatus[T],
+case class StartToGoal[T <: BiDirStepData](exeStatus:  PathingStatus[T],
                                            decideFunc: T => PathingStatus[T],
-                                           stepFunc: T => (T, List[Breadcrumb]))
+                                           stepFunc:   T => (T, Seq[Breadcrumb]))
                                            extends BiDirActor[T](exeStatus, decideFunc, stepFunc)
 
-case class GoalToStart[T <: BiDirStepData](exeStatus: PathingStatus[T],
+case class GoalToStart[T <: BiDirStepData](exeStatus:  PathingStatus[T],
                                            decideFunc: T => PathingStatus[T],
-                                           stepFunc: T => (T, List[Breadcrumb]))
+                                           stepFunc:   T => (T, Seq[Breadcrumb]))
                                            extends BiDirActor[T](exeStatus, decideFunc, stepFunc)

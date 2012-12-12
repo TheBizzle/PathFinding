@@ -14,7 +14,7 @@ import pathfinding.breadcrumb.Breadcrumb
  * Time: 4:19 PM
  */
 
-class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], stepFunc: T => (T, List[Breadcrumb])) {
+class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], stepFunc: T => (T, Seq[Breadcrumb])) {
 
   val decide = decisionFunc
   val step = stepFunc
@@ -76,7 +76,7 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
     actorArgs foreach ( _ ! BiDirActor.StopMessageStr )
   }
 
-  def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : ((PathingStatus[T], List[Breadcrumb]), (PathingStatus[T], List[Breadcrumb])) = {
+  def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : ((PathingStatus[T], Seq[Breadcrumb]), (PathingStatus[T], Seq[Breadcrumb])) = {
 
     stg.start()
     val stgFuture = (stg !! BiDirActor.StartMessageStr)
@@ -84,8 +84,8 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
     gts.start()
     val gtsFuture = (gts !! BiDirActor.StartMessageStr)
 
-    val stgTuple = stgFuture().asInstanceOf[(PathingStatus[T], List[Breadcrumb])]
-    val gtsTuple = gtsFuture().asInstanceOf[(PathingStatus[T], List[Breadcrumb])]
+    val stgTuple = stgFuture().asInstanceOf[(PathingStatus[T], Seq[Breadcrumb])]
+    val gtsTuple = gtsFuture().asInstanceOf[(PathingStatus[T], Seq[Breadcrumb])]
 
     (stgTuple, gtsTuple)
 

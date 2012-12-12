@@ -7,7 +7,6 @@ import pathfinding.StepDataSingleton
 import astar_base.{FactoryThatTakesAStarStepData, AStarStepData}
 import pathfinding.breadcrumb.Breadcrumb
 import annotation.tailrec
-import shapeless._
 import astar_base.exceptions.UnexpectedDataException
 
 /**
@@ -47,13 +46,12 @@ class BiDirStepData(currentLocation: Coordinate2D,
   }
 
   @tailrec
-  final def assimilateBreadcrumbs(crumbList: List[Breadcrumb]) {
-    // For some reason, pattern matching on this code doesn't work...
-    if (crumbList != Nil) {
-      val h = crumbList.head
-      val t = crumbList.tail
-      othersBreadcrumbArr(h.to.x)(h.to.y) = h.from
-      assimilateBreadcrumbs(t)
+  final def assimilateBreadcrumbs(crumbs: Seq[Breadcrumb]) {
+    crumbs.toList match {
+      case Nil    => ()
+      case h :: t =>
+        othersBreadcrumbArr(h.to.x)(h.to.y) = h.from
+        assimilateBreadcrumbs(t)
     }
   }
 
@@ -76,6 +74,8 @@ class BiDirStepData(currentLocation: Coordinate2D,
 
 
 object BiDirStepData extends StepDataSingleton[BiDirStepData] with FactoryThatTakesAStarStepData[BiDirStepData] {
+
+  import shapeless._
 
   override type Extras = Array[Array[Coordinate2D]] :: HNil //@ Give the head type here a friendly alias
 

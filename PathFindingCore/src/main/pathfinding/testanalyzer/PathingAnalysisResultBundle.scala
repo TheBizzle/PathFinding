@@ -10,4 +10,4 @@ import pathfinding.coordinate.Coordinate2D
  * Time: 5:25 PM
  */
 
-class PathingAnalysisResultBundle(val wasSuccess: Boolean, val path: List[Coordinate2D]) extends TestAnalysisResultBundle
+class PathingAnalysisResultBundle(val wasSuccess: Boolean, val path: Seq[Coordinate2D]) extends TestAnalysisResultBundle

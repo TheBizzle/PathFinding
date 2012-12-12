@@ -14,5 +14,5 @@ import astar_base.AStarDependencyTest
 
 object OmniTestQuiet extends OmniTestBase {
   run()
-  protected def tests = List((AStarDependencyTest, "dependency"), (AStarQuiet, "AStar"), (BiDirQuiet, "BiDir"))
+  protected def tests = Seq((AStarDependencyTest, "dependency"), (AStarQuiet, "AStar"), (BiDirQuiet, "BiDir"))
 }

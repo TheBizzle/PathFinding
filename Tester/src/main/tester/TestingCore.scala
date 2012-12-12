@@ -1,13 +1,15 @@
 package tester
 
+import annotation.tailrec
+import collection.immutable.Map
+
+import org.scalatest.Suite
+
 import criteria._
 import exceptions._
-import collection.immutable.{List, Map}
-import annotation.tailrec
-import org.scalatest.Suite
-import testanalyzer.{TestAnalysisResultBundle, ExecutionStatus, TestAnalysisFlagBundle}
-import testcluster._
-import testfunction.{TestFuncConstructionBundle, TestFunction, TestFuncFlagBundle}
+import testanalyzer.{ ExecutionStatus, TestAnalysisFlagBundle, TestAnalysisResultBundle }
+import testcluster.{ Testable, TestCluster, testfunction, TestSubject }
+import testfunction.{ TestFuncConstructionBundle, TestFuncFlagBundle, TestFunction }
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,25 +27,23 @@ object TestingCore {
   //@ Annoying compiler bug....  Fix this rubbish when the compiler gets fixed!
   def apply[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle, ResultFlags <: TestAnalysisResultBundle,
             TFConsBundle <: TestFuncConstructionBundle, TFunc <: TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], TCluster <: TestCluster[TFunc, Subject, TFConsBundle]]
-           (args: List[TestCriteria],
-            testable: T = null,
-            cluster: TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], Subject, TFConsBundle] = null,
+           (args:      Seq[TestCriteria],
+            testable:  T = null,
+            cluster:   TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], Subject, TFConsBundle] = null,
             baseTests: Seq[Suite] = Seq[Suite]()) {
-
     val argMap = sortArgLists(args)
     makeTestRunningDecisions(argMap, testable, cluster, baseTests)
-
   }
 
   private def makeTestRunningDecisions[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle,
                                        ResultFlags <: TestAnalysisResultBundle, TFConsBundle <: TestFuncConstructionBundle,
                                        TFunc <: TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], TCluster <: TestCluster[TFunc, Subject, TFConsBundle]]
-                                       (argMap: Map[String, List[TestCriteria]],
+                                       (argMap: Map[String, Seq[TestCriteria]],
                                         testable: T,
                                         cluster: TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], Subject, TFConsBundle],
                                         baseTests: Seq[Suite]) {
 
-    val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[List[TestCriteriaToggleFlag]]].getOrElse(throw new MysteriousDataException("OMG, what did you do?!"))
+    val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[Seq[TestCriteriaToggleFlag]]] getOrElse (throw new MysteriousDataException("OMG, what did you do?!"))
 
     val toggles = new TestToggleFlagWrapper(rawToggles)
     val wantsToRunExternals = assessExternalityDesire(argMap)
@@ -57,16 +57,16 @@ object TestingCore {
 
     if (!isSkippingExternalTests && wantsToRunExternals) {
 
-      val valuesOption = argMap.get(ArgKeyValue).asInstanceOf[Option[List[TestRunningnessValue]]]
-      val rangesOption = argMap.get(ArgKeyRange).asInstanceOf[Option[List[TestRunningnessRange]]]
+      val valuesOption = argMap.get(ArgKeyValue).asInstanceOf[Option[Seq[TestRunningnessValue]]]
+      val rangesOption = argMap.get(ArgKeyRange).asInstanceOf[Option[Seq[TestRunningnessRange]]]
 
-      val values = valuesOption map (sortCriteria(_)) getOrElse(Nil)
-      val ranges = rangesOption map (sortCriteria(_)) getOrElse(Nil)
+      val values = valuesOption map (sortCriteria(_)) getOrElse(Seq())
+      val ranges = rangesOption map (sortCriteria(_)) getOrElse(Seq())
 
-      val testFlagPairs = List(isTalkative) zip List[TestToggleFlag](Talkative)
-      val testToggles = testFlagPairs collect { case (true, x) => x }
+      val testFlagPairs  = Seq(isTalkative) zip Seq[TestToggleFlag](Talkative)
+      val testToggles    = testFlagPairs collect { case (true, x) => x }
       val testFlagBundle = new TestFuncFlagBundle(testToggles)
-      val testsToRun = handleTestIntervals(values, ranges, cluster.getSize)
+      val testsToRun     = handleTestIntervals(values, ranges, cluster.getSize)
 
       runTests(cluster.getTestsToRun(testsToRun), testable, testFlagBundle, isStacktracing)
 
@@ -78,7 +78,7 @@ object TestingCore {
   }
 
   private def runTests[T <: Testable, TFunc <: TestFunction[T, _, _, _, _]]
-                      (tests: List[TFunc], testable: T, flags: TestFuncFlagBundle, isStacktracing: Boolean) {
+                      (tests: Seq[TFunc], testable: T, flags: TestFuncFlagBundle, isStacktracing: Boolean) {
 
     def successStr(testNumber: Int) = "Test number " + testNumber + " was a success."
     def failureStr(testNumber: Int) = "Test number " + testNumber + " failed miserably!"
@@ -100,15 +100,15 @@ object TestingCore {
   }
 
   // Basically, takes advantage of bucketing to quickly deal with test numbers and their test-ness/skip-ness
-  // Calls an implicit conversion of List[RangeTuples] into List[List[ValueTuple]]s where it is called
-  private[tester] def generateResultArray(runRanges: List[TestRunningnessRange], runValues: List[TestRunningnessValue],
-                                          skipRanges: List[TestRunningnessRange], skipValues: List[TestRunningnessValue], maxNum: Int) : Array[Boolean] = {
+  // Calls an implicit conversion of Seq[RangeTuples] into Seq[Seq[ValueTuple]]s where it is called
+  private[tester] def generateResultArray(runRanges: Seq[TestRunningnessRange], runValues: Seq[TestRunningnessValue],
+                                          skipRanges: Seq[TestRunningnessRange], skipValues: Seq[TestRunningnessValue], maxNum: Int) : Array[Boolean] = {
     val arr  = new Array[Boolean](maxNum + 1)
-    List(runRanges.flatten, runValues, skipRanges.flatten, skipValues) foreach (applyValuesToArr(_, arr))
+    Seq(runRanges.flatten, runValues, skipRanges.flatten, skipValues) foreach (applyValuesToArr(_, arr))
     arr
   }
 
-  private[tester] def applyValuesToArr(values: List[TestRunningnessValue], arr: Array[Boolean]) : Array[Boolean] = {
+  private[tester] def applyValuesToArr(values: Seq[TestRunningnessValue], arr: Array[Boolean]) : Array[Boolean] = {
     values foreach {
       x =>
         val isTesting = isIncludingTest(x)
@@ -121,7 +121,7 @@ object TestingCore {
   }
 
   // Expects values and ranges to both be sorted
-  private[tester] def handleTestIntervals(values: List[TestRunningnessValue], ranges: List[TestRunningnessRange], testCount: Int) : List[Int] = {
+  private[tester] def handleTestIntervals(values: Seq[TestRunningnessValue], ranges: Seq[TestRunningnessRange], testCount: Int) : Seq[Int] = {
 
     val (testRanges, skipRanges, maxRangeVal) = handleRanges(ranges, testCount)
     val (testValues, skipValues, maxValueVal) = handleValues(values, testCount)
@@ -131,76 +131,73 @@ object TestingCore {
       throw new NotRunningTestsException("All runnable tests were excluded!  Use the SkipExternalTests flag, instead!")
 
     val resultArr = generateResultArray(testRanges, testValues, skipRanges, skipValues, overallMax)
-    val outList = resultArr.zipWithIndex collect { case (true, x) => x } toList
+    val out = resultArr.zipWithIndex collect { case (true, x) => x } toSeq
 
-    if (!outList.isEmpty)
-      outList
+    if (!out.isEmpty)
+      out
     else
       throw new NotRunningTestsException("All runnable tests were excluded!  Use the SkipExternalTests flag, instead!")
 
   }
 
   // Expects ranges to be sorted
-  private[tester] def handleRanges(ranges: List[TestRunningnessRange], testCount: Int) : (List[TestRunningnessRange], List[TestRunningnessRange], Int) = {
+  private[tester] def handleRanges(ranges: Seq[TestRunningnessRange], testCount: Int) : (Seq[TestRunningnessRange], Seq[TestRunningnessRange], Int) = {
 
     if (!ranges.isEmpty) {
 
-      val (testList, skipList) = ranges.partition(isIncludingTest)
+      val (tests, skips) = ranges.partition(isIncludingTest)
 
-      val (testsHaveOverlap, firstTest, secondTest) = containsOverlaps(testList)
+      val (testsHaveOverlap, firstTest, secondTest) = containsOverlaps(tests)
       if (testsHaveOverlap) throw new RedundancyException("Test list has an overlap between " + firstTest.get.toString + " and " + secondTest.get.toString)
 
-      val (skipsHaveOverlap, firstSkip, secondSkip) = containsOverlaps(skipList)
+      val (skipsHaveOverlap, firstSkip, secondSkip) = containsOverlaps(skips)
       if (skipsHaveOverlap) throw new RedundancyException("Skip list has an overlap between " + firstSkip.get.toString + " and " + secondSkip.get.toString)
 
       val maxOfRanges = {
-        if (!testList.isEmpty) {
-          val value = testList.last.guide._2
+        if (!tests.isEmpty) {
+          val value = tests.last.guide._2
           if (value <= testCount)
             value
           else
-            throw new InvalidTestNumberException("Test range " + testList.last.toString + " extends to a number for which there is no corresponding test.  " +
+            throw new InvalidTestNumberException("Test range " + tests.last.toString + " extends to a number for which there is no corresponding test.  " +
                                                  "Min is 1.  Max is " + testCount + ".")
         }
         else
           0
       }
 
-      (testList, skipList, maxOfRanges)
+      (tests, skips, maxOfRanges)
 
     }
-    else
-      (Nil, Nil, 0)
+    else (Seq(), Seq(), 0)
 
   }
 
   // Expects values to be sorted
-  private[tester] def handleValues(values: List[TestRunningnessValue], testCount: Int) : (List[TestRunningnessValue], List[TestRunningnessValue], Int) = {
+  private[tester] def handleValues(values: Seq[TestRunningnessValue], testCount: Int) : (Seq[TestRunningnessValue], Seq[TestRunningnessValue], Int) = {
     if (!values.isEmpty) {
-      val (testList, skipList) = values.partition(isIncludingTest)
-      val value = if (!testList.isEmpty) testList.last.guide else 0
+      val (tests, skips) = values.partition(isIncludingTest)
+      val value          = if (!tests.isEmpty) tests.last.guide else 0
       if (value <= testCount)
-        (testList, skipList, value)
+        (tests, skips, value)
       else
         throw new InvalidTestNumberException("There is no test #" + values.last.guide)
     }
-    else
-      (Nil, Nil, 0)
+    else (Seq(), Seq(), 0)
   }
 
   private def runBaseTests(baseTests: Seq[Suite]) {
     baseTests foreach { x => print("\n"); x.execute(stats = true) }
   }
 
-  private[tester] def assessExternalityDesire(argMap:  Map[String, List[TestCriteria]]) : Boolean = {
-    argMap(ArgKeyValue).asInstanceOf[List[TestRunningnessValue]].exists(isIncludingTest) || argMap(ArgKeyRange).asInstanceOf[List[TestRunningnessRange]].exists(isIncludingTest)
-  }
+  private[tester] def assessExternalityDesire(argMap:  Map[String, Seq[TestCriteria]]) : Boolean =
+    argMap(ArgKeyValue).asInstanceOf[Seq[TestRunningnessValue]].exists(isIncludingTest) || argMap(ArgKeyRange).asInstanceOf[Seq[TestRunningnessRange]].exists(isIncludingTest)
 
-  private[tester] def sortArgLists(args: List[TestCriteria]) : Map[String, List[TestCriteria]] = {
+  private[tester] def sortArgLists(args: Seq[TestCriteria]) : Map[String, Seq[TestCriteria]] = {
 
-    val baseMap = Map(ArgKeyValue  -> List[TestRunningnessValue](),
-                      ArgKeyRange  -> List[TestRunningnessRange](),
-                      ArgKeyToggle -> List[TestCriteriaToggleFlag]())
+    val baseMap = Map(ArgKeyValue  -> Seq[TestRunningnessValue](),
+                      ArgKeyRange  -> Seq[TestRunningnessRange](),
+                      ArgKeyToggle -> Seq[TestCriteriaToggleFlag]())
 
     val argMap = args.groupBy {
       case _: TestRunningnessValue   => ArgKeyValue
@@ -213,25 +210,21 @@ object TestingCore {
 
   }
 
-  private[tester] def sortCriteria[T <: TestRunningnessCriteria[_, _] : Manifest](inList: List[T]) : List[T] = {
-    inList sortBy (_.getKey)
-  }
+  private[tester] def sortCriteria[T <: TestRunningnessCriteria[_, _] : Manifest](criteria: Seq[T]) : Seq[T] = criteria sortBy (_.getKey)
 
-  // Assumes the passed-in list to be sorted
+  // Assumes the passed-in ranges to be sorted
   @tailrec
-  private[tester] def containsOverlaps(inList: List[TestRunningnessRange]) : (Boolean, Option[TestRunningnessRange], Option[TestRunningnessRange]) = {
-    inList match {
-      case h1::h2::_ =>
-        if (h1 intersects h2)
-          (true, Some(h1), Some(h2))
+  private[tester] def containsOverlaps(ranges: Seq[TestRunningnessRange]) : (Boolean, Option[TestRunningnessRange], Option[TestRunningnessRange]) = {
+    ranges.toList match {
+      case r1 :: r2 :: tail =>
+        if (r1 intersects r2)
+          (true, Some(r1), Some(r2))
         else
-          containsOverlaps(inList.tail)
+          containsOverlaps(r2 :: tail)
       case _  => (false, None, None)
     }
   }
 
-  private def isIncludingTest(tuple: TestRunningnessCriteria[_, _]) : Boolean = {
-    tuple.flag == RunTest
-  }
+  private def isIncludingTest(tuple: TestRunningnessCriteria[_, _]) = tuple.flag == RunTest
 
 }

@@ -13,5 +13,5 @@ import tester.criteria._
  */
 
 object AStarDependencyTest extends TestScript {
-  TestingCore(List[TestCriteria](RunBaseTests), baseTests = AStarSuiteCoagulator.coagulate)
+  TestingCore(Seq[TestCriteria](RunBaseTests), baseTests = AStarSuiteCoagulator.coagulate)
 }

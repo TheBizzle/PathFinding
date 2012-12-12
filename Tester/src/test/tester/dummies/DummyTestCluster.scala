@@ -13,9 +13,9 @@ import tester.testanalyzer.{TestAnalysisResultBundle, ExecutionStatus, TestAnaly
  */
 
 object DummyTestCluster extends TestCluster[TestFunction[Testable, TestSubject, ExecutionStatus, TestAnalysisFlagBundle, TestAnalysisResultBundle], TestSubject, TestFuncConstructionBundle] {
-  protected def TestFunctionRegex = ""
-  def getSize = 10
-  def getTestsToRun(testNums: List[Int]) : List[TestFunction[Testable, TestSubject, ExecutionStatus, TestAnalysisFlagBundle, TestAnalysisResultBundle]] = null
-  protected def generateTestFunction(fieldData: (Field, String), regex: String) = null
-  protected def construct(subject: TestSubject, testNumber: Int, shouldPass: Boolean, bundle: TestFuncConstructionBundle) = null
+  override protected def TestFunctionRegex = ""
+  override           def getSize = 10
+  override protected def construct(subject: TestSubject, testNumber: Int, shouldPass: Boolean, bundle: TestFuncConstructionBundle) = null
+  override protected def generateTestFunction(fieldData: (Field, String), regex: String) = null
+  override           def getTestsToRun(testNums: Seq[Int]) : Seq[TestFunction[Testable, TestSubject, ExecutionStatus, TestAnalysisFlagBundle, TestAnalysisResultBundle]] = null
 }

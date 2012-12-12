@@ -44,14 +44,14 @@ class PathingMapSpec extends FlatSpec with GivenWhenThen {
 
     given("a 4x3 pathing map with a goal at (1, 1), with only (0, 1) and (1, 0) as passable neighbors")
     when("asked for the neighbors of (1, 1) and the neighbors of (4, 3)")
-    val goodTerrainList = pMap.neighborsOf(Coordinate(1, 1))
-    val emptyTerrainList = pMap.neighborsOf(Coordinate(4, 3))
+    val goodTerrains = pMap.neighborsOf(Coordinate(1, 1))
+    val noTerrains   = pMap.neighborsOf(Coordinate(4, 3))
 
     then("the first should contain only (0, 1) and (1, 0)")
-    ((goodTerrainList == List(Coordinate(0, 1), Coordinate(1, 0))) || (goodTerrainList == List(Coordinate(1, 0), Coordinate(0, 1)))) === true
+    ((goodTerrains == Seq(Coordinate(0, 1), Coordinate(1, 0))) || (goodTerrains == Seq(Coordinate(1, 0), Coordinate(0, 1)))) === true
 
     and("the second should be empty")
-    emptyTerrainList === Nil
+    noTerrains === Seq()
 
   }
 

@@ -52,25 +52,25 @@ object PathingMapStringInterpreter {
 
   private def findStartAndGoal(arr: Array[Array[Terrain]], cols: Int, rows: Int) : (Coordinate2D, Coordinate2D) = {
 
-    val selfList = new ListBuffer[Coordinate2D]()
-    val goalList = new ListBuffer[Coordinate2D]()
+    val selfCoords = new ListBuffer[Coordinate2D]()
+    val goalCoords = new ListBuffer[Coordinate2D]()
 
     for (x <- (0 until cols)) {
       for (y <- (0 until rows)) {
         if (arr(x)(y) == Self)
-          selfList += Coordinate(x, y)
+          selfCoords += Coordinate(x, y)
         else if (arr(x)(y) == Goal)
-          goalList += Coordinate(x, y)
+          goalCoords += Coordinate(x, y)
       }
     }
 
-    if (selfList.size != 1)
+    if (selfCoords.size != 1)
       throw new InvalidMapStringException("Invalid number of starts!")
 
-    if (goalList.size != 1)
+    if (goalCoords.size != 1)
       throw new InvalidMapStringException("Invalid number of goals!")
 
-    (selfList.head, goalList.head)
+    (selfCoords.head, goalCoords.head)
 
   }
 

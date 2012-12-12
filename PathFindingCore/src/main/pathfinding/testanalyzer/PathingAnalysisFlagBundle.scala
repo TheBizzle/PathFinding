@@ -10,4 +10,4 @@ import tester.criteria.TestToggleFlag
  * Time: 6:39 PM
  */
 
-class PathingAnalysisFlagBundle(inToggles: List[TestToggleFlag]) extends TestAnalysisFlagBundle(inToggles)
+class PathingAnalysisFlagBundle(inToggles: Seq[TestToggleFlag]) extends TestAnalysisFlagBundle(inToggles)

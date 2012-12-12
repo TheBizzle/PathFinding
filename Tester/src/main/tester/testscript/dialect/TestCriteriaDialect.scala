@@ -14,7 +14,7 @@ object TestCriteriaDialect {
   implicit def int2PTCVal(value: Int)                                     : PimpedValueTuple    = PimpedValueTuple(TestRunningnessValue(value, RunTest))
   implicit def int2PTCPromoter(value: Int)                                : PimpedClassPromoter = PimpedClassPromoter(value)
   implicit def criteriaFlag2PTCFlag[T <% TestCriteriaToggleFlag](flag: T) : PimpedToggleFlag    = PimpedToggleFlag(flag)
-  implicit def pimper2TCList(pimper: CombinatorPimper)                    : List[TestCriteria]  = pimper.^^  // Might need to get rid of this at some point...
+  implicit def pimper2TCSeq(pimper: CombinatorPimper)                     : Seq[TestCriteria]   = pimper.^^  // Might need to get rid of this at some point...
 }
 
 
@@ -28,15 +28,15 @@ object TestCriteriaDialect {
 // I've chosen the latter.
 
 //@ This could be substantially more FP (by having making constructor take form: Cons(crit, tail)
-//  and having `&&` return `new CombiantorPimper(crit, tail :: (that.crit :: that.tail))`)
+//  and having `&&` return `new CombinatorPimper(crit, tail :: (that.crit :: that.tail))`)
 //  Could even leverage HList-like static typing on the list, then....
 //  This deserves to be fixed at some point.
 private[dialect] sealed abstract class CombinatorPimper(private val crit: TestCriteria) {
 
   private[dialect] val buffer = new ListBuffer[TestCriteria]() += crit
 
-  def &&(that: CombinatorPimper) : CombinatorPimper   = { buffer ++= that.buffer; this }
-  def ^^                         : List[TestCriteria] =   buffer.toList
+  def &&(that: CombinatorPimper) : CombinatorPimper  = { buffer ++= that.buffer; this }
+  def ^^                         : Seq[TestCriteria] =   buffer.toSeq
 
 }
 
