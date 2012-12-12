@@ -281,9 +281,9 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
 
   test("addString(sb, sep, start, end)") {
     val (sep, start, end) = ("york", "dork", "bjork")
-    val target1 = baseList.addString(new StringBuilder()).toString replaceAll (",", " -> ") replaceAll ("""\(|\)""", "")
-    val target2 = baseList.addString(new StringBuilder(), sep).toString replaceAll (",", " -> ") replaceAll ("""\(|\)""", "")
-    val target4 = baseList.addString(new StringBuilder(), sep, start, end).toString replaceAll (",", " -> ") replaceAll ("""\(|\)""", "")
+    val target1 = baseList.addString(new StringBuilder()).toString replaceAll (",", " <-> ") replaceAll ("""\(|\)""", "")
+    val target2 = baseList.addString(new StringBuilder(), sep).toString replaceAll (",", " <-> ") replaceAll ("""\(|\)""", "")
+    val target4 = baseList.addString(new StringBuilder(), sep, start, end).toString replaceAll (",", " <-> ") replaceAll ("""\(|\)""", "")
     biHash.addString(new StringBuilder()).toString.sorted should equal (target1.sorted)                    // One-arg version
     biHash.addString(new StringBuilder(), sep).toString.sorted should equal (target2.sorted)               // Two-arg version
     biHash.addString(new StringBuilder(), sep, start, end).toString.sorted should equal (target4.sorted)   // Four-arg version
@@ -746,7 +746,7 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   // but it's good enough proof of correctness for me if the two strings are of the same length and contain all of the same letters
   test("mkString") {
     val (sep, start, end) = ("york", "dork", "bjork")
-    def morph(str: String) = str replaceAll (",", " -> ") replaceAll ("""\(|\)""", "")
+    def morph(str: String) = str replaceAll (",", " <-> ") replaceAll ("""\(|\)""", "")
     val target0 = morph(baseList.mkString).sorted
     val target1 = morph(baseList.mkString(sep)).sorted
     val target3 = morph(baseList.mkString(sep, start, end)).sorted

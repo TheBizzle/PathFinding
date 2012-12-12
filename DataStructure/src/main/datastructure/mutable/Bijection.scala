@@ -33,7 +33,11 @@ trait Bijection[A, B, M[X, Y] <: MMap[X, Y], Rpr[X, Y] <: Bijection[X, Y, M, Rpr
   /*new!*/ def flip       : Rpr[B, A] =   this.swap
   override def hashCode() : Int       =   abMap.hashCode() ^ baMap.hashCode()   // XOR the hashcodes of the two maps
   override def size       : Int       = { require (abMap.size == baMap.size); abMap.size }
+  override def stringPrefix           =   "Bijection"
   /*new!*/ def swap       : Rpr[B, A]
+
+  override def addString(b: StringBuilder, start: String, sep: String, end: String) : StringBuilder =
+    this.iterator.map { case (k, v) => k+" <-> "+v }.addString(b, start, sep, end)
 
   override def canEqual(other: Any) : Boolean
   override def equals(that: Any)    : Boolean  = {
