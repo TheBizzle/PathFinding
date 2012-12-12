@@ -13,7 +13,6 @@ import datastructure.parallel.mutable.ParBiHashMap
  * Time: 11:15 PM
  */
 
-//@ Should probably implement `toString` correctly; currently claims this to be a `Map`
 class BiHashMap[A, B] private[datastructure](override protected val abMap: HashMap[A, B], override protected val baMap: HashMap[B, A])
     extends HashMap[A, B]
     with Bijection[A, B, HashMap, BiHashMap]
