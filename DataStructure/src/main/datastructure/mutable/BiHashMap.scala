@@ -14,7 +14,6 @@ import datastructure.parallel.mutable.ParBiHashMap
  */
 
 //@ Should probably implement `toString` correctly; currently claims this to be a `Map`
-//@ Should add `<->` as a tuple-building operator
 class BiHashMap[A, B] private[datastructure](override protected val abMap: HashMap[A, B], override protected val baMap: HashMap[B, A])
     extends HashMap[A, B]
     with Bijection[A, B, HashMap, BiHashMap]
