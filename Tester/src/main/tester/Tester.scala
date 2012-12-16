@@ -1,15 +1,13 @@
 package tester
 
 import annotation.tailrec
+import cluster._
 import collection.immutable.Map
 
 import org.scalatest.Suite
 
 import criteria._
-import exceptions._
-import testanalyzer.{ ExecutionStatus, TestAnalysisFlagBundle, TestAnalysisResultBundle }
-import testcluster.{ Testable, TestCluster, testfunction, TestSubject }
-import testfunction.{ TestFuncConstructionBundle, TestFuncFlagBundle, TestFunction }
+import scala.Some
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,7 +16,7 @@ import testfunction.{ TestFuncConstructionBundle, TestFuncFlagBundle, TestFuncti
  * Time: 8:27 PM
  */
 
-object TestingCore {
+object Tester {
 
   private[tester] val ArgKeyValue = "value"
   private[tester] val ArgKeyRange = "range"
@@ -45,7 +43,7 @@ object TestingCore {
 
     val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[Seq[TestCriteriaToggleFlag]]] getOrElse (throw new MysteriousDataException("OMG, what did you do?!"))
 
-    val toggles = new TestToggleFlagWrapper(rawToggles)
+    val toggles = new TestToggleFlagManager(rawToggles)
     val wantsToRunExternals = assessExternalityDesire(argMap)
     val (isTalkative, isRunningBaseTests, isSkippingExternalTests, isStacktracing) = (toggles.get(Talkative), toggles.get(RunBaseTests), toggles.get(SkipExternalTests), toggles.get(StackTrace))
 

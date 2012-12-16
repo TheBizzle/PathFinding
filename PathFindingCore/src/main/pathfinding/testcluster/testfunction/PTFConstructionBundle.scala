@@ -1,6 +1,6 @@
 package pathfinding.testcluster.testfunction
 
-import tester.testcluster.testfunction.TestFuncConstructionBundle
+import tester.cluster.TestFuncConstructionBundle
 
 /**
  * Created by IntelliJ IDEA.

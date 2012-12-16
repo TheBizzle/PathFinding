@@ -1,9 +1,10 @@
 package astar_base
 
-import suitereporter.AStarSuiteCoagulator
+import tester.{ criteria, Tester }, criteria._
+
 import pathfinding.testscript.TestScript
-import tester.TestingCore
-import tester.criteria._
+
+import suitereporter.AStarSuiteCoagulator
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,5 +14,5 @@ import tester.criteria._
  */
 
 object AStarDependencyTest extends TestScript {
-  TestingCore(Seq[TestCriteria](RunBaseTests), baseTests = AStarSuiteCoagulator.coagulate)
+  Tester(Seq[TestCriteria](RunBaseTests), baseTests = AStarSuiteCoagulator.coagulate)
 }

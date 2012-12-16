@@ -1,8 +1,8 @@
 package astar_base.bidir_astar
 
+import tester.{ criteria, TestCriteriaDialect }, criteria._, TestCriteriaDialect._
+
 import pathfinding.testscript.TestScript
-import tester.criteria._
-import tester.testscript.dialect.TestCriteriaDialect._
 
 /**
  * Created by IntelliJ IDEA.

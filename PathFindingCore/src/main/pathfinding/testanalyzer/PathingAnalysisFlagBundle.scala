@@ -1,7 +1,7 @@
 package pathfinding.testanalyzer
 
-import tester.testanalyzer.TestAnalysisFlagBundle
 import tester.criteria.TestToggleFlag
+import tester.cluster.TestAnalysisFlagBundle
 
 /**
  * Created by IntelliJ IDEA.

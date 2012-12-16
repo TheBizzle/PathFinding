@@ -1,6 +1,6 @@
 package pathfinding.pathingmap.pathingmapdata
 
-import tester.testcluster.TestSubject
+import tester.cluster.TestSubject
 
 /**
  * Created by IntelliJ IDEA.

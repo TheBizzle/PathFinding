@@ -1,7 +1,5 @@
 package tester.criteria
 
-import tester.exceptions.MysteriousDataException
-
 /**
  * Created by IntelliJ IDEA.
  * User: Jason
@@ -9,31 +7,37 @@ import tester.exceptions.MysteriousDataException
  * Time: 9:21 PM
  */
 
-sealed trait TestingFlag                              // A marker trait
-sealed trait TestRunningnessFlag extends TestingFlag  // A trait whose possessors will represent signs of about whether or not a test(s) should be run
-sealed trait TestToggleFlag extends TestingFlag {     // Everytime something is made to inherit from this, it MUST be added to TestToggleFlagWrapper's `flags`
-  implicit def flag2Criteria(that: TestToggleFlag) : TestCriteriaToggleFlag = {
-    TestCriteriaToggleFlag(that)
-  }
-}
-
-case object RunTest extends TestRunningnessFlag
-case object SkipTest extends TestRunningnessFlag
-
-case object Talkative extends TestToggleFlag             // Enables the "Here, let me draw that for you on the map!" thing in PathFindingCore tests; overall, gives tests permission to println
-case object RunBaseTests extends TestToggleFlag          // Enables running the ScalaTest tests on the core data structures and such
-case object SkipExternalTests extends TestToggleFlag     // Skips the running of any of the actual external (e.g. pathfinding) tests
-case object StackTrace extends TestToggleFlag            // Signifies the desire to see stacktraces when tests fail as a result of throwing exceptions
-
-// If you add a flag to this file, add it to TestingFlag.flags!!!!!!
-
+sealed trait TestingFlag
 object TestingFlag {
   val flags = Seq[TestToggleFlag](Talkative, RunBaseTests, SkipExternalTests, StackTrace)
-  def flipRunningness(flag: TestRunningnessFlag) : TestRunningnessFlag = { // Should be replaced with a setup kind of like `Option` has; inherit a trait and call `flip` on the flags
-    flag match {
-      case RunTest  => SkipTest
-      case SkipTest => RunTest
-      case _        => throw new MysteriousDataException("Unknown TestRunningnessFlag for runningness flip!")
-    }
-  }
 }
+
+
+
+sealed trait TestToggleFlag extends TestingFlag { // Everytime something is made to inherit from this, it MUST be added to TestToggleFlagWrapper's `flags`
+  implicit def flag2Criteria(that: TestToggleFlag) = TestCriteriaToggleFlag(that)
+}
+
+case object Talkative         extends TestToggleFlag  // Enables the "Here, let me draw that for you on the map!" thing in PathFindingCore tests; overall, gives tests permission to println
+case object RunBaseTests      extends TestToggleFlag  // Enables running the ScalaTest tests on the core data structures and such
+case object SkipExternalTests extends TestToggleFlag  // Skips the running of any of the actual external (e.g. pathfinding) tests
+case object StackTrace        extends TestToggleFlag  // Signifies the desire to see stacktraces when tests fail as a result of throwing exceptions
+
+
+
+sealed trait TestRunningnessFlag extends TestingFlag {
+  protected def isRunning : Boolean
+  def flipRunningness : TestRunningnessFlag = TestRunningnessFlag(!isRunning)
+}
+
+object TestRunningnessFlag {
+  def apply(isRunning: Boolean) = if (isRunning) RunTest else SkipTest
+}
+
+case object RunTest extends TestRunningnessFlag {
+  override protected def isRunning = true
+}
+case object SkipTest extends TestRunningnessFlag {
+  override protected def isRunning = false
+}
+

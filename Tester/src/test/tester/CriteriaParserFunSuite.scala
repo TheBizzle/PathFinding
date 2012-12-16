@@ -1,10 +1,10 @@
-package tester.criteria.parser
+package tester
 
 import util.matching.Regex
 
 import org.scalatest.{ FunSuite, matchers }, matchers.ShouldMatchers
 
-import tester.criteria._
+import criteria._
 import TestCriteriaParser._
 
 /**
@@ -210,11 +210,11 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
   }
 
   private def criteriaShouldPass(args: String*) {
-    testShouldPass(criteria, args.mkString(";"), args.toCriteria)
+    testShouldPass(crit, args.mkString(";"), args.toCriteria)
   }
 
   private def criteriaShouldFail(args: String*) {
-    testShouldFail(criteria, args.mkString(";"))
+    testShouldFail(crit, args.mkString(";"))
   }
 
   private def testShouldPass[T](parser: TestCriteriaParser.Parser[T], testStr: String, target: T) {

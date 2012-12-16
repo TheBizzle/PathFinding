@@ -1,6 +1,6 @@
 package astar_base.suitereporter
 
-import tester.suitereporter.SuiteReporter
+import tester.suite.SuiteReporter
 
 /**
  * Created by IntelliJ IDEA.

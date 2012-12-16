@@ -1,15 +1,17 @@
 package pathfinding.testcluster
 
+import java.lang.reflect.Field
+
+import tester.{ cluster, criteria, MysteriousDataException }
+import criteria.Talkative
+import cluster.{ TestAnalyzer, TestCluster }
+
+// Wow, WTF!
 import pathfinding.pathingmap.pathingmapdata.PathingMapString
 import pathfinding.pathingmap.PathingMap
-import tester.testcluster.TestCluster
 import pathfinding.statuses.{Failure, Success, PathingStatus}
 import pathfinding.StepData
 import pathfinding.coordinate.Coordinate2D
-import tester.testanalyzer.TestAnalyzer
-import tester.exceptions.MysteriousDataException
-import java.lang.reflect.Field
-import tester.criteria.Talkative
 import pathfinding.testanalyzer.{ PathingAnalysisResultBundle, PathingAnalysisFlagBundle }
 import testfunction.{ PathingTestFunction, PTFConstructionBundle }
 
@@ -20,8 +22,9 @@ import testfunction.{ PathingTestFunction, PTFConstructionBundle }
  * Time: 4:28 PM
  */
 
-object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapString, PTFConstructionBundle]
-                             with TestAnalyzer[PathingStatus[StepData], PathingAnalysisFlagBundle, PathingAnalysisResultBundle] {
+object PathingTestCluster
+  extends TestCluster[PathingTestFunction, PathingMapString, PTFConstructionBundle]
+    with TestAnalyzer[PathingStatus[StepData], PathingAnalysisFlagBundle, PathingAnalysisResultBundle] {
 
   override protected def TestFunctionRegex = "TestMapString([0-9]+)((_L([0-9]+))?)"
 

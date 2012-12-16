@@ -1,6 +1,6 @@
 package datastructure.suitereporter
 
-import tester.suitereporter.SuiteReporter
+import tester.suite.SuiteReporter
 
 import datastructure.mutable._
 

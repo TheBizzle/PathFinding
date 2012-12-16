@@ -1,7 +1,7 @@
 package pathfinding.statuses
 
 import pathfinding.StepData
-import tester.testanalyzer.ExecutionStatus
+import tester.cluster.ExecutionStatus
 
 /**
  * Created by IntelliJ IDEA.

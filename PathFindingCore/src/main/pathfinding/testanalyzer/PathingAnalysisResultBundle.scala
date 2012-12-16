@@ -1,7 +1,7 @@
 package pathfinding.testanalyzer
 
-import tester.testanalyzer.TestAnalysisResultBundle
 import pathfinding.coordinate.Coordinate2D
+import tester.cluster.TestAnalysisResultBundle
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,6 +1,7 @@
-package tester.testscript.dialect
+package tester
 
 import collection.mutable.ListBuffer
+
 import tester.criteria._
 
 /**
@@ -31,9 +32,9 @@ object TestCriteriaDialect {
 //  and having `&&` return `new CombinatorPimper(crit, tail ::: (that.crit :: that.tail))`)
 //  Could even leverage HList-like static typing on the list, then....
 //  This deserves to be fixed at some point.
-private[dialect] sealed abstract class CombinatorPimper(private val crit: TestCriteria) {
+private[tester] sealed abstract class CombinatorPimper(private val crit: TestCriteria) {
 
-  private[dialect] val buffer = new ListBuffer[TestCriteria]() += crit
+  private[tester] val buffer = new ListBuffer[TestCriteria]() += crit
 
   def &&(that: CombinatorPimper) : CombinatorPimper  = { buffer ++= that.buffer; this }
   def ^^                         : Seq[TestCriteria] =   buffer.toSeq
@@ -43,13 +44,13 @@ private[dialect] sealed abstract class CombinatorPimper(private val crit: TestCr
 // With the current state of things, the necessity of these pimped classes is actually questionable
 // Couldn't I just get rid of these altogether and directly instantiate `CombinatorPimper`s?
 // But is that a good idea...?
-private[dialect] case class PimpedValueTuple(valueTuple: TestRunningnessValue) extends CombinatorPimper(valueTuple)
-private[dialect] case class PimpedRangeTuple(rangeTuple: TestRunningnessRange) extends CombinatorPimper(rangeTuple)
-private[dialect] case class PimpedToggleFlag(toggleFlag: TestCriteriaToggleFlag) extends CombinatorPimper(toggleFlag)
+private[tester] case class PimpedValueTuple(valueTuple: TestRunningnessValue) extends CombinatorPimper(valueTuple)
+private[tester] case class PimpedRangeTuple(rangeTuple: TestRunningnessRange) extends CombinatorPimper(rangeTuple)
+private[tester] case class PimpedToggleFlag(toggleFlag: TestCriteriaToggleFlag) extends CombinatorPimper(toggleFlag)
 
 // This class handles the class promotion of modified values, while barring invalid modifier combinations
 // i.e. `!13` is allowed (since it makes total sense), but `!13 >!> 18` is not.
-private[dialect] case class PimpedClassPromoter(value: Int) {
+private[tester] case class PimpedClassPromoter(value: Int) {
   def unary_!       : PimpedValueTuple = PimpedValueTuple(TestRunningnessValue(value, SkipTest))
   def >&>(end: Int) : PimpedRangeTuple = PimpedRangeTuple(TestRunningnessRange(value, end, RunTest))
   def >!>(end: Int) : PimpedRangeTuple = PimpedRangeTuple(TestRunningnessRange(value, end, SkipTest))

@@ -3,7 +3,7 @@ package pathfinding.testscript
 import pathfinding.testcluster.PathingTestCluster
 import pathfinding.{StepData, PathFinder}
 import tester.criteria._
-import tester.TestingCore
+import tester.Tester
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,6 +14,6 @@ import tester.TestingCore
 
 abstract class TestScript extends App {
   def run(criteria: Seq[TestCriteria], pf: PathFinder[_ <: StepData]) {
-    TestingCore(criteria, pf.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
+    Tester(criteria, pf.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
   }
 }

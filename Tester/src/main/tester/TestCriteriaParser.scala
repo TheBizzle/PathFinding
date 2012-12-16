@@ -1,4 +1,4 @@
-package tester.criteria.parser
+package tester
 
 import util.parsing.combinator.RegexParsers
 import tester.criteria._
@@ -46,7 +46,7 @@ object TestCriteriaParser extends RegexParsers {
     case name => TestCriteriaToggleFlag(flags.zip(flagNames).find(_._2.compareToIgnoreCase(name) == 0).get._1)
   }
 
-  def criteria : Parser[Seq[TestCriteria]] = rep1sep(testingnessNotRange | testingnessRange | testingnessValue | otherFlag, Sep) ^^ {
+  def crit : Parser[Seq[TestCriteria]] = rep1sep(testingnessNotRange | testingnessRange | testingnessValue | otherFlag, Sep) ^^ {
     case criteria: Seq[TestCriteria] => criteria
   }
 

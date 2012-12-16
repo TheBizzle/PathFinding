@@ -1,9 +1,9 @@
-package tester.testscript.dialect
+package tester
 
-import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
-import tester.testscript.dialect.TestCriteriaDialect._
-import tester.criteria._
+import org.scalatest.{ FunSuite, matchers }, matchers.ShouldMatchers
+
+import criteria._
+import TestCriteriaDialect._
 
 /**
  * Created by IntelliJ IDEA.
