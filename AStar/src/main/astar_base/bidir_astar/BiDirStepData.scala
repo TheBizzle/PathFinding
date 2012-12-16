@@ -1,6 +1,5 @@
 package astar_base.bidir_astar
 
-import annotation.tailrec
 import collection.mutable.PriorityQueue
 
 import pathfinding.{ breadcrumb, coordinate, pathingmap, StepDataSingleton }
@@ -46,14 +45,8 @@ class BiDirStepData(currentLocation: Coordinate2D,
                       //@ Concoct something for infinite deep-cloning
   }
 
-  @tailrec
   final def assimilateBreadcrumbs(crumbs: Seq[Breadcrumb]) {
-    crumbs.toList match {
-      case Nil    => ()
-      case h :: t =>
-        othersBreadcrumbArr(h.to.x)(h.to.y) = h.from
-        assimilateBreadcrumbs(t)
-    }
+    crumbs foreach (c => othersBreadcrumbArr(c.to.x)(c.to.y) = c.from)
   }
 
   def transformGoalForClone(oGoal: Coordinate2D) : BiDirStepData = cloneBase(g = oGoal)

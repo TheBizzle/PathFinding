@@ -1,5 +1,6 @@
 package astar_base
 
+import annotation.tailrec
 import collection.mutable.PriorityQueue
 
 import pathfinding.coordinate.{ Coordinate2D, PriorityCoordinate }
@@ -22,8 +23,8 @@ trait AStarGruntwork[T <: AStarStepData] {
    * Returns the first location in "queue" that hasn't already been examined (as determined by checking "beenThere").
    */
   //@ Make some type variables (and maybe implicits) to carry about for "Coordinate2D with PriorityCoordinate"
-  //@ Make use of `dropWhile` here
-  protected def getFreshLoc(queue: PriorityQueue[Coordinate2D with PriorityCoordinate], beenThere: Array[Array[Boolean]]) : Option[Coordinate2D with PriorityCoordinate] = {
+  @tailrec // The side-effecty nature of this actually makes it quite difficult to abstract away the tail recursion into a loop or typical library call
+  protected final def getFreshLoc(queue: PriorityQueue[Coordinate2D with PriorityCoordinate], beenThere: Array[Array[Boolean]]) : Option[Coordinate2D with PriorityCoordinate] = {
     val loc = queue.dequeue()
     if (!beenThere(loc.x)(loc.y))
       Option(loc) // Exit point (success)

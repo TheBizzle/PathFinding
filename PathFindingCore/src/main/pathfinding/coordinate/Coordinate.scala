@@ -1,7 +1,5 @@
 package pathfinding.coordinate
 
-import annotation.tailrec
-
 /**
  * Created by IntelliJ IDEA.
  * User: Jason
@@ -23,14 +21,11 @@ sealed trait Coordinate extends Equals {
 
   override def toString : String    = axisCollection.mkString("(", ",", ")")
   override def hashCode             = {
-    @tailrec def calculateHash(hash: Int, tail: Seq[Int], isFirst: Boolean = false) : Int = {
-      tail.toList match {
-        case Nil               => hash
-        case h :: t if isFirst => calculateHash(hash + h, t)
-        case h :: t            => calculateHash(41 * hash + h, t)
-      }
-    }
-    calculateHash(4111, axisCollection, true)
+    axisCollection.foldLeft((4111, true)) {
+      case ((hash, isFirst), x) =>
+        val h = if (isFirst) hash else 41 * hash
+        (h + x, false)
+    }._1
   }
 
   override def canEqual(that: Any) = that.isInstanceOf[CoordType]

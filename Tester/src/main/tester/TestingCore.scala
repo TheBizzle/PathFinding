@@ -212,7 +212,7 @@ object TestingCore {
 
   private[tester] def sortCriteria[T <: TestRunningnessCriteria[_, _] : Manifest](criteria: Seq[T]) : Seq[T] = criteria sortBy (_.getKey)
 
-  // Assumes the passed-in ranges to be sorted
+  // Assumes the passed-in ranges to be sorted (could be written more idiomatically, but I would then lose my pointless optimization!)
   @tailrec
   private[tester] def containsOverlaps(ranges: Seq[TestRunningnessRange]) : (Boolean, Option[TestRunningnessRange], Option[TestRunningnessRange]) = {
     ranges.toList match {
