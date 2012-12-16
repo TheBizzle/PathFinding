@@ -9,7 +9,7 @@ import collection.{ generic, GenTraversableOnce, mutable }, generic.CanBuildFrom
  * Time: 3:56 PM
  */
 
-trait BijectionForwardOps[A, B, M[X, Y] <: MMap[X, Y], R[X, Y] <: Bijection[X, Y, M, R]] {
+private[mutable] trait BijectionForwardOps[A, B, M[X, Y] <: MMap[X, Y], R[X, Y] <: Bijection[X, Y, M, R]] {
 
   self: Bijection[A, B, M, R] =>
 

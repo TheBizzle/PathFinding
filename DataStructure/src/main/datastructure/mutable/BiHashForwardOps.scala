@@ -9,7 +9,7 @@ import collection.mutable.HashMap
  * Time: 9:47 PM
  */
 
-trait BiHashForwardOps[A, B] extends BijectionForwardOps[A, B, HashMap, BiHashMap] {
+private[mutable] trait BiHashForwardOps[A, B] extends BijectionForwardOps[A, B, HashMap, BiHashMap] {
   self: Bijection[A, B, HashMap, BiHashMap] =>
 }
 

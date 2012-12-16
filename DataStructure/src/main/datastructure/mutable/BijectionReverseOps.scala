@@ -10,7 +10,7 @@ import collection.mutable.{ Map => MMap }
  * Time: 1:39 PM
  */
 
-trait BijectionReverseOps[A, B, M[X, Y] <: MMap[X, Y], R[X, Y] <: Bijection[X, Y, M, R]] {
+private[mutable] trait BijectionReverseOps[A, B, M[X, Y] <: MMap[X, Y], R[X, Y] <: Bijection[X, Y, M, R]] {
 
   self: Bijection[A, B, M, R] =>
 

@@ -9,7 +9,7 @@ import collection.{ GenTraversableOnce, mutable }, mutable.HashMap
  * Time: 2:18 PM
  */
 
-trait BiHashReverseOps[A, B] extends BijectionReverseOps[A, B, HashMap, BiHashMap] {
+private[mutable] trait BiHashReverseOps[A, B] extends BijectionReverseOps[A, B, HashMap, BiHashMap] {
 
   self: Bijection[A, B, HashMap, BiHashMap] =>
 
