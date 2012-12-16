@@ -50,7 +50,7 @@ abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicF
         if (!beenThereArr(x)(y)) {
 
           val newCost = costArr(loc.x)(loc.y) + 1
-          val doesContainNeighbor = queueDoesContain(neighbor, queue)
+          val doesContainNeighbor = queue exists (x => neighbor overlaps x)
 
           if (!doesContainNeighbor || (newCost < costArr(x)(y))) {
 
