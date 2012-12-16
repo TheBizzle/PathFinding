@@ -1,13 +1,13 @@
-package astar_base.bidir_astar.concurrency
+package astar
 
+import actors.Actor
 import annotation.tailrec
 
 import pathfinding.{ coordinate, PathingStatus }
 import coordinate.{ Breadcrumb, Coordinate2D }
 import PathingStatus._
 
-import astar_base.bidir_astar.BiDirStepData
-import astar_base.exceptions.UnexpectedDataException
+import base.UnexpectedDataException
 
 /**
  * Created by IntelliJ IDEA.
@@ -94,3 +94,46 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
   }
 
 }
+
+sealed abstract class BiDirActor[T <: BiDirStepData](es: PathingStatus[T], dFunc: T => PathingStatus[T], sFunc: T => (T, Seq[Breadcrumb])) extends Actor {
+
+  var status = es
+  val decide = dFunc
+  val step   = sFunc
+
+  protected def moveAndMutate() : (PathingStatus[T], Seq[Breadcrumb]) = {
+    val (neoStepData, neoCrumbs) = step(status.stepData)
+    status = decide(neoStepData)
+    (status, neoCrumbs)
+  }
+
+  def act() {
+    import BiDirMessage._
+    loop {
+      react {
+        case Assimilate(crumbs) => status.stepData.assimilateBreadcrumbs(crumbs)
+        case Start => reply(moveAndMutate())
+        case Stop  => exit()
+      }
+    }
+  }
+
+}
+
+sealed trait BiDirMessage
+
+object BiDirMessage {
+  case class  Assimilate(crumbs: Seq[Breadcrumb]) extends BiDirMessage
+  case object Start                               extends BiDirMessage
+  case object Stop                                extends BiDirMessage
+}
+
+private case class StartToGoal[T <: BiDirStepData](exeStatus:  PathingStatus[T],
+                                           decideFunc: T => PathingStatus[T],
+                                           stepFunc:   T => (T, Seq[Breadcrumb]))
+  extends BiDirActor[T](exeStatus, decideFunc, stepFunc)
+
+private case class GoalToStart[T <: BiDirStepData](exeStatus:  PathingStatus[T],
+                                           decideFunc: T => PathingStatus[T],
+                                           stepFunc:   T => (T, Seq[Breadcrumb]))
+  extends BiDirActor[T](exeStatus, decideFunc, stepFunc)

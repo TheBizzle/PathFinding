@@ -1,10 +1,11 @@
-package astar_base.exceptions
+package astar.base
 
 /**
  * Created by IntelliJ IDEA.
  * User: Jason
- * Date: 1/9/12
- * Time: 12:24 AM
+ * Date: 12/16/12
+ * Time: 1:33 PM
  */
 
 class UnexpectedDataException(s: String = "") extends Exception("Unhandlable data encountered: " + s)
+

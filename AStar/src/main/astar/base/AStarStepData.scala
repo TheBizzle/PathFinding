@@ -1,10 +1,10 @@
-package astar_base
+package astar.base
 
 import collection.mutable.PriorityQueue
 
-import pathfinding.coordinate.{ BadCoordinate2D, Coordinate2D, PriorityCoordinate }
-import pathfinding.pathingmap.PathingMap
-import pathfinding.{ StepData, StepDataSingleton }
+import pathfinding.{ coordinate, pathingmap, StepData, StepDataSingleton }
+import coordinate.{ BadCoordinate2D, Coordinate2D, PriorityCoordinate }
+import pathingmap.PathingMap
 
 /**
  * Created by IntelliJ IDEA.

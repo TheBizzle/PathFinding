@@ -1,4 +1,4 @@
-package astar_base.astar
+package astar
 
 import annotation.tailrec
 
@@ -7,7 +7,7 @@ import coordinate.{ BadCoordinate2D, Coordinate2D }
 import pathingmap.PathingMapString
 import PathingStatus._
 
-import astar_base.{ AStarStepData, AStarBase, heuristics }, heuristics.HeuristicLib
+import base.{ AStarBase, AStarStepData, HeuristicLib }
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,12 +43,7 @@ object AStar extends AStarBase[AStarStepData](1.0, HeuristicLib.manhattanDistanc
     executeHelper(step(stepData)._1, maxIters)
   }
 
-  protected def goalIsFound(stepData: AStarStepData, freshLoc: Coordinate2D) : Boolean = {
-    freshLoc overlaps stepData.goal
-  }
-
-  protected def makeNewStepData(stepData: AStarStepData, freshLoc: Coordinate2D = BadCoordinate2D, isIncingIters: Boolean = false) : AStarStepData = {
-    AStarStepData(freshLoc, stepData, isIncingIters)
-  }
+  protected def goalIsFound    (stepData: AStarStepData, freshLoc: Coordinate2D)                                                   = freshLoc overlaps stepData.goal
+  protected def makeNewStepData(stepData: AStarStepData, freshLoc: Coordinate2D = BadCoordinate2D, isIncingIters: Boolean = false) = AStarStepData(freshLoc, stepData, isIncingIters)
 
 }

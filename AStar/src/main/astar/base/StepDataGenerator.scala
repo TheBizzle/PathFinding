@@ -1,11 +1,12 @@
-package astar_base
+package astar.base
 
 import collection.mutable.PriorityQueue
 
 import shapeless._
 
-import pathfinding.coordinate.{ PriorityCoordinateOrdering, PriorityCoordinate, BadCoordinate2D, Coordinate2D }
-import pathfinding.pathingmap.{ PathingMap, PathingMapString }
+import pathfinding.{ coordinate, pathingmap }
+import coordinate.{ PriorityCoordinateOrdering, PriorityCoordinate, BadCoordinate2D, Coordinate2D }
+import pathingmap.{ PathingMap, PathingMapString }
 
 /**
  * Created by IntelliJ IDEA.

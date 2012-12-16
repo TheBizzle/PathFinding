@@ -1,9 +1,7 @@
-package astar_base
+package astar
 
 import tester.{ criteria, Tester }, criteria._
 
-
-import suitereporter.AStarSuiteCoagulator
 import pathfinding.TestScript
 
 /**

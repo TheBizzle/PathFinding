@@ -1,4 +1,4 @@
-package astar_base.omni
+package astar
 
 import pathfinding.TestScript
 
@@ -23,3 +23,4 @@ abstract class OmniTestBase extends TestScript {
   }
 
 }
+

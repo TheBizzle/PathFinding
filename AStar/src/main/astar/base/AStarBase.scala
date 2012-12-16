@@ -1,4 +1,4 @@
-package astar_base
+package astar.base
 
 import collection.mutable.ListBuffer
 
@@ -6,8 +6,6 @@ import pathfinding.{ coordinate, PathFinder, pathingmap, PathingStatus }
 import coordinate.{ Breadcrumb, Coordinate, PriorityCoordinate }
 import pathingmap.PathingMap
 import PathingStatus._
-
-import heuristics.HeuristicBundle
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,7 +17,7 @@ import heuristics.HeuristicBundle
 abstract class AStarBase[T <: AStarStepData](branchingFactor: Double, heuristicFunc: HeuristicBundle => Int) extends AStarLike[T] with AStarGruntwork[T] with PathFinder[T] {
 
   protected val scalingFactor = branchingFactor // How much of the map you're willing to query (from 0 to 1)
-  protected val heuristic = heuristicFunc       // The heuristic function that A* will be using
+  protected val heuristic     = heuristicFunc   // The heuristic function that A* will be using
 
   override protected def decide(stepData: T, maxIters: Int) : PathingStatus[T] = {
     import stepData._

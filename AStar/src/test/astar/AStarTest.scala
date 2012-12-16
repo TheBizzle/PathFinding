@@ -1,4 +1,4 @@
-package astar_base.astar
+package astar
 
 import tester.{ criteria, TestCriteriaDialect }, criteria._, TestCriteriaDialect._
 
@@ -13,4 +13,8 @@ import pathfinding.TestScript
 
 object AStarTest extends TestScript {
   run(1 >&> 39 && Talkative, AStar)
+}
+
+object AStarQuiet extends TestScript {
+  run(1 >&> 39, AStar)
 }

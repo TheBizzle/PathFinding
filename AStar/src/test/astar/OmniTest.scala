@@ -1,16 +1,17 @@
-package astar_base.omni.tests
+package astar
 
-import astar_base.astar.AStarQuiet
-import astar_base.bidir_astar.BiDirQuiet
-import astar_base.omni.OmniTestBase
-import astar_base.AStarDependencyTest
 
 /**
  * Created by IntelliJ IDEA.
  * User: Jason
- * Date: 2/15/12
- * Time: 11:47 PM
+ * Date: 2/14/12
+ * Time: 10:16 PM
  */
+
+object OmniTest extends OmniTestBase {
+  run()
+  protected def tests = Seq((AStarDependencyTest, "dependency"), (AStarTest, "AStar"), (BiDirAStarTest, "BiDir"))
+}
 
 object OmniTestQuiet extends OmniTestBase {
   run()

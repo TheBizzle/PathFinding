@@ -1,4 +1,4 @@
-package astar_base
+package astar.base
 
 import annotation.tailrec
 import collection.mutable.PriorityQueue

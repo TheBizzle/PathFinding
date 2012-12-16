@@ -1,11 +1,10 @@
-package astar_base.bidir_astar
+package astar
 
 import pathfinding.{ coordinate, pathingmap, PathingStatus }
 import coordinate.{ BadCoordinate2D, Coordinate2D }
 import pathingmap.PathingMapString
 
-import astar_base.{ AStarBase, heuristics }, heuristics.HeuristicLib
-import concurrency.BiDirDirector
+import base.{ AStarBase, HeuristicLib }
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,12 +34,10 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
 
   }
 
-  override protected def goalIsFound(stepData: BiDirStepData, freshLoc: Coordinate2D) : Boolean = {
+  override protected def goalIsFound(stepData: BiDirStepData, freshLoc: Coordinate2D) =
     (freshLoc overlaps stepData.goal) || (stepData hasInOthersBreadcrumbs freshLoc)
-  }
 
-  override protected def makeNewStepData(stepData: BiDirStepData, freshLoc: Coordinate2D = BadCoordinate2D, isIncingIters: Boolean = false) : BiDirStepData = {
+  override protected def makeNewStepData(stepData: BiDirStepData, freshLoc: Coordinate2D = BadCoordinate2D, isIncingIters: Boolean = false) =
     BiDirStepData(freshLoc, stepData, isIncingIters)
-  }
 
 }

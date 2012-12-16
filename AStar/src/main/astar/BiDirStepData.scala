@@ -1,4 +1,4 @@
-package astar_base.bidir_astar
+package astar
 
 import collection.mutable.PriorityQueue
 
@@ -6,7 +6,7 @@ import pathfinding.{ coordinate, pathingmap, StepDataSingleton }
 import coordinate.{ BadCoordinate2D, Breadcrumb, Coordinate2D, PriorityCoordinate}
 import pathingmap.PathingMap
 
-import astar_base.{ AStarStepData, exceptions, StepDataGenerator }, exceptions.UnexpectedDataException
+import base.{ AStarStepData, StepDataGenerator, UnexpectedDataException }
 
 /**
  * Created by IntelliJ IDEA.
