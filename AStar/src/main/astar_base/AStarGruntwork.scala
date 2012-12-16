@@ -1,6 +1,7 @@
 package astar_base
 
-import datastructure.priorityqueue.PriorityQueue
+import collection.mutable.PriorityQueue
+
 import pathfinding.coordinate.{ Coordinate2D, PriorityCoordinate }
 
 /**
@@ -21,6 +22,7 @@ trait AStarGruntwork[T <: AStarStepData] {
    * Returns the first location in "queue" that hasn't already been examined (as determined by checking "beenThere").
    */
   //@ Make some type variables (and maybe implicits) to carry about for "Coordinate2D with PriorityCoordinate"
+  //@ Make use of `dropWhile` here
   protected def getFreshLoc(queue: PriorityQueue[Coordinate2D with PriorityCoordinate], beenThere: Array[Array[Boolean]]) : Option[Coordinate2D with PriorityCoordinate] = {
     val loc = queue.dequeue()
     if (!beenThere(loc.x)(loc.y))

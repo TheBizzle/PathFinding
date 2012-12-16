@@ -1,7 +1,6 @@
 package datastructure.suitereporter
 
 import tester.suitereporter.SuiteReporter
-import datastructure.heap.HeapSpec
 import datastructure.bihashmap.BiHashMapSpec
 
 /**
@@ -11,4 +10,4 @@ import datastructure.bihashmap.BiHashMapSpec
  * Time: 10:58 PM
  */
 
-object DataStructureSuiteReporter extends SuiteReporter(Seq(new HeapSpec(), new BiHashMapSpec()))
+object DataStructureSuiteReporter extends SuiteReporter(Seq(new BiHashMapSpec()))

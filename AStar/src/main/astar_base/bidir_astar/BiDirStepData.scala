@@ -1,13 +1,14 @@
 package astar_base.bidir_astar
 
-import pathfinding.coordinate._
-import datastructure.priorityqueue.PriorityQueue
-import pathfinding.pathingmap.PathingMap
-import pathfinding.StepDataSingleton
-import astar_base.{FactoryThatTakesAStarStepData, AStarStepData}
-import pathfinding.breadcrumb.Breadcrumb
 import annotation.tailrec
-import astar_base.exceptions.UnexpectedDataException
+import collection.mutable.PriorityQueue
+
+import pathfinding.{ breadcrumb, coordinate, pathingmap, StepDataSingleton }
+import breadcrumb.Breadcrumb
+import coordinate.{ BadCoordinate2D, Coordinate2D, PriorityCoordinate }
+import pathingmap.PathingMap
+
+import astar_base.{ AStarStepData, exceptions, FactoryThatTakesAStarStepData }, exceptions.UnexpectedDataException
 
 /**
  * Created by IntelliJ IDEA.
