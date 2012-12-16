@@ -1,6 +1,6 @@
 package pathfinding.pathingmap.terrain
 
-import datastructure.bihashmap.BiHashMap
+import datastructure.mutable.BiHashMap
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,6 +10,9 @@ import datastructure.bihashmap.BiHashMap
  */
 
 object TerrainCharConverter {
+
+  def apply(c: Char)    = ConversionMap.get(c)
+  def apply(t: Terrain) = ConversionMap.get(t)
 
   private val ConversionMap = BiHashMap(
     Ant -> 'a',
@@ -23,13 +26,5 @@ object TerrainCharConverter {
     Query -> '.',
     Self -> '*'
   )
-
-  def apply(c: Char) : Option[Terrain] = {
-    ConversionMap.get(c)
-  }
-
-  def apply(t: Terrain) : Option[Char] = {
-    ConversionMap.get(t)
-  }
 
 }

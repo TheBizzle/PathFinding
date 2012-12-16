@@ -1,7 +1,7 @@
 package datastructure.suitereporter
 
 import tester.suitereporter.SuiteReporter
-import datastructure.bihashmap.BiHashMapSpec
+import datastructure.mutable.BiHashMapSpec
 
 /**
  * Created by IntelliJ IDEA.
