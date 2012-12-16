@@ -31,7 +31,7 @@ object TestingCore {
             testable:  T = null,
             cluster:   TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], Subject, TFConsBundle] = null,
             baseTests: Seq[Suite] = Seq[Suite]()) {
-    val argMap = sortArgLists(args)
+    val argMap = sortArgLists(args) //@ Uhh... wow.  How about, instead of wrapping these heterogenous `Seq`s up in a `Map`, I just put each as a member of one class...?
     makeTestRunningDecisions(argMap, testable, cluster, baseTests)
   }
 
@@ -77,8 +77,7 @@ object TestingCore {
 
   }
 
-  private def runTests[T <: Testable, TFunc <: TestFunction[T, _, _, _, _]]
-                      (tests: Seq[TFunc], testable: T, flags: TestFuncFlagBundle, isStacktracing: Boolean) {
+  private def runTests[T <: Testable, TFunc <: TestFunction[T, _, _, _, _]](tests: Seq[TFunc], testable: T, flags: TestFuncFlagBundle, isStacktracing: Boolean) {
 
     def successStr(testNumber: Int) = "Test number " + testNumber + " was a success."
     def failureStr(testNumber: Int) = "Test number " + testNumber + " failed miserably!"
@@ -86,9 +85,8 @@ object TestingCore {
     tests foreach {
       case test =>
         try {
-          val result = test(testable, flags)
-          if (test.shouldSucceed == result) println(successStr(test.testNum))
-          else                              println(failureStr(test.testNum))
+          val f = if (test.shouldSucceed == test(testable, flags)) successStr _ else failureStr _
+          println(f(test.testNum))
         }
         catch {
           case e: Exception =>
