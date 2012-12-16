@@ -1,7 +1,8 @@
 package datastructure.suitereporter
 
 import tester.suitereporter.SuiteReporter
-import datastructure.mutable.BiHashMapSpec
+
+import datastructure.mutable._
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,4 +11,4 @@ import datastructure.mutable.BiHashMapSpec
  * Time: 10:58 PM
  */
 
-object DataStructureSuiteReporter extends SuiteReporter(Seq(new BiHashMapSpec()))
+object DataStructureSuiteReporter extends SuiteReporter(Seq(new BiHashMapFunSuite()))
