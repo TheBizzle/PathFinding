@@ -1,10 +1,10 @@
 package astar_base.suitereporter
 
-import datastructure.suitereporter.DataStructureSuiteReporter
 
 import tester.{ suite, TesterSuiteReporter }, suite.SuiteCoagulator
 
 import pathfinding.suitereporter.PathFindingSuiteReporter
+import datastructure.DataStructureSuiteReporter
 
 /**
  * Created by IntelliJ IDEA.

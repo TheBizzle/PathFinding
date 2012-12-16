@@ -1,4 +1,4 @@
-package datastructure.suitereporter
+package datastructure
 
 import tester.suite.SuiteReporter
 
