@@ -1,11 +1,14 @@
 package astar_base.bidir_astar.concurrency
 
-import astar_base.bidir_astar.BiDirStepData
-import pathfinding.statuses._
-import pathfinding.coordinate.Coordinate2D
 import annotation.tailrec
+
+import pathfinding.{ breadcrumb, coordinate, statuses }
+import breadcrumb.Breadcrumb
+import coordinate.Coordinate2D
+import statuses.{ Continue, Failure, PathingStatus, Success }
+
+import astar_base.bidir_astar.BiDirStepData
 import astar_base.exceptions.UnexpectedDataException
-import pathfinding.breadcrumb.Breadcrumb
 
 /**
  * Created by IntelliJ IDEA.
@@ -40,8 +43,8 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
           case (result @ Failure(_)) => result
           case Success(x) => mergeBreadcrumbsForBackwardsOnSuccess(x, stgStatus.stepData)
           case Continue(_) =>
-            stg ! (BiDirActor.AssimilateMessageStr, gtsCrumbs)
-            gts ! (BiDirActor.AssimilateMessageStr, stgCrumbs)
+            stg ! (BiDirMessage.Assimilate(gtsCrumbs))
+            gts ! (BiDirMessage.Assimilate(stgCrumbs))
             evaluateActions(stg, gts)
         }
     }
@@ -73,16 +76,16 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
   }
 
   def terminateActors(actorArgs: BiDirActor[T]*) {
-    actorArgs foreach ( _ ! BiDirActor.StopMessageStr )
+    actorArgs foreach (_ ! BiDirMessage.Stop)
   }
 
   def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : ((PathingStatus[T], Seq[Breadcrumb]), (PathingStatus[T], Seq[Breadcrumb])) = {
 
     stg.start()
-    val stgFuture = (stg !! BiDirActor.StartMessageStr)
+    val stgFuture = (stg !! BiDirMessage.Start)
 
     gts.start()
-    val gtsFuture = (gts !! BiDirActor.StartMessageStr)
+    val gtsFuture = (gts !! BiDirMessage.Start)
 
     val stgTuple = stgFuture().asInstanceOf[(PathingStatus[T], Seq[Breadcrumb])]
     val gtsTuple = gtsFuture().asInstanceOf[(PathingStatus[T], Seq[Breadcrumb])]

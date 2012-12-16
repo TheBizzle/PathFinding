@@ -27,22 +27,24 @@ sealed abstract class BiDirActor[T <: BiDirStepData](es: PathingStatus[T],
   }
 
   def act() {
+    import BiDirMessage._
     loop {
       react {
-        case (BiDirActor.AssimilateMessageStr, crumbs: Seq[Breadcrumb]) => status.stepData.assimilateBreadcrumbs(crumbs)
-        case  BiDirActor.StartMessageStr                                => reply(moveAndMutate())
-        case  BiDirActor.StopMessageStr                                 => exit()
+        case Assimilate(crumbs) => status.stepData.assimilateBreadcrumbs(crumbs)
+        case Start => reply(moveAndMutate())
+        case Stop  => exit()
       }
     }
   }
 
 }
 
-//@ Oh, wow.  This is terrible and archaic.
-private[concurrency] object BiDirActor {
-  val StartMessageStr = "start"
-  val AssimilateMessageStr = "assimilate"
-  val StopMessageStr = "stop"
+sealed trait BiDirMessage
+
+private[concurrency] object BiDirMessage {
+  case class  Assimilate(crumbs: Seq[Breadcrumb]) extends BiDirMessage
+  case object Start                               extends BiDirMessage
+  case object Stop                                extends BiDirMessage
 }
 
 case class StartToGoal[T <: BiDirStepData](exeStatus:  PathingStatus[T],

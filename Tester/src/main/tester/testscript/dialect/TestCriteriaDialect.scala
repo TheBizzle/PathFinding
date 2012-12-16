@@ -28,7 +28,7 @@ object TestCriteriaDialect {
 // I've chosen the latter.
 
 //@ This could be substantially more FP (by having making constructor take form: Cons(crit, tail)
-//  and having `&&` return `new CombinatorPimper(crit, tail :: (that.crit :: that.tail))`)
+//  and having `&&` return `new CombinatorPimper(crit, tail ::: (that.crit :: that.tail))`)
 //  Could even leverage HList-like static typing on the list, then....
 //  This deserves to be fixed at some point.
 private[dialect] sealed abstract class CombinatorPimper(private val crit: TestCriteria) {

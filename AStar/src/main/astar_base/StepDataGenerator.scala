@@ -14,8 +14,7 @@ import pathfinding.pathingmap.{ PathingMap, pathingmapdata }, pathingmapdata.Pat
  * Time: 7:08 PM
  */
 
-//@ Rename to "StepDataGenerator"
-trait FactoryThatTakesAStarStepData[T] {
+trait StepDataGenerator[T] {
 
   // A bad/initial numerical value for some things—NOT COUNTING THE "X" AND "Y" MEMBERS OF COORDINATE OBJECTS; they have their own InvalidValue
   // P.S. This is gross

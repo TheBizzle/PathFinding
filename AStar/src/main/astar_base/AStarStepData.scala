@@ -4,7 +4,7 @@ import collection.mutable.PriorityQueue
 
 import pathfinding.coordinate.{ BadCoordinate2D, Coordinate2D, PriorityCoordinate }
 import pathfinding.pathingmap.PathingMap
-import pathfinding.{StepData, StepDataSingleton}
+import pathfinding.{ StepData, StepDataSingleton }
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,13 +24,13 @@ class AStarStepData(currentLocationOpt: Coordinate2D,
                     val iters: Int = 0,  // Satan's `var`
                     endGoalLocation: Coordinate2D = BadCoordinate2D) extends StepData(currentLocationOpt, goalLocation, pMap, breadcrumbs, endGoalLocation)
 
-object AStarStepData extends StepDataSingleton[AStarStepData] with FactoryThatTakesAStarStepData[AStarStepData] {
+object AStarStepData extends StepDataSingleton[AStarStepData] with StepDataGenerator[AStarStepData] {
 
   import shapeless._
 
-  type Extras = HNil
+  override type Extras = HNil
 
-  def apply(freshLoc: Coordinate2D, stepData: AStarStepData, isIncingIters: Boolean = false) : AStarStepData = { import stepData._
+  override def apply(freshLoc: Coordinate2D, stepData: AStarStepData, isIncingIters: Boolean = false) : AStarStepData = { import stepData._
     new AStarStepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, if (isIncingIters) iters + 1 else iters, endGoal)
   }
 

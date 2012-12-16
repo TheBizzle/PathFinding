@@ -7,7 +7,6 @@ package pathfinding.coordinate
  * Time: 12:25 AM
  */
 
-//@ Unit tests!
 sealed trait Coordinate extends Equals {
 
   self: DimensionSet =>
@@ -77,7 +76,6 @@ object BadCoordinate2D extends Coordinate2D with BadCoordinate {
   override val (x, y) = (-1, -1)
 }
 
-//@ Make this whole class generic on units (i.e. Should all coordinates really have to use `Int`s?)
 object Coordinate {
   def apply(_x: Int)                   = new Coordinate1D { override val x = _x }
   def apply(_x: Int, _y: Int)          = new Coordinate2D { override val (x, y) = (_x, _y) }

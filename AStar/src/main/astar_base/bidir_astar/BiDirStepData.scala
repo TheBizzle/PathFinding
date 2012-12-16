@@ -7,7 +7,7 @@ import breadcrumb.Breadcrumb
 import coordinate.{ BadCoordinate2D, Coordinate2D, PriorityCoordinate }
 import pathingmap.PathingMap
 
-import astar_base.{ AStarStepData, exceptions, FactoryThatTakesAStarStepData }, exceptions.UnexpectedDataException
+import astar_base.{ AStarStepData, exceptions, StepDataGenerator }, exceptions.UnexpectedDataException
 
 /**
  * Created by IntelliJ IDEA.
@@ -50,13 +50,13 @@ class BiDirStepData(currentLocation: Coordinate2D,
   }
 
   def transformGoalForClone(oGoal: Coordinate2D) : BiDirStepData = cloneBase(g = oGoal)
-  def hasInOthersBreadcrumbs(loc: Coordinate2D)                  = othersBreadcrumbArr(loc.x)(loc.y).isValid
+  def hasInOthersBreadcrumbs(loc: Coordinate2D)  : Boolean       = othersBreadcrumbArr(loc.x)(loc.y).isValid
 
   def reverseBreadcrumbs() {
     def reversalHelper(location: Coordinate2D, crumbArr: Array[Array[Coordinate2D]]) {
       val crumb = crumbArr(location.x)(location.y)
       if (crumb.isValid) {
-        reversalHelper(crumb, crumbArr) //@ Reduce all this casting with some implicits
+        reversalHelper(crumb, crumbArr)
         crumbArr(crumb.x)(crumb.y) = location
       }
     }
@@ -67,13 +67,13 @@ class BiDirStepData(currentLocation: Coordinate2D,
 }
 
 
-object BiDirStepData extends StepDataSingleton[BiDirStepData] with FactoryThatTakesAStarStepData[BiDirStepData] {
+object BiDirStepData extends StepDataSingleton[BiDirStepData] with StepDataGenerator[BiDirStepData] {
 
   import shapeless._
 
-  override type Extras = Array[Array[Coordinate2D]] :: HNil //@ Give the head type here a friendly alias
+  override type Extras = Array[Array[Coordinate2D]] :: HNil
 
-  def apply(freshLoc: Coordinate2D, stepData: BiDirStepData, isIncingIters: Boolean = false) : BiDirStepData = {
+  override def apply(freshLoc: Coordinate2D, stepData: BiDirStepData, isIncingIters: Boolean = false) : BiDirStepData = {
     import stepData._
     new BiDirStepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr,
                       totalArr, breadcrumbArr, othersBreadcrumbArr, if (isIncingIters) iters + 1 else iters, endGoal)
