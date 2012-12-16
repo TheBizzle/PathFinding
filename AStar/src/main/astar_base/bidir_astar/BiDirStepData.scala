@@ -2,9 +2,8 @@ package astar_base.bidir_astar
 
 import collection.mutable.PriorityQueue
 
-import pathfinding.{ breadcrumb, coordinate, pathingmap, StepDataSingleton }
-import breadcrumb.Breadcrumb
-import coordinate.{ BadCoordinate2D, Coordinate2D, PriorityCoordinate }
+import pathfinding.{ coordinate, pathingmap, StepDataSingleton }
+import coordinate.{ BadCoordinate2D, Breadcrumb, Coordinate2D, PriorityCoordinate}
 import pathingmap.PathingMap
 
 import astar_base.{ AStarStepData, exceptions, StepDataGenerator }, exceptions.UnexpectedDataException

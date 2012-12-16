@@ -1,9 +1,8 @@
-package pathfinding.pathingmap.pathingmapdata
+package pathfinding.pathingmap
 
-import pathfinding.pathingmap.terrain._
-import pathfinding.coordinate.{ Coordinate, Coordinate2D }
-import pathfinding.pathingmap.exceptions.InvalidMapStringException
 import collection.mutable.ListBuffer
+
+import pathfinding.coordinate.{ Coordinate, Coordinate2D }
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,6 +12,8 @@ import collection.mutable.ListBuffer
  */
 
 object PathingMapStringInterpreter {
+
+  import Terrain._
 
   def apply(mapString: PathingMapString) : PathingMapData = {
 
@@ -74,8 +75,6 @@ object PathingMapStringInterpreter {
 
   }
 
-  private def charToTerrain(c: Char) : Terrain = {
-    TerrainCharConverter(c).get
-  }
+  private def charToTerrain(c: Char) : Terrain = Terrain(c).get
 
 }

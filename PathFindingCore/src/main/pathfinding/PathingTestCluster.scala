@@ -1,19 +1,13 @@
-package pathfinding.testcluster
+package pathfinding
 
 import java.lang.reflect.Field
 
 import tester.{ cluster, criteria, MysteriousDataException }
-import criteria.Talkative
-import cluster.{ TestAnalyzer, TestCluster }
+import criteria.{ Talkative, TestToggleFlag }
+import cluster.{ TestAnalysisFlagBundle, TestAnalysisResultBundle, TestAnalyzer, TestCluster }
 
-// Wow, WTF!
-import pathfinding.pathingmap.pathingmapdata.PathingMapString
-import pathfinding.pathingmap.PathingMap
-import pathfinding.statuses.{Failure, Success, PathingStatus}
-import pathfinding.StepData
-import pathfinding.coordinate.Coordinate2D
-import pathfinding.testanalyzer.{ PathingAnalysisResultBundle, PathingAnalysisFlagBundle }
-import testfunction.{ PathingTestFunction, PTFConstructionBundle }
+import coordinate.Coordinate2D
+import pathingmap.{ PathingMap, PathingMapString }
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,6 +15,9 @@ import testfunction.{ PathingTestFunction, PTFConstructionBundle }
  * Date: 12/23/11
  * Time: 4:28 PM
  */
+
+class PathingAnalysisFlagBundle(inToggles: Seq[TestToggleFlag]) extends TestAnalysisFlagBundle(inToggles)
+class PathingAnalysisResultBundle(val wasSuccess: Boolean, val path: Seq[Coordinate2D]) extends TestAnalysisResultBundle
 
 object PathingTestCluster
   extends TestCluster[PathingTestFunction, PathingMapString, PTFConstructionBundle]
@@ -35,8 +32,9 @@ object PathingTestCluster
 
   override protected def analyze(status: PathingStatus[StepData], flags: PathingAnalysisFlagBundle) : PathingAnalysisResultBundle = {
 
-    val isTalkative = flags.get(Talkative)
+    import PathingStatus._
 
+    val isTalkative = flags.get(Talkative)
     val (wasSuccessful, path) = status match {
       case Success(x) =>
         if (isTalkative) println("\n\nFound a solution!")
@@ -417,3 +415,4 @@ object PathingTestCluster
                                                      "________________________DDDDDDDDDDDDDDDDDDDDDD", "\\|")
 
 }
+

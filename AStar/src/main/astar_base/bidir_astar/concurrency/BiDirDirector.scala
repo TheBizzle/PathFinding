@@ -2,10 +2,9 @@ package astar_base.bidir_astar.concurrency
 
 import annotation.tailrec
 
-import pathfinding.{ breadcrumb, coordinate, statuses }
-import breadcrumb.Breadcrumb
-import coordinate.Coordinate2D
-import statuses.{ Continue, Failure, PathingStatus, Success }
+import pathfinding.{ coordinate, PathingStatus }
+import coordinate.{ Breadcrumb, Coordinate2D }
+import PathingStatus._
 
 import astar_base.bidir_astar.BiDirStepData
 import astar_base.exceptions.UnexpectedDataException
@@ -20,11 +19,11 @@ import astar_base.exceptions.UnexpectedDataException
 class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], stepFunc: T => (T, Seq[Breadcrumb])) {
 
   val decide = decisionFunc
-  val step = stepFunc
+  val step   = stepFunc
 
   def direct(forwardStepData: T, backwardsStepData: T) : PathingStatus[T] = {
-    val stg = new StartToGoal[T](Continue(forwardStepData), decide, step)
-    val gts = new GoalToStart[T](Continue(backwardsStepData), decide, step)
+    val stg    = new StartToGoal[T](Continue(forwardStepData),   decide, step)
+    val gts    = new GoalToStart[T](Continue(backwardsStepData), decide, step)
     val outVal = evaluateActions(stg, gts)
     terminateActors(stg, gts)
     outVal

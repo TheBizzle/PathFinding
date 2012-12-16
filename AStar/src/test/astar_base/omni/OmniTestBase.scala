@@ -1,6 +1,6 @@
 package astar_base.omni
 
-import pathfinding.testscript.TestScript
+import pathfinding.TestScript
 
 /**
  * Created by IntelliJ IDEA.

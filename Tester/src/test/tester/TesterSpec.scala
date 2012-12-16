@@ -4,8 +4,7 @@ import cluster.Testable
 import org.scalatest.{ FlatSpec, GivenWhenThen }
 
 import criteria._
-import exceptions._
-import cluster.{ DummyTestCluster }
+import cluster.DummyTestCluster
 
 /**
  * Created by IntelliJ IDEA.

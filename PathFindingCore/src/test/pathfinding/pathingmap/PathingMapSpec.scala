@@ -1,10 +1,9 @@
 package pathfinding.pathingmap
 
 import org.scalatest.{GivenWhenThen, FlatSpec}
-import pathfinding.pathingmap.pathingmapdata.PathingMapString
 import pathfinding.coordinate.Coordinate
-import pathfinding.pathingmap.terrain._
-import pathfinding.pathingmap.direction._
+import Terrain._
+import Direction._
 
 /**
  * Created by IntelliJ IDEA.

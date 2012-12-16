@@ -2,8 +2,8 @@ package astar_base.bidir_astar.concurrency
 
 import actors.Actor
 import astar_base.bidir_astar.BiDirStepData
-import pathfinding.statuses.PathingStatus
-import pathfinding.breadcrumb.Breadcrumb
+import pathfinding.coordinate.Breadcrumb
+import pathfinding.PathingStatus
 
 /**
  * Created by IntelliJ IDEA.

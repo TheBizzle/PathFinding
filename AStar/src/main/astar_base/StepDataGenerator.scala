@@ -5,7 +5,7 @@ import collection.mutable.PriorityQueue
 import shapeless._
 
 import pathfinding.coordinate.{ PriorityCoordinateOrdering, PriorityCoordinate, BadCoordinate2D, Coordinate2D }
-import pathfinding.pathingmap.{ PathingMap, pathingmapdata }, pathingmapdata.PathingMapString
+import pathfinding.pathingmap.{ PathingMap, PathingMapString }
 
 /**
  * Created by IntelliJ IDEA.

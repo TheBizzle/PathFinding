@@ -1,11 +1,13 @@
 package astar_base.astar
 
-import astar_base.heuristics.HeuristicLib
-import pathfinding.pathingmap.pathingmapdata.PathingMapString
-import pathfinding.statuses._
-import pathfinding.coordinate._
 import annotation.tailrec
-import astar_base.{AStarStepData, AStarBase}
+
+import pathfinding.{ coordinate, pathingmap, PathingStatus }
+import coordinate.{ BadCoordinate2D, Coordinate2D }
+import pathingmap.PathingMapString
+import PathingStatus._
+
+import astar_base.{ AStarStepData, AStarBase, heuristics }, heuristics.HeuristicLib
 
 /**
  * Created by IntelliJ IDEA.

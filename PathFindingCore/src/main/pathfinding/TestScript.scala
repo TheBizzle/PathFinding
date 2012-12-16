@@ -1,9 +1,6 @@
-package pathfinding.testscript
+package pathfinding
 
-import pathfinding.testcluster.PathingTestCluster
-import pathfinding.{StepData, PathFinder}
-import tester.criteria._
-import tester.Tester
+import tester.{ criteria, Tester }, criteria.TestCriteria
 
 /**
  * Created by IntelliJ IDEA.

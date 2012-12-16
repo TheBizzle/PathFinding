@@ -1,6 +1,4 @@
-package pathfinding.breadcrumb
-
-import pathfinding.coordinate.Coordinate2D
+package pathfinding.coordinate
 
 /**
  * Created by IntelliJ IDEA.

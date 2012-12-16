@@ -1,4 +1,4 @@
-package pathfinding.suitereporter
+package pathfinding
 
 import pathfinding.pathingmap.PathingMapSpec
 import tester.suite.SuiteReporter

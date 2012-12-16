@@ -1,11 +1,10 @@
 package pathfinding.pathingmap
 
-import direction._
-import exceptions.{ UnknownSubclassException, InvalidParameterException }
-import terrain._
-import pathingmapdata.{ PathingMapStringInterpreter, PathingMapString }
-import pathfinding.coordinate.{ Coordinate, Coordinate2D }
 import collection.mutable.ListBuffer
+
+import pathfinding.coordinate.{ Coordinate, Coordinate2D }
+import Direction._
+import Terrain._
 
 /**
  * Created by IntelliJ IDEA.
@@ -75,7 +74,7 @@ object PathingMap {
   }
 
   private def terrainToChar(terrain: Terrain) : Char = {
-    TerrainCharConverter(terrain).get
+    Terrain(terrain).get
   }
 
   def findNeighborCoord(loc: Coordinate2D, dir: Direction) : Coordinate2D = {
@@ -103,3 +102,6 @@ object PathingMap {
   }
 
 }
+
+case class PathingMapData(start: Coordinate2D, goal: Coordinate2D, cols: Int, rows: Int, arr: Array[Array[Terrain]])
+case class PathingMapString(str: String, delim: String) extends tester.cluster.TestSubject

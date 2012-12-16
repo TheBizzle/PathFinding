@@ -2,9 +2,9 @@ package astar_base
 
 import tester.{ criteria, Tester }, criteria._
 
-import pathfinding.testscript.TestScript
 
 import suitereporter.AStarSuiteCoagulator
+import pathfinding.TestScript
 
 /**
  * Created by IntelliJ IDEA.

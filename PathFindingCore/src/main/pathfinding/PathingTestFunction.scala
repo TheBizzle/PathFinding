@@ -1,10 +1,8 @@
-package pathfinding.testcluster.testfunction
+package pathfinding
 
-import pathfinding.{StepData, PathFinder}
-import pathfinding.statuses.PathingStatus
-import pathfinding.pathingmap.pathingmapdata.PathingMapString
-import pathfinding.testanalyzer.{PathingAnalysisFlagBundle, PathingAnalysisResultBundle}
-import tester.cluster.{TestFuncFlagBundle, TestFunction}
+import tester.cluster.{ TestFuncConstructionBundle, TestFuncFlagBundle, TestFunction }
+
+import pathingmap.PathingMapString
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,3 +35,5 @@ class PathingTestFunction(testString: PathingMapString,
   }
 
 }
+
+class PTFConstructionBundle(val expectedPathLength: Int) extends TestFuncConstructionBundle

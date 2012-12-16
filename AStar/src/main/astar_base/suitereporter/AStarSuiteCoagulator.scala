@@ -3,8 +3,8 @@ package astar_base.suitereporter
 
 import tester.{ suite, TesterSuiteReporter }, suite.SuiteCoagulator
 
-import pathfinding.suitereporter.PathFindingSuiteReporter
 import datastructure.DataStructureSuiteReporter
+import pathfinding.PathFindingSuiteReporter
 
 /**
  * Created by IntelliJ IDEA.

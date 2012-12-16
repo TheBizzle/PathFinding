@@ -7,7 +7,6 @@ package pathfinding.coordinate
  * Time: 1:52 AM
  */
 
-//@ This stuff should be in the 'datastructure' package...
 trait PriorityCoordinate {
   self: Coordinate =>
   def priority: Int

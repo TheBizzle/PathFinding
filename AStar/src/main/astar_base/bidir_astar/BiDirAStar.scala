@@ -1,11 +1,11 @@
 package astar_base.bidir_astar
 
+import pathfinding.{ coordinate, pathingmap, PathingStatus }
+import coordinate.{ BadCoordinate2D, Coordinate2D }
+import pathingmap.PathingMapString
+
+import astar_base.{ AStarBase, heuristics }, heuristics.HeuristicLib
 import concurrency.BiDirDirector
-import pathfinding.pathingmap.pathingmapdata.PathingMapString
-import astar_base._
-import heuristics.HeuristicLib
-import pathfinding.coordinate._
-import pathfinding.statuses._
 
 /**
  * Created by IntelliJ IDEA.

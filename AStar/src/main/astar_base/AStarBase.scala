@@ -1,12 +1,13 @@
 package astar_base
 
-import heuristics.HeuristicBundle
-import pathfinding.PathFinder
-import pathfinding.pathingmap.PathingMap
-import pathfinding.coordinate.{PriorityCoordinate, Coordinate}
-import pathfinding.statuses._
-import pathfinding.breadcrumb.Breadcrumb
 import collection.mutable.ListBuffer
+
+import pathfinding.{ coordinate, PathFinder, pathingmap, PathingStatus }
+import coordinate.{ Breadcrumb, Coordinate, PriorityCoordinate }
+import pathingmap.PathingMap
+import PathingStatus._
+
+import heuristics.HeuristicBundle
 
 /**
  * Created by IntelliJ IDEA.
