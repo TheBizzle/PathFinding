@@ -249,9 +249,9 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
 
       def matchesTuple(r: Regex)(s: String) = r matches s
 
-      def getAsValue(s: String)    : TestRunningnessValue = { val ValueTuple(not, value) = s; TestRunningnessValue(value.toInt, not) }
-      def getAsNotRange(s: String) : TestRunningnessRange = { val NotRangeTuple(start, end) = s; TestRunningnessRange(start.toInt, end.toInt, SkipTest) }
-      def getAsRange(s: String)    : TestRunningnessRange = { val RangeTuple(not, start, end) = s; TestRunningnessRange(start.toInt, end.toInt, not) }
+      def getAsValue   (s: String) : TestRunningnessValue = { val ValueTuple(not, value)      = s; TestRunningnessValue(value.toInt, not) }
+      def getAsNotRange(s: String) : TestRunningnessRange = { val NotRangeTuple(start, end)   = s; TestRunningnessRange(start.toInt, end.toInt, SkipTest) }
+      def getAsRange   (s: String) : TestRunningnessRange = { val RangeTuple(not, start, end) = s; TestRunningnessRange(start.toInt, end.toInt, not) }
       val tuplesAndFuncs = Seq((ValueTuple, getAsValue(_)), (NotRangeTuple, getAsNotRange(_)), (RangeTuple, getAsRange(_))) map { case (rgx, func) => (matchesTuple(rgx)(_), func) }
 
       def matchesFlag(name: String)(s: String) = s == name
@@ -259,8 +259,9 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
       val flagsAndFuncs = flagNames.map(name => matchesFlag(name)(_)) zip flags.map(flag => getAsFlag(flag)(_))
 
       // I wish this could all be done more smoothly and/or readably with `Option`-juggling...
-      tuplesAndFuncs ++ flagsAndFuncs collectFirst { case (condFunc, resultFunc) if (condFunc(str)) => resultFunc(str) } getOrElse
-              (throw new Exception("Failed to convert %s to any `TestCriteria` subclass".format(str)))
+      tuplesAndFuncs ++ flagsAndFuncs collectFirst {
+        case (condFunc, resultFunc) if (condFunc(str)) => resultFunc(str)
+      } getOrElse (throw new Exception("Failed to convert %s to any `TestCriteria` subclass".format(str)))
       
     }
     
