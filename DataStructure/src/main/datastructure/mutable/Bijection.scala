@@ -50,8 +50,8 @@ trait Bijection[A, B, M[X, Y] <: MMap[X, Y], Rpr[X, Y] <: Bijection[X, Y, M, Rpr
   override def iterator : Iterator[Tup] = abMap.iterator
 
   // Lambda-operation methods
-  override def foreach[C]                 (f: (Tup) => C)                                                    { abMap.foreach(f) }
-  override def withDefault                (d: A => B)                                        : MMap[A, B]  =   abMap withDefault d   //@ I'd love to do this with a better return type...
+  override def foreach[C] (f: (Tup) => C)                 { abMap foreach f }
+  override def withDefault(d: A => B)     : MMap[A, B]  =   abMap withDefault d   //@ I'd love to do this with a better return type...
 
   def sameElements[U : ((A, B) || (B, A))#T, C >: U](that: collection.GenIterable[C]) : Boolean = (abMap sameElements that) || (baMap sameElements that)
 
