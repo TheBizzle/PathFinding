@@ -1,10 +1,11 @@
 package tester.criteria.parser
 
-import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
-import TestCriteriaParser._
-import tester.criteria._
 import util.matching.Regex
+
+import org.scalatest.{ FunSuite, matchers }, matchers.ShouldMatchers
+
+import tester.criteria._
+import TestCriteriaParser._
 
 /**
  * Created by IntelliJ IDEA.
