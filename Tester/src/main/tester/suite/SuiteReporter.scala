@@ -1,6 +1,7 @@
 package tester.suite
 
-import org.scalatest.Suite
+import
+  org.scalatest.Suite
 
 /**
  * Created by IntelliJ IDEA.

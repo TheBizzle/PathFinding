@@ -1,7 +1,8 @@
 package pathfinding
 
-import coordinate.{ BadCoordinate2D, Coordinate2D }
-import pathingmap.PathingMap
+import
+  coordinate.{ BadCoordinate2D, Coordinate2D },
+  pathingmap.PathingMap
 
 /**
  * Created by IntelliJ IDEA.

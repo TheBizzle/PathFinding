@@ -1,8 +1,12 @@
 package astar
 
-import tester.{ criteria, TestCriteriaDialect }, criteria._, TestCriteriaDialect._
+import
+  tester.{ criteria, TestCriteriaDialect },
+    criteria._,
+    TestCriteriaDialect._
 
-import pathfinding.TestScript
+import
+  pathfinding.TestScript
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,11 +1,15 @@
 package tester
 
-import util.matching.Regex
+import
+  util.matching.Regex
 
-import org.scalatest.{ FunSuite, matchers }, matchers.ShouldMatchers
+import
+  org.scalatest.{ FunSuite, matchers },
+    matchers.ShouldMatchers
 
-import criteria._
-import TestCriteriaParser._
+import
+  criteria._,
+  TestCriteriaParser._
 
 /**
  * Created by IntelliJ IDEA.

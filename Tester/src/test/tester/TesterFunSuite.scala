@@ -1,10 +1,14 @@
 package tester
 
-import collection.immutable.HashMap
+import
+  collection.immutable.HashMap
 
-import org.scalatest.{ FunSuite, matchers }, matchers.ShouldMatchers
+import
+  org.scalatest.{ FunSuite, matchers },
+    matchers.ShouldMatchers
 
-import criteria._
+import
+  criteria._
 
 /**
  * Created by IntelliJ IDEA.

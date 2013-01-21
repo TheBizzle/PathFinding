@@ -1,6 +1,9 @@
 package datastructure.mutable
 
-import collection.{ generic, GenTraversableOnce, mutable }, generic.CanBuildFrom, mutable.{ Map => MMap }
+import
+  collection.{ generic, GenTraversableOnce, mutable },
+    generic.CanBuildFrom,
+    mutable.{ Map => MMap }
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,8 +1,10 @@
 package pathfinding.pathingmap
 
-import collection.mutable.ListBuffer
+import
+  collection.mutable.ListBuffer
 
-import pathfinding.coordinate.{ Coordinate, Coordinate2D }
+import
+  pathfinding.coordinate.{ Coordinate, Coordinate2D }
 
 /**
  * Created by IntelliJ IDEA.

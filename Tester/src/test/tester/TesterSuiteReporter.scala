@@ -1,6 +1,7 @@
 package tester
 
-import suite.SuiteReporter
+import
+  suite.SuiteReporter
 
 /**
  * Created by IntelliJ IDEA.

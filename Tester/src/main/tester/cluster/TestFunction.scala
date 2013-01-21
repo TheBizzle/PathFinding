@@ -1,8 +1,10 @@
 package tester.cluster
 
-import java.lang.reflect.Field
+import
+  java.lang.reflect.Field
 
-import tester.criteria.{ Talkative, TestToggleFlag, ToggleFlagManager }
+import
+  tester.criteria.{ Talkative, TestToggleFlag, ToggleFlagManager }
 
 /**
  * Created by IntelliJ IDEA.

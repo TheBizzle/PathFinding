@@ -1,13 +1,16 @@
 package astar
 
-import actors.Actor
-import annotation.tailrec
+import
+  actors.Actor,
+  annotation.tailrec
 
-import pathfinding.{ coordinate, PathingStatus }
-import coordinate.{ Breadcrumb, Coordinate2D }
-import PathingStatus._
+import
+  pathfinding.{ coordinate, PathingStatus },
+    coordinate.{ Breadcrumb, Coordinate2D },
+    PathingStatus._
 
-import base.UnexpectedDataException
+import
+  base.UnexpectedDataException
 
 /**
  * Created by IntelliJ IDEA.

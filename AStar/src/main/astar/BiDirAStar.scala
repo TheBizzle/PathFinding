@@ -1,10 +1,12 @@
 package astar
 
-import pathfinding.{ coordinate, pathingmap, PathingStatus }
-import coordinate.{ BadCoordinate2D, Coordinate2D }
-import pathingmap.PathingMapString
+import
+  pathfinding.{ coordinate, pathingmap, PathingStatus },
+    coordinate.{ BadCoordinate2D, Coordinate2D },
+    pathingmap.PathingMapString
 
-import base.{ AStarBase, HeuristicLib }
+import
+  base.{ AStarBase, HeuristicLib }
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,13 +1,16 @@
 package astar
 
-import annotation.tailrec
+import
+  annotation.tailrec
 
-import pathfinding.{ coordinate, pathingmap, PathingStatus }
-import coordinate.{ BadCoordinate2D, Coordinate2D }
-import pathingmap.PathingMapString
-import PathingStatus._
+import
+  pathfinding.{ coordinate, pathingmap, PathingStatus },
+    coordinate.{ BadCoordinate2D, Coordinate2D },
+    pathingmap.PathingMapString,
+    PathingStatus._
 
-import base.{ AStarBase, AStarStepData, HeuristicLib }
+import
+  base.{ AStarBase, AStarStepData, HeuristicLib }
 
 /**
  * Created by IntelliJ IDEA.

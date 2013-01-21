@@ -1,8 +1,10 @@
 package pathfinding
 
-import tester.cluster.{ TestFuncConstructionBundle, TestFuncFlagBundle, TestFunction }
+import
+  tester.cluster.{ TestFuncConstructionBundle, TestFuncFlagBundle, TestFunction }
 
-import pathingmap.PathingMapString
+import
+  pathingmap.PathingMapString
 
 /**
  * Created by IntelliJ IDEA.

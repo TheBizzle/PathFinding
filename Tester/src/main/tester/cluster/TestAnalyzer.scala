@@ -1,6 +1,7 @@
 package tester.cluster
 
-import tester.criteria.{ ToggleFlagManager, Talkative, TestToggleFlag }
+import
+  tester.criteria.{ ToggleFlagManager, Talkative, TestToggleFlag }
 
 /**
  * Created by IntelliJ IDEA.

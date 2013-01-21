@@ -1,9 +1,12 @@
 package datastructure.mutable
 
-import collection.GenTraversableOnce
-import collection.mutable.ListBuffer
+import
+  collection.{ GenTraversableOnce, mutable },
+    mutable.ListBuffer
 
-import org.scalatest.{ BeforeAndAfterEach, FunSuite, matchers }, matchers.ShouldMatchers
+import
+  org.scalatest.{ BeforeAndAfterEach, FunSuite, matchers },
+    matchers.ShouldMatchers
 
 /**
  * Created by IntelliJ IDEA.

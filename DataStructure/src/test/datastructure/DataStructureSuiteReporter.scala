@@ -1,8 +1,10 @@
 package datastructure
 
-import tester.suite.SuiteReporter
+import
+  tester.suite.SuiteReporter
 
-import datastructure.mutable._
+import
+  datastructure.mutable._
 
 /**
  * Created by IntelliJ IDEA.

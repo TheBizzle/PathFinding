@@ -1,11 +1,13 @@
 package astar.base
 
-import collection.mutable.ListBuffer
+import
+  collection.mutable.ListBuffer
 
-import pathfinding.{ coordinate, PathFinder, pathingmap, PathingStatus }
-import coordinate.{ Breadcrumb, Coordinate, PriorityCoordinate }
-import pathingmap.PathingMap
-import PathingStatus._
+import
+  pathfinding.{ coordinate, PathFinder, pathingmap, PathingStatus },
+    coordinate.{ Breadcrumb, Coordinate, PriorityCoordinate },
+    pathingmap.PathingMap,
+    PathingStatus._
 
 /**
  * Created by IntelliJ IDEA.

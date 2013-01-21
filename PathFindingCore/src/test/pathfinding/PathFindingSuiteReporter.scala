@@ -1,7 +1,10 @@
 package pathfinding
 
-import pathfinding.pathingmap.PathingMapSpec
-import tester.suite.SuiteReporter
+import
+  pathfinding.pathingmap.PathingMapSpec
+
+import
+  tester.suite.SuiteReporter
 
 /**
  * Created by IntelliJ IDEA.

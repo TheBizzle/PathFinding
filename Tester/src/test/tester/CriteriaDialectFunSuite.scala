@@ -1,9 +1,12 @@
 package tester
 
-import org.scalatest.{ FunSuite, matchers }, matchers.ShouldMatchers
+import
+  org.scalatest.{ FunSuite, matchers },
+    matchers.ShouldMatchers
 
-import criteria._
-import TestCriteriaDialect._
+import
+  criteria._,
+  TestCriteriaDialect._
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,6 +1,8 @@
 package datastructure.mutable
 
-import collection.{ GenTraversableOnce, mutable }, mutable.HashMap
+import
+  collection.{ GenTraversableOnce, mutable },
+    mutable.HashMap
 
 /**
  * Created by IntelliJ IDEA.

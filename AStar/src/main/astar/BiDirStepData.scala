@@ -1,12 +1,15 @@
 package astar
 
-import collection.mutable.PriorityQueue
+import
+  collection.mutable.PriorityQueue
 
-import pathfinding.{ coordinate, pathingmap, StepDataSingleton }
-import coordinate.{ BadCoordinate2D, Breadcrumb, Coordinate2D, PriorityCoordinate}
-import pathingmap.PathingMap
+import
+  pathfinding.{ coordinate, pathingmap, StepDataSingleton },
+    coordinate.{ BadCoordinate2D, Breadcrumb, Coordinate2D, PriorityCoordinate },
+    pathingmap.PathingMap
 
-import base.{ AStarStepData, StepDataGenerator, UnexpectedDataException }
+import
+  base.{ AStarStepData, StepDataGenerator, UnexpectedDataException }
 
 /**
  * Created by IntelliJ IDEA.

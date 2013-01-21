@@ -1,6 +1,5 @@
 package astar
 
-
 /**
  * Created by IntelliJ IDEA.
  * User: Jason

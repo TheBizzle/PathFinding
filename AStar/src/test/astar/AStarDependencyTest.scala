@@ -1,8 +1,11 @@
 package astar
 
-import tester.{ criteria, Tester }, criteria._
+import
+  tester.{ criteria, Tester },
+    criteria._
 
-import pathfinding.TestScript
+import
+  pathfinding.TestScript
 
 /**
  * Created by IntelliJ IDEA.

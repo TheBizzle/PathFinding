@@ -1,8 +1,10 @@
 package tester
 
-import collection.mutable.ListBuffer
+import
+  collection.mutable.ListBuffer
 
-import tester.criteria._
+import
+  tester.criteria._
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,6 +1,7 @@
 package astar.base
 
-import pathfinding.coordinate.Coordinate2D
+import
+  pathfinding.coordinate.Coordinate2D
 
 /**
  * Created by IntelliJ IDEA.

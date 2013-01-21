@@ -8,13 +8,12 @@ package mutable
 * Time: 10:12 PM
 */
 
-import collection.{ GenIterable, GenTraversableOnce }
-import collection.parallel.mutable.{ ParHashMap, ParHashTable, ParMapLike, ParMap }
-import collection.parallel.Combiner
-import collection.generic._
-import collection.mutable.DefaultEntry
-import collection.mutable.HashMap
-
+import
+  collection.{ generic, GenIterable, GenTraversableOnce, mutable, parallel },
+    generic._,
+    mutable.{ DefaultEntry, HashMap },
+    parallel.{ Combiner, mutable => pmutable },
+      pmutable.{ ParHashMap, ParHashTable, ParMapLike, ParMap }
 
 //@ Does not even come close to working right now.  And I do not really care (for the time being).
 @SerialVersionUID(1L)

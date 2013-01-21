@@ -1,9 +1,14 @@
 package astar
 
-import tester.{ suite, TesterSuiteReporter }, suite.{ SuiteCoagulator, SuiteReporter }
+import
+  tester.{ suite, TesterSuiteReporter },
+    suite.{ SuiteCoagulator, SuiteReporter }
 
-import datastructure.DataStructureSuiteReporter
-import pathfinding.PathFindingSuiteReporter
+import
+  datastructure.DataStructureSuiteReporter
+
+import
+  pathfinding.PathFindingSuiteReporter
 
 /**
  * Created by IntelliJ IDEA.

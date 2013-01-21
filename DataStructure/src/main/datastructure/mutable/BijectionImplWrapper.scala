@@ -1,7 +1,8 @@
 package datastructure.mutable
 
-import collection.Set
-import collection.mutable.{ Map => MMap }
+import
+  collection.{ mutable, Set },
+    mutable.{ Map => MMap }
 
 /**
  * Created by IntelliJ IDEA.

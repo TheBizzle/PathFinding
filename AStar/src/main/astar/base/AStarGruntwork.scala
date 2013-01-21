@@ -1,9 +1,13 @@
 package astar.base
 
-import annotation.tailrec
-import collection.mutable.PriorityQueue
+import
+  annotation.tailrec
 
-import pathfinding.coordinate.{ Coordinate2D, PriorityCoordinate }
+import
+  collection.mutable.PriorityQueue
+
+import
+  pathfinding.coordinate.{ Coordinate2D, PriorityCoordinate }
 
 /**
  * Created by IntelliJ IDEA.

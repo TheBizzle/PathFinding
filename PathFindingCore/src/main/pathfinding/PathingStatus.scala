@@ -1,6 +1,7 @@
 package pathfinding
 
-import tester.cluster.ExecutionStatus
+import
+  tester.cluster.ExecutionStatus
 
 /**
  * Created by IntelliJ IDEA.

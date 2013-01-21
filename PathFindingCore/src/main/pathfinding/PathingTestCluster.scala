@@ -1,13 +1,16 @@
 package pathfinding
 
-import java.lang.reflect.Field
+import
+  java.lang.reflect.Field
 
-import tester.{ cluster, criteria, MysteriousDataException }
-import criteria.{ Talkative, TestToggleFlag }
-import cluster.{ TestAnalysisFlagBundle, TestAnalysisResultBundle, TestAnalyzer, TestCluster }
+import
+  tester.{ cluster, criteria, MysteriousDataException },
+    cluster.{ TestAnalysisFlagBundle, TestAnalysisResultBundle, TestAnalyzer, TestCluster },
+    criteria.{ Talkative, TestToggleFlag }
 
-import coordinate.Coordinate2D
-import pathingmap.{ PathingMap, PathingMapString }
+import
+  coordinate.Coordinate2D,
+  pathingmap.{ PathingMap, PathingMapString }
 
 /**
  * Created by IntelliJ IDEA.

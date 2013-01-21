@@ -1,8 +1,9 @@
 package astar.base
 
-import pathfinding.{ coordinate, pathingmap, PathingStatus }
-import coordinate.{ BadCoordinate2D, Breadcrumb, Coordinate2D }
-import pathingmap.PathingMapString
+import
+  pathfinding.{ coordinate, pathingmap, PathingStatus },
+    coordinate.{ BadCoordinate2D, Breadcrumb, Coordinate2D },
+    pathingmap.PathingMapString
 
 /**
  * Created by IntelliJ IDEA.

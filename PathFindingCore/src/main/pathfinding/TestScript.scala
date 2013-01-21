@@ -1,6 +1,8 @@
 package pathfinding
 
-import tester.{ criteria, Tester }, criteria.TestCriteria
+import
+  tester.{ criteria, Tester },
+    criteria.TestCriteria
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,10 +1,11 @@
 package tester
 
-import cluster.Testable
-import org.scalatest.{ FlatSpec, GivenWhenThen }
+import
+  org.scalatest.{ FlatSpec, GivenWhenThen }
 
-import criteria._
-import cluster.DummyTestCluster
+import
+  criteria._,
+  cluster.{ DummyTestCluster, Testable }
 
 /**
  * Created by IntelliJ IDEA.

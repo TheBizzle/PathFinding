@@ -1,6 +1,7 @@
 package astar
 
-import pathfinding.TestScript
+import
+  pathfinding.TestScript
 
 /**
  * Created by IntelliJ IDEA.

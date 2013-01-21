@@ -1,10 +1,12 @@
 package datastructure.mutable
 
-import collection.{ CustomParallelizable, generic, mutable }
-import mutable.HashMap
-import generic.{ CanBuildFrom, MutableMapFactory }
+import
+  collection.{ CustomParallelizable, generic, mutable },
+    generic.{ CanBuildFrom, MutableMapFactory },
+    mutable.HashMap
 
-import datastructure.parallel.mutable.ParBiHashMap
+import
+  datastructure.parallel.mutable.ParBiHashMap
 
 /**
  * Created by IntelliJ IDEA.

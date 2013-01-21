@@ -1,7 +1,10 @@
 package tester
 
-import util.parsing.combinator.RegexParsers
-import tester.criteria._
+import
+  util.parsing.combinator.RegexParsers
+
+import
+  tester.criteria._
 
 /**
  * Created by IntelliJ IDEA.

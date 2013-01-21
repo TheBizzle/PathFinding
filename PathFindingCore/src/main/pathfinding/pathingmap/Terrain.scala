@@ -1,6 +1,7 @@
 package pathfinding.pathingmap
 
-import datastructure.mutable.BiHashMap
+import
+  datastructure.mutable.BiHashMap
 
 /**
  * Created by IntelliJ IDEA.

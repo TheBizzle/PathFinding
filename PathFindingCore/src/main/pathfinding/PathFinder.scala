@@ -1,8 +1,10 @@
 package pathfinding
 
-import tester.cluster.Testable
+import
+  tester.cluster.Testable
 
-import pathingmap.PathingMapString
+import
+  pathingmap.PathingMapString
 
 /**
  * Created by IntelliJ IDEA.

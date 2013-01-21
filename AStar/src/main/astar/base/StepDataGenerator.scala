@@ -1,12 +1,15 @@
 package astar.base
 
-import collection.mutable.PriorityQueue
+import
+  collection.mutable.PriorityQueue
 
-import shapeless._
+import
+  shapeless._
 
-import pathfinding.{ coordinate, pathingmap }
-import coordinate.{ PriorityCoordinateOrdering, PriorityCoordinate, BadCoordinate2D, Coordinate2D }
-import pathingmap.{ PathingMap, PathingMapString }
+import
+  pathfinding.{ coordinate, pathingmap },
+    coordinate.{ PriorityCoordinateOrdering, PriorityCoordinate, BadCoordinate2D, Coordinate2D },
+    pathingmap.{ PathingMap, PathingMapString }
 
 /**
  * Created by IntelliJ IDEA.

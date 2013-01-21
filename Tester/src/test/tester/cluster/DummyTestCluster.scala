@@ -1,6 +1,7 @@
 package tester.cluster
 
-import java.lang.reflect.Field
+import
+  java.lang.reflect.Field
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,13 +1,15 @@
 package tester
 
-import annotation.tailrec
-import cluster._
-import collection.immutable.Map
+import
+  annotation.tailrec,
+  collection.immutable.Map
 
-import org.scalatest.Suite
+import
+  org.scalatest.Suite
 
-import criteria._
-import scala.Some
+import
+  cluster._,
+  criteria._
 
 /**
  * Created by IntelliJ IDEA.
