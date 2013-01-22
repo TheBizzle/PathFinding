@@ -18,5 +18,5 @@ trait ExecutionStatus
 
 abstract class TestAnalysisResultBundle
 
-abstract class TestAnalysisFlagBundle(inToggles: Seq[TestToggleFlag], extras: Seq[TestToggleFlag] = Seq())(implicit passItOn: Seq[TestToggleFlag] = extras ++ Seq(Talkative))
-  extends ToggleFlagManager(inToggles, passItOn)
+abstract class TestAnalysisFlagBundle(inToggles: Seq[TestToggleFlag], extras: Seq[TestToggleFlag] = Seq())
+  extends ToggleFlagManager(inToggles, extras ++ Seq(Talkative))
