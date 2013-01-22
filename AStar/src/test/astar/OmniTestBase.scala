@@ -17,9 +17,9 @@ abstract class OmniTestBase extends TestScript {
   def run() {
     tests foreach {
       case (test, name) =>
-        println("Start %s test:\n".format(name))
+        println(s"Start $name test:\n")
         test.main(Array[String]())
-        println("\nEnd %s test.".format(name))
+        println(s"\nEnd $name test.")
     }
   }
 
