@@ -182,11 +182,11 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   test("--(that)") {
-    def forwards(bhm: BHM, target: TraversableOnce[AB], removees: TraversableOnce[A]) {
+    def forwards(bhm: BHM, target: Traversable[AB], removees: Traversable[A]) {
       (bhm -- bhm.aValues) should equal (BiHashMap.empty)
       testSameElems(bhm -- removees, target)
     }
-    def backwards(bhm: BHM, target: TraversableOnce[AB], removees: TraversableOnce[B]) {
+    def backwards(bhm: BHM, target: Traversable[AB], removees: Traversable[B]) {
       (bhm -- bhm.bValues) should equal (BiHashMap.empty)
       testSameElems(bhm -- removees, target)
     }
@@ -196,18 +196,19 @@ class BiHashMapFunSuite extends FunSuite with BeforeAndAfterEach with ShouldMatc
   }
 
   test("--=(traversableOnce[A])") {
-    def forwards(bhm: BHM, target: TraversableOnce[AB], removees: TraversableOnce[A]) {
+    def forwards(bhm: BHM, target: Traversable[AB], removees: Traversable[A]) {
 
       val subjectEmpty = bhm.clone
       (subjectEmpty --= bhm.aValues) should equal (BiHashMap.empty)
       subjectEmpty should equal (BiHashMap.empty)
+
 
       val subject = bhm.clone
       testSameElems(subject --= removees, target)
       testSameElems(subject, target)
 
     }
-    def backwards(bhm: BHM, target: TraversableOnce[AB], removees: TraversableOnce[B]) {
+    def backwards(bhm: BHM, target: Traversable[AB], removees: Traversable[B]) {
 
       val subjectEmpty = bhm.clone
       (subjectEmpty --= bhm.bValues) should equal (BiHashMap.empty)

@@ -250,6 +250,14 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
 
     def toCriteria : Seq[TestCriteria] = strings map string2TestCriteria
 
+    // Courtesy of mkneissl on StackOverflow
+    implicit def regexToRichRegex(r: Regex) = new RichRegex(r)
+
+    // Courtesy of mkneissl on StackOverflow
+    protected class RichRegex(underlying: Regex) {
+      def matches(s: String) = underlying.pattern.matcher(s).matches
+    }
+
     private def string2TestCriteria(str: String) : TestCriteria = {
 
       def matchesTuple(r: Regex)(s: String) = r matches s
@@ -269,15 +277,7 @@ class CriteriaParserFunSuite extends FunSuite with ShouldMatchers {
       } getOrElse (throw new Exception("Failed to convert %s to any `TestCriteria` subclass".format(str)))
       
     }
-    
-    // Courtesy of mkneissl on StackOverflow
-    implicit def regexToRichRegex(r: Regex) = new RichRegex(r)
 
-    // Courtesy of mkneissl on StackOverflow
-    protected class RichRegex(underlying: Regex) {
-      def matches(s: String) = underlying.pattern.matcher(s).matches
-    }
-    
   }
 
 }

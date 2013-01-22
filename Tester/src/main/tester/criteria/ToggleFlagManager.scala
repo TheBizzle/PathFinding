@@ -21,5 +21,6 @@ class ToggleFlagManager(toggles: Seq[TestToggleFlag], supportedToggles: Seq[Test
 
 }
 
-class TestToggleFlagManager(toggles: Seq[TestCriteriaToggleFlag])(implicit passItOn: Seq[TestToggleFlag] = toggles map (_.flag))
-  extends ToggleFlagManager(passItOn, TestingFlag.flags collect { case x: TestToggleFlag => x })
+class TestToggleFlagManager(toggles: Seq[TestCriteriaToggleFlag])
+//  extends ToggleFlagManager(toggles map (_.flag), TestingFlag.flags collect { case x: TestToggleFlag => x })
+  extends ToggleFlagManager(toggles map (_.flag), TestingFlag.flags filter { case x => x.isInstanceOf[TestToggleFlag] }) //@ Temporary workaround for above code failing on 2.10
