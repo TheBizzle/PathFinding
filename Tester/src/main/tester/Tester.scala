@@ -20,8 +20,8 @@ import
 
 object Tester {
 
-  private[tester] val ArgKeyValue = "value"
-  private[tester] val ArgKeyRange = "range"
+  private[tester] val ArgKeyValue  = "value"
+  private[tester] val ArgKeyRange  = "range"
   private[tester] val ArgKeyToggle = "toggle"
 
   //@ Annoying compiler bug....  Fix this rubbish when the compiler gets fixed!
