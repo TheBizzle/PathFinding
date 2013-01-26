@@ -1,8 +1,15 @@
 package astar
 
 import
-  actors.Actor,
-  annotation.tailrec
+  annotation.tailrec,
+  concurrent.{ Await, duration },
+    duration._
+
+import
+  akka.{ actor, pattern, util },
+    actor.{ Actor, ActorRef, ActorSystem, PoisonPill, Props },
+    pattern.ask,
+    util.Timeout
 
 import
   pathfinding.{ coordinate, PathingStatus },
@@ -21,19 +28,21 @@ import
 
 class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], stepFunc: T => (T, Seq[Breadcrumb])) {
 
+  private val actorSystem = ActorSystem("BiDir")
+
   val decide = decisionFunc
   val step   = stepFunc
 
   def direct(forwardStepData: T, backwardsStepData: T) : PathingStatus[T] = {
-    val stg    = new StartToGoal[T](Continue(forwardStepData),   decide, step)
-    val gts    = new GoalToStart[T](Continue(backwardsStepData), decide, step)
+    val stg    = actorSystem.actorOf(Props(new BiDirActor(Continue(forwardStepData),   decide, step)), name = "stg")
+    val gts    = actorSystem.actorOf(Props(new BiDirActor(Continue(backwardsStepData), decide, step)), name = "gts")
     val outVal = evaluateActions(stg, gts)
     terminateActors(stg, gts)
     outVal
   }
 
   @tailrec
-  private def evaluateActions(stg: StartToGoal[T], gts: GoalToStart[T]) : PathingStatus[T] = {
+  private def evaluateActions(stg: ActorRef, gts: ActorRef) : PathingStatus[T] = {
 
     val ((stgStatus, stgCrumbs), (gtsStatus, gtsCrumbs)) = runActionsForResult(stg, gts)
 
@@ -77,66 +86,56 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
     myData
   }
 
-  def terminateActors(actorArgs: BiDirActor[T]*) {
-    actorArgs foreach (_ ! BiDirMessage.Stop)
+  def terminateActors(actorArgs: ActorRef*) {
+    actorArgs foreach (_ ! PoisonPill)
   }
 
-  def runActionsForResult(stg: StartToGoal[T], gts: GoalToStart[T]) : ((PathingStatus[T], Seq[Breadcrumb]), (PathingStatus[T], Seq[Breadcrumb])) = {
+  def runActionsForResult(stg: ActorRef, gts: ActorRef) : ((PathingStatus[T], Seq[Breadcrumb]), (PathingStatus[T], Seq[Breadcrumb])) = {
 
-    stg.start()
-    val stgFuture = (stg !! BiDirMessage.Start)
+    import BiDirMessage._
+    import concurrent.ExecutionContext.Implicits.global
 
-    gts.start()
-    val gtsFuture = (gts !! BiDirMessage.Start)
+    implicit val timeout = Timeout(1.second)
 
-    val stgTuple = stgFuture().asInstanceOf[(PathingStatus[T], Seq[Breadcrumb])]
-    val gtsTuple = gtsFuture().asInstanceOf[(PathingStatus[T], Seq[Breadcrumb])]
+    val stgResult = Await.result(stg ? Start, 1.second) match { case StepState(result: Result[T]) => result }
+    val gtsResult = Await.result(gts ? Start, 1.second) match { case StepState(result: Result[T]) => result }
 
-    (stgTuple, gtsTuple)
+    (stgResult, gtsResult)
 
   }
 
 }
 
-sealed abstract class BiDirActor[T <: BiDirStepData](es: PathingStatus[T], dFunc: T => PathingStatus[T], sFunc: T => (T, Seq[Breadcrumb])) extends Actor {
+private class BiDirActor[T <: BiDirStepData](es: PathingStatus[T], dFunc: T => PathingStatus[T], sFunc: T => (T, Seq[Breadcrumb])) extends Actor {
+
+  import BiDirMessage._
 
   var status = es
   val decide = dFunc
   val step   = sFunc
 
-  protected def moveAndMutate() : (PathingStatus[T], Seq[Breadcrumb]) = {
+  protected def moveAndMutate() : Result[T] = {
     val (neoStepData, neoCrumbs) = step(status.stepData)
     status = decide(neoStepData)
     (status, neoCrumbs)
   }
 
-  def act() {
-    import BiDirMessage._
-    loop {
-      react {
-        case Assimilate(crumbs) => status.stepData.assimilateBreadcrumbs(crumbs)
-        case Start => reply(moveAndMutate())
-        case Stop  => exit()
-      }
-    }
+  override def receive = {
+    case Assimilate(crumbs) => status.stepData.assimilateBreadcrumbs(crumbs)
+    case Start              => sender ! StepState(moveAndMutate())
   }
 
 }
 
 sealed trait BiDirMessage
-
 object BiDirMessage {
-  case class  Assimilate(crumbs: Seq[Breadcrumb]) extends BiDirMessage
-  case object Start                               extends BiDirMessage
-  case object Stop                                extends BiDirMessage
+
+  type BDSD              = BiDirStepData
+  type Result[T <: BDSD] = (PathingStatus[T], Seq[Breadcrumb])
+
+  case class  Assimilate(crumbs: Seq[Breadcrumb])     extends BiDirMessage
+  case object Start                                   extends BiDirMessage
+  case class  StepState[T <: BDSD](result: Result[T]) extends BiDirMessage
+
 }
 
-private case class StartToGoal[T <: BiDirStepData](exeStatus:  PathingStatus[T],
-                                           decideFunc: T => PathingStatus[T],
-                                           stepFunc:   T => (T, Seq[Breadcrumb]))
-  extends BiDirActor[T](exeStatus, decideFunc, stepFunc)
-
-private case class GoalToStart[T <: BiDirStepData](exeStatus:  PathingStatus[T],
-                                           decideFunc: T => PathingStatus[T],
-                                           stepFunc:   T => (T, Seq[Breadcrumb]))
-  extends BiDirActor[T](exeStatus, decideFunc, stepFunc)
