@@ -13,7 +13,7 @@ import
  */
 
 trait AStarLike[T <: AStarStepData] {
-            def apply(mapString: PathingMapString)               : PathingStatus[T]
+  /*none */ def apply(mapString: PathingMapString)               : PathingStatus[T]
   protected def decide(stepData: T, maxIters: Int)               : PathingStatus[T]
   protected def execute(stepData: T,  maxIters: Int)             : PathingStatus[T]
   protected def goalIsFound(stepData: T, freshLoc: Coordinate2D) : Boolean
