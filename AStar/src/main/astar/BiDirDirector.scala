@@ -97,10 +97,9 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
 
     implicit val timeout = Timeout(1.second)
 
-    val stgResult = Await.result(stg ? Start, 1.second) match { case StepState(result: Result[T]) => result }
-    val gtsResult = Await.result(gts ? Start, 1.second) match { case StepState(result: Result[T]) => result }
+    val takeOneStep = (actor: ActorRef) => Await.result(actor ? Start, 1.second) match { case StepState(result: Result[T]) => result }
 
-    (stgResult, gtsResult)
+    (takeOneStep(stg), takeOneStep(gts))
 
   }
 
