@@ -12,4 +12,3 @@ class InvalidTestNumberException(s: String = "") extends Exception("Invalid test
 class MysteriousDataException   (s: String = "") extends Exception("Rather mysterious data detected: " + s)
 class NotRunningTestsException  (s: String = "") extends Exception("No tests are being run: " + s)
 class RedundancyException       (s: String = "") extends Exception("Redundant inclusion: " + s)
-
