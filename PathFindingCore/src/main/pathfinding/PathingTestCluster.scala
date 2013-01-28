@@ -19,19 +19,18 @@ import
  * Time: 4:28 PM
  */
 
-class PathingAnalysisFlagBundle(inToggles: Set[TestToggleFlag]) extends TestAnalysisFlagBundle(inToggles)
+class PathingAnalysisFlagBundle(inToggles: Set[TestToggleFlag])                         extends TestAnalysisFlagBundle(inToggles)
 class PathingAnalysisResultBundle(val wasSuccess: Boolean, val path: Seq[Coordinate2D]) extends TestAnalysisResultBundle
 
-object PathingTestCluster
-  extends TestCluster[PathingTestFunction, PathingMapString, PTFConstructionBundle]
+object PathingTestCluster extends TestCluster[PathingTestFunction, PathingMapString, PTFConstructionBundle]
     with TestAnalyzer[PathingStatus[StepData], PathingAnalysisFlagBundle, PathingAnalysisResultBundle] {
-
-  override protected def TestFunctionRegex = "TestMapString([0-9]+)((_L([0-9]+))?)"
 
   lazy val tests = generateTests
 
   override def getTestsToRun(testNums: Seq[Int]) : Seq[PathingTestFunction] = tests.zipWithIndex collect { case (x, y) if (testNums.contains(y + 1)) => x }
-  override def getSize = tests.length
+  override def size                                                         = tests.length
+
+  override protected def TestFunctionRegex = "TestMapString([0-9]+)((_L([0-9]+))?)"
 
   override protected def analyze(status: PathingStatus[StepData], flags: PathingAnalysisFlagBundle) : PathingAnalysisResultBundle = {
 
@@ -46,7 +45,7 @@ object PathingTestCluster
         if (isTalkative) println("\n\nFailed to find a solution....")
         (false, Seq())
       case x          =>
-        throw new MysteriousDataException("Unexpected ExecutionStatus!  Received: " + x)
+        throw new MysteriousDataException(s"Unexpected ExecutionStatus!  Received: $x")
     }
 
     new PathingAnalysisResultBundle(wasSuccessful, path)
@@ -58,7 +57,7 @@ object PathingTestCluster
     val pathTaken = eatBreadcrumbsForPath(breadcrumbs, goal)
 
     if (isTalkative)
-      println("The path taken was: " + pathTaken + "\nHere, let me draw that for you on the map!\n")
+      println(s"The path taken was: $pathTaken\nHere, let me draw that for you on the map!\n")
 
     pathingMap.markAsGoal(goal)
 
@@ -68,7 +67,7 @@ object PathingTestCluster
     val suggestedLoc = pathTaken.tail.head
 
     if (isTalkative)
-      println("So, anyway... you should move " + PathingMap.findDirection(pathTaken.head, suggestedLoc) + " towards " + suggestedLoc)
+      println(s"So, anyway... you should move ${PathingMap.findDirection(pathTaken.head, suggestedLoc)} towards $suggestedLoc")
 
     pathTaken
 
@@ -85,19 +84,26 @@ object PathingTestCluster
   }
 
   override protected def generateTestFunction(testField: (Field, String), regex: String) : Option[PathingTestFunction] = {
-    if (testField._2.matches(regex)) {
-      val Matcher = regex.r
+
+    val Matcher = regex.r
+
+    if (Matcher.pattern.matcher(testField._2).matches) {
+
       val Matcher(testNum, shouldPass, _, foundLength) = testField._2
-      val expectedPathLength = if (foundLength != null) foundLength.toInt else -1
-      val func = construct(testField._1.get(this).asInstanceOf[PathingMapString], testNum.toInt, !(shouldPass isEmpty), PTFConstructionBundle(expectedPathLength))
-      Option(func)
+      val expectedLength                               = if (foundLength != null) foundLength.toInt else -1
+
+      testField._1.get(this) match {
+        case str: PathingMapString => Option(construct(str, testNum.toInt, !shouldPass.isEmpty, PTFConstructionBundle(expectedLength)))
+        case x                     => throw new MysteriousDataException(s"What could $x possibly be if not a `PathingMapString`...?")
+      }
+
     }
-    else None
+    else
+      None
   }
 
-  override protected def construct(subject: PathingMapString, testNumber: Int, shouldPass: Boolean, bundle: PTFConstructionBundle) : PathingTestFunction = {
+  override protected def construct(subject: PathingMapString, testNumber: Int, shouldPass: Boolean, bundle: PTFConstructionBundle) =
     new PathingTestFunction(subject, analyze, testNumber, shouldPass, bundle.expectedPathLength)
-  }
 
   /*
 

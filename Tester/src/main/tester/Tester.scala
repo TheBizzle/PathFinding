@@ -67,7 +67,7 @@ object Tester {
 
       val testToggles    = Seq(isTalkative) zip Seq[TestToggleFlag](Talkative) collect { case (true, x) => x } toSet
       val testFlagBundle = new TestFuncFlagBundle(testToggles)
-      val testsToRun     = handleTestIntervals(values, ranges, cluster.getSize)
+      val testsToRun     = handleTestIntervals(values, ranges, cluster.size)
 
       runTests(cluster.getTestsToRun(testsToRun), testable, testFlagBundle, isStacktracing)
 
