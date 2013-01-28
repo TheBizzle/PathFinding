@@ -11,9 +11,9 @@ import
  */
 
 object DummyTestCluster extends TestCluster[TestFunction[Testable, TestSubject, ExecutionStatus, TestAnalysisFlagBundle, TestAnalysisResultBundle], TestSubject, TestFuncConstructionBundle] {
-  override protected def TestFunctionRegex = ""
-  override           def getSize = 10
+  override protected def TestFunctionRegex                                                                                         = ""
+  override /*none */ def getSize                                                                                                   = 10
+  override /*none */ def getTestsToRun(testNums: Seq[Int])                                                                         = Seq()
   override protected def construct(subject: TestSubject, testNumber: Int, shouldPass: Boolean, bundle: TestFuncConstructionBundle) = null
-  override protected def generateTestFunction(fieldData: (Field, String), regex: String) = null
-  override           def getTestsToRun(testNums: Seq[Int]) : Seq[TestFunction[Testable, TestSubject, ExecutionStatus, TestAnalysisFlagBundle, TestAnalysisResultBundle]] = null
+  override protected def generateTestFunction(fieldData: (Field, String), regex: String)                                           = None
 }
