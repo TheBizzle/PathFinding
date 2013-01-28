@@ -15,8 +15,6 @@ trait TestAnalyzer[T <: ExecutionStatus, U <: TestAnalysisFlagBundle, V <: TestA
 }
 
 trait ExecutionStatus
+trait TestAnalysisResultBundle
 
-abstract class TestAnalysisResultBundle
-
-abstract class TestAnalysisFlagBundle(inToggles: Seq[TestToggleFlag], extras: Seq[TestToggleFlag] = Seq())
-  extends ToggleFlagManager(inToggles, extras ++ Seq(Talkative))
+abstract class TestAnalysisFlagBundle(inToggles: Set[TestToggleFlag], extras: Set[TestToggleFlag] = Set()) extends ToggleFlagManager(inToggles, extras ++ Set(Talkative))

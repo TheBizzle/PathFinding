@@ -9,12 +9,12 @@ package tester.criteria
 
 sealed trait TestingFlag
 object TestingFlag {
-  val flags = Seq[TestToggleFlag](Talkative, RunBaseTests, SkipExternalTests, StackTrace)
+  val flags = Set[TestToggleFlag](Talkative, RunBaseTests, SkipExternalTests, StackTrace)
 }
 
 
 
-sealed trait TestToggleFlag extends TestingFlag { // Everytime something is made to inherit from this, it MUST be added to TestToggleFlagWrapper's `flags`
+sealed trait TestToggleFlag extends TestingFlag {
   implicit def flag2Criteria(that: TestToggleFlag) = TestCriteriaToggleFlag(that)
 }
 
@@ -27,7 +27,7 @@ case object StackTrace        extends TestToggleFlag  // Signifies the desire to
 
 sealed trait TestRunningnessFlag extends TestingFlag {
   protected def isRunning : Boolean
-  def flipRunningness : TestRunningnessFlag = TestRunningnessFlag(!isRunning)
+  /*none */ def flip      : TestRunningnessFlag = TestRunningnessFlag(!isRunning)
 }
 
 object TestRunningnessFlag {

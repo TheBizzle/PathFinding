@@ -33,7 +33,7 @@ class PathingTestFunction(testString: PathingMapString,
   }
 
   protected def extractAnalysisFlags(flags: TestFuncFlagBundle) : PathingAnalysisFlagBundle = {
-    new PathingAnalysisFlagBundle(flags.getAll)
+    new PathingAnalysisFlagBundle(flags.toggles)
   }
 
 }

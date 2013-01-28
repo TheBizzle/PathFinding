@@ -28,8 +28,8 @@ abstract class TestFunction[T <: Testable, Subject <: TestSubject, Status <: Exe
 
 abstract class TestFuncConstructionBundle
 
-class TestFuncFlagBundle(inToggles: Seq[TestToggleFlag], extras: Seq[TestToggleFlag] = Seq())
-  extends ToggleFlagManager(inToggles, extras ++ Seq(Talkative))
+class TestFuncFlagBundle(inToggles: Set[TestToggleFlag], extras: Set[TestToggleFlag] = Set())
+  extends ToggleFlagManager(inToggles, extras + Talkative)
 
 trait TestFunctionFactory[T <: TestFunction[_, U, _, _, _], U <: TestSubject, V <: TestFuncConstructionBundle] {
 

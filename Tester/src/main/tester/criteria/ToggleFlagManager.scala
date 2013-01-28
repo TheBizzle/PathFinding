@@ -8,19 +8,15 @@ package tester.criteria
  */
 
 //@ Looking back at it, I truly don't get this thing
-class ToggleFlagManager(toggles: Seq[TestToggleFlag], supportedToggles: Seq[TestToggleFlag]) {
+class ToggleFlagManager(val toggles: Set[TestToggleFlag], supportedToggles: Set[TestToggleFlag]) {
 
-  private val flags = supportedToggles
-  require(!toggles.map(flags.contains(_)).contains(false)) // `flags` must contain everything in `toggles`
   // If this triggers, you likely created a new flag and forgot to add it to the implementing class's `flags`
+  require(toggles.subsetOf(supportedToggles))
 
-  private val flagMap = flags map (x => (x, toggles.contains(x))) toMap
-
-  def get(flag: TestToggleFlag) : Boolean             = flagMap(flag)
-  def getAll                    : Seq[TestToggleFlag] = flagMap.filter(_._2 == true).keySet.toSeq
+  def contains(flag: TestToggleFlag) = toggles.contains(flag)
 
 }
 
-class TestToggleFlagManager(toggles: Seq[TestCriteriaToggleFlag])
+class TestToggleFlagManager(toggles: Set[TestCriteriaToggleFlag])
 //  extends ToggleFlagManager(toggles map (_.flag), TestingFlag.flags collect { case x: TestToggleFlag => x })
   extends ToggleFlagManager(toggles map (_.flag), TestingFlag.flags filter { case x => x.isInstanceOf[TestToggleFlag] }) //@ Temporary workaround for above code failing on 2.10

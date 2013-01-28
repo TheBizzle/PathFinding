@@ -46,9 +46,10 @@ object Tester {
 
     val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[Seq[TestCriteriaToggleFlag]]] getOrElse (throw new MysteriousDataException("OMG, what did you do?!"))
 
-    val toggles = new TestToggleFlagManager(rawToggles)
+    val toggles             = new TestToggleFlagManager(rawToggles.toSet)
     val wantsToRunExternals = assessExternalityDesire(argMap)
-    val (isTalkative, isRunningBaseTests, isSkippingExternalTests, isStacktracing) = (toggles.get(Talkative), toggles.get(RunBaseTests), toggles.get(SkipExternalTests), toggles.get(StackTrace))
+    val (isTalkative, isRunningBaseTests, isSkippingExternalTests, isStacktracing) =
+      (toggles.contains(Talkative), toggles.contains(RunBaseTests), toggles.contains(SkipExternalTests), toggles.contains(StackTrace))
 
     if (isSkippingExternalTests && wantsToRunExternals)
       throw new ContradictoryArgsException("If you want skip the external tests, you should not specify external tests to run.")
@@ -61,11 +62,10 @@ object Tester {
       val valuesOption = argMap.get(ArgKeyValue).asInstanceOf[Option[Seq[TestRunningnessValue]]]
       val rangesOption = argMap.get(ArgKeyRange).asInstanceOf[Option[Seq[TestRunningnessRange]]]
 
-      val values = valuesOption map (sortCriteria(_)) getOrElse(Seq())
-      val ranges = rangesOption map (sortCriteria(_)) getOrElse(Seq())
+      val values = valuesOption map (x => sortCriteria(x.toSeq)) getOrElse(Seq())
+      val ranges = rangesOption map (x => sortCriteria(x.toSeq)) getOrElse(Seq())
 
-      val testFlagPairs  = Seq(isTalkative) zip Seq[TestToggleFlag](Talkative)
-      val testToggles    = testFlagPairs collect { case (true, x) => x }
+      val testToggles    = Seq(isTalkative) zip Seq[TestToggleFlag](Talkative) collect { case (true, x) => x } toSet
       val testFlagBundle = new TestFuncFlagBundle(testToggles)
       val testsToRun     = handleTestIntervals(values, ranges, cluster.getSize)
 
@@ -189,7 +189,7 @@ object Tester {
     baseTests foreach { x => print("\n"); x.execute(stats = true) }
   }
 
-  private[tester] def assessExternalityDesire(argMap:  Map[String, Seq[TestCriteria]]) : Boolean =
+  private[tester] def assessExternalityDesire(argMap: Map[String, Seq[TestCriteria]]) : Boolean =
     argMap(ArgKeyValue).asInstanceOf[Seq[TestRunningnessValue]].exists(isIncludingTest) || argMap(ArgKeyRange).asInstanceOf[Seq[TestRunningnessRange]].exists(isIncludingTest)
 
   private[tester] def sortArgLists(args: Seq[TestCriteria]) : Map[String, Seq[TestCriteria]] = {

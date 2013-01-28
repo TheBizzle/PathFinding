@@ -7,6 +7,8 @@ package tester.criteria
  * Time: 8:30 PM
  */
 
+// This whole file is a piece of shit. --Jason
+
 sealed trait TestCriteria
 
 abstract class TestFlagCriteria[T <: TestingFlag](testFlag: T) extends TestCriteria {
@@ -77,9 +79,9 @@ object TestRunningnessRange {
   def apply(guide: (Int, Int), flag: TestRunningnessFlag)               = new TestRunningnessRange(guide, flag)
   def apply(guideStart: Int, guideEnd: Int,  flag: TestRunningnessFlag) = new TestRunningnessRange((guideStart, guideEnd), flag)
 
-  implicit def rangeTupleSeq2ValueTupleSeqSeq(ranges: Seq[TestRunningnessRange]) : Seq[Seq[TestRunningnessValue]] = ranges map (rangeTuple2ValueTupleSeq(_))
-  implicit def rangeTuple2ValueTupleSeq(range: TestRunningnessRange)             : Seq[TestRunningnessValue]      =
-    Range(range.guide._1, range.guide._2).inclusive map (TestRunningnessValue(_, range.flag)) toSeq
+  implicit def rangeTupleSet2ValueTupleSetSet(ranges: Set[TestRunningnessRange]) : Set[Set[TestRunningnessValue]] = ranges map (rangeTuple2ValueTupleSet(_))
+  implicit def rangeTuple2ValueTupleSet(range: TestRunningnessRange)             : Set[TestRunningnessValue]      =
+    Range(range.guide._1, range.guide._2).inclusive map (TestRunningnessValue(_, range.flag)) toSet
 
 }
 

@@ -19,7 +19,7 @@ import
  * Time: 4:28 PM
  */
 
-class PathingAnalysisFlagBundle(inToggles: Seq[TestToggleFlag]) extends TestAnalysisFlagBundle(inToggles)
+class PathingAnalysisFlagBundle(inToggles: Set[TestToggleFlag]) extends TestAnalysisFlagBundle(inToggles)
 class PathingAnalysisResultBundle(val wasSuccess: Boolean, val path: Seq[Coordinate2D]) extends TestAnalysisResultBundle
 
 object PathingTestCluster
@@ -37,7 +37,7 @@ object PathingTestCluster
 
     import PathingStatus._
 
-    val isTalkative = flags.get(Talkative)
+    val isTalkative = flags.contains(Talkative)
     val (wasSuccessful, path) = status match {
       case Success(x) =>
         if (isTalkative) println("\n\nFound a solution!")
