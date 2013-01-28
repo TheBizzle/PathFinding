@@ -1,8 +1,9 @@
 package astar
 
 import
-  tester.{ criteria, Tester },
-    criteria._
+  tester.{ criteria, suite, Tester },
+    criteria._,
+    suite.SuiteReporter
 
 import
   pathfinding.TestScript
@@ -15,5 +16,5 @@ import
  */
 
 object AStarDependencyTest extends TestScript {
-  Tester(Seq[TestCriteria](RunBaseTests), baseTests = AStarSuiteCoagulator.coagulate)
+  Tester(Seq[TestCriteria](RunBaseTests), baseTests = AStarSuiteReporter.reporterSet.foldLeft(new SuiteReporter)(_ ++ _).suites)
 }

@@ -2,7 +2,7 @@ package astar
 
 import
   tester.{ suite, TesterSuiteReporter },
-    suite.{ SuiteCoagulator, SuiteReporter }
+    suite.SuiteReporter
 
 import
   datastructure.DataStructureSuiteReporter
@@ -17,6 +17,6 @@ import
  * Time: 11:00 PM
  */
 
-// Pass all of the SuiteReporters of your class—and of your dependencies—to the superclass's constructor!
-object AStarSuiteReporter   extends SuiteReporter(Seq())
-object AStarSuiteCoagulator extends SuiteCoagulator(AStarSuiteReporter, DataStructureSuiteReporter, PathFindingSuiteReporter, TesterSuiteReporter)
+object AStarSuiteReporter extends SuiteReporter {
+  val reporterSet = Set(AStarSuiteReporter, DataStructureSuiteReporter, PathFindingSuiteReporter, TesterSuiteReporter)
+}
