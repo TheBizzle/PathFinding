@@ -89,7 +89,7 @@ object PathingTestCluster
       val Matcher = regex.r
       val Matcher(testNum, shouldPass, _, foundLength) = testField._2
       val expectedPathLength = if (foundLength != null) foundLength.toInt else -1
-      val func = construct(testField._1.get(this).asInstanceOf[PathingMapString], testNum.toInt, !(shouldPass isEmpty), new PTFConstructionBundle(expectedPathLength))
+      val func = construct(testField._1.get(this).asInstanceOf[PathingMapString], testNum.toInt, !(shouldPass isEmpty), PTFConstructionBundle(expectedPathLength))
       Option(func)
     }
     else None

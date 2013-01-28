@@ -26,7 +26,7 @@ abstract class TestFunction[T <: Testable, Subject <: TestSubject, Status <: Exe
 
 }
 
-abstract class TestFuncConstructionBundle
+trait TestFuncConstructionBundle
 
 class TestFuncFlagBundle(inToggles: Set[TestToggleFlag], extras: Set[TestToggleFlag] = Set())
   extends ToggleFlagManager(inToggles, extras + Talkative)
