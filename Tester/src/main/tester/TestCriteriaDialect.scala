@@ -1,9 +1,6 @@
 package tester
 
 import
-  scala.collection.mutable.ListBuffer
-
-import
   tester.criteria._
 
 /**
@@ -20,27 +17,9 @@ object TestCriteriaDialect {
   implicit def pimper2TCSeq(pimper: CombinatorPimper)                     : Seq[TestCriteria]   = pimper.^^  // Might need to get rid of this at some point...
 }
 
-
-// Utility classes
-
-// This feels a little weird, but it's unclear how best to solve the problem at hand here.
-// Either a single item must actually be a sequence of items, or, when things start to
-// chain, the single item needs to morph into a sequence of items that behaves similarly
-// to how the single item does in the first place.  So... it seems that I either have
-// to have weird, unclear, duplicated code, or weird, identity-crisis-suffering classes.
-// I've chosen the latter.
-
-//@ This could be substantially more FP (by making the constructor take form: Cons(crit, tail)
-//  and having `&&` return `new CombinatorPimper(crit, tail ::: (that.crit :: that.tail))`)
-//  Could even leverage HList-like static typing on the list, then....
-//  This deserves to be fixed at some point.
-private[tester] case class CombinatorPimper(crit: TestCriteria) {
-
-  private val buffer = new ListBuffer[TestCriteria]() += crit
-
-  def &&(that: CombinatorPimper) : CombinatorPimper  = { buffer ++= that.buffer; this }
-  def ^^                         : Seq[TestCriteria] =   buffer.toSeq
-
+private[tester] case class CombinatorPimper(crit: TestCriteria, tail: Seq[TestCriteria] = Seq()) {
+  def &&(that: CombinatorPimper) : CombinatorPimper  = CombinatorPimper(crit, tail ++ (that.crit +: that.tail))
+  def ^^                         : Seq[TestCriteria] = crit +: tail
 }
 
 // This class handles the class promotion of modified values, while barring invalid modifier combinations
