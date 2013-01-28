@@ -19,6 +19,8 @@ import
  * Time: 8:27 PM
  */
 
+// This file, too, is a giant piece of shit. --Jason
+
 object Tester {
 
   private[tester] val ArgKeyValue  = "value"
@@ -80,8 +82,8 @@ object Tester {
 
   private def runTests[T <: Testable, TFunc <: TestFunction[T, _, _, _, _]](tests: Seq[TFunc], testable: T, flags: TestFuncFlagBundle, isStacktracing: Boolean) {
 
-    def successStr(testNumber: Int) = "Test number " + testNumber + " was a success."
-    def failureStr(testNumber: Int) = "Test number " + testNumber + " failed miserably!"
+    def successStr(testNumber: Int) = s"Test number $testNumber was a success."
+    def failureStr(testNumber: Int) = s"Test number $testNumber failed miserably!"
 
     tests foreach {
       case test =>
@@ -91,7 +93,7 @@ object Tester {
         }
         catch {
           case e: Exception =>
-            println("Test number " + test.testNum + " failed with an exception (" + e.getClass + ").")
+            println(s"Test number ${test.testNum} failed with an exception (${e.getClass}).")
             if (isStacktracing) println("\n" + e.getStackTraceString)
         }
     }
@@ -114,7 +116,7 @@ object Tester {
         if (arr(x.guide) != isTesting)
           arr(x.guide) = isTesting
         else
-          throw new RedundancyException("Setting " + x.toString + " to" + ( if (isTesting) " run " else " skip " ) + "is unnecessary.")
+          throw new RedundancyException(s"Setting ${x.toString} to ${if (isTesting) "run" else "skip"} is unnecessary.")
     }
     arr
   }
@@ -147,10 +149,10 @@ object Tester {
       val (tests, skips) = ranges.partition(isIncludingTest)
 
       val (testsHaveOverlap, firstTest, secondTest) = containsOverlaps(tests)
-      if (testsHaveOverlap) throw new RedundancyException("Test list has an overlap between " + firstTest.get.toString + " and " + secondTest.get.toString)
+      if (testsHaveOverlap) throw new RedundancyException(s"Test list has an overlap between ${firstTest.get.toString} and ${secondTest.get.toString}")
 
       val (skipsHaveOverlap, firstSkip, secondSkip) = containsOverlaps(skips)
-      if (skipsHaveOverlap) throw new RedundancyException("Skip list has an overlap between " + firstSkip.get.toString + " and " + secondSkip.get.toString)
+      if (skipsHaveOverlap) throw new RedundancyException(s"Skip list has an overlap between ${firstSkip.get.toString} and ${secondSkip.get.toString}")
 
       val maxOfRanges = {
         if (!tests.isEmpty) {
@@ -158,8 +160,7 @@ object Tester {
           if (value <= testCount)
             value
           else
-            throw new InvalidTestNumberException("Test range " + tests.last.toString + " extends to a number for which there is no corresponding test.  " +
-                                                 "Min is 1.  Max is " + testCount + ".")
+            throw new InvalidTestNumberException(s"Test range ${tests.last.toString} extends to a number for which there is no corresponding test.  Min is 1.  Max is $testCount.")
         }
         else
           0
@@ -168,27 +169,35 @@ object Tester {
       (tests, skips, maxOfRanges)
 
     }
-    else (Seq(), Seq(), 0)
+    else
+      (Seq(), Seq(), 0)
 
   }
 
   // Expects values to be sorted
   private[tester] def handleValues(values: Seq[TestRunningnessValue], testCount: Int) : (Seq[TestRunningnessValue], Seq[TestRunningnessValue], Int) = {
+
     if (!values.isEmpty) {
+
       val (tests, skips) = values.partition(isIncludingTest)
       val value          = if (!tests.isEmpty) tests.last.guide else 0
+
       if (value <= testCount)
         (tests, skips, value)
       else
-        throw new InvalidTestNumberException("There is no test #" + values.last.guide)
+        throw new InvalidTestNumberException(s"There is no test #${values.last.guide}")
+
     }
-    else (Seq(), Seq(), 0)
+    else
+      (Seq(), Seq(), 0)
+
   }
 
   private def runBaseTests(baseTests: Seq[Suite]) {
     baseTests foreach { x => print("\n"); x.execute(stats = true) }
   }
 
+  //@ This is so hideous...
   private[tester] def assessExternalityDesire(argMap: Map[String, Seq[TestCriteria]]) : Boolean =
     argMap(ArgKeyValue).asInstanceOf[Seq[TestRunningnessValue]].exists(isIncludingTest) || argMap(ArgKeyRange).asInstanceOf[Seq[TestRunningnessRange]].exists(isIncludingTest)
 
