@@ -191,12 +191,12 @@ class CriteriaDialectFunSuite extends FunSuite with ShouldMatchers {
 
   // ======================== UTILITIES - TEST FUNCTIONS ============================
 
-  private def testValue[T <% PimpedValueTuple](subject: T, numAndFlag: (Int, TestRunningnessFlag)) {
-    test(subject.valueTuple, TestRunningnessValue(numAndFlag._1, numAndFlag._2))
+  private def testValue[T <% CombinatorPimper](subject: T, numAndFlag: (Int, TestRunningnessFlag)) {
+    test(subject.crit, TestRunningnessValue(numAndFlag._1, numAndFlag._2))
   }
 
-  private def testRange(subject: PimpedRangeTuple, numsAndFlag: (Int, Int, TestRunningnessFlag)) {
-    test(subject.rangeTuple, TestRunningnessRange(numsAndFlag._1, numsAndFlag._2, numsAndFlag._3))
+  private def testRange(subject: CombinatorPimper, numsAndFlag: (Int, Int, TestRunningnessFlag)) {
+    test(subject.crit, TestRunningnessRange(numsAndFlag._1, numsAndFlag._2, numsAndFlag._3))
   }
   
   private def testFlag[T <% TestCriteriaToggleFlag](subject: T, flag: TestCriteriaToggleFlag) {
@@ -207,8 +207,8 @@ class CriteriaDialectFunSuite extends FunSuite with ShouldMatchers {
     require(subject.size == target.size)
     subject zip target foreach {
       case (s: TestCriteriaToggleFlag, (None, None, flag: TestToggleFlag))                  => testFlag(s, TestCriteriaToggleFlag(flag))
-      case (s: TestRunningnessValue,   (Some(num), None, flag: TestRunningnessFlag))        => testValue(PimpedValueTuple(s), (num, flag))
-      case (s: TestRunningnessRange,   (Some(start), Some(end), flag: TestRunningnessFlag)) => testRange(PimpedRangeTuple(s), (start, end, flag))
+      case (s: TestRunningnessValue,   (Some(num), None, flag: TestRunningnessFlag))        => testValue(CombinatorPimper(s), (num, flag))
+      case (s: TestRunningnessRange,   (Some(start), Some(end), flag: TestRunningnessFlag)) => testRange(CombinatorPimper(s), (start, end, flag))
       case (s, t)                                                                           => throw new MatchError("Failed to match %s with %s".format(s, t))
       case  x                                                                               => throw new MatchError("Failed to match %s".format(x))
     }
