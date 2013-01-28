@@ -11,12 +11,9 @@ package tester.criteria
 
 sealed trait TestCriteria
 
-abstract class TestFlagCriteria[T <: TestingFlag](testFlag: T) extends TestCriteria {
-  val flag = testFlag
-}
+abstract class TestFlagCriteria[T <: TestingFlag](val flag: T) extends TestCriteria
 
-sealed abstract class TestRunningnessCriteria[T, U <: TestRunningnessFlag](testGuide: T, testFlag: U) extends TestFlagCriteria(testFlag) with Equals {
-  val guide = testGuide
+sealed abstract class TestRunningnessCriteria[T, U <: TestRunningnessFlag](val guide: T, testFlag: U) extends TestFlagCriteria(testFlag) with Equals {
   def getKey : Int
 }
 
@@ -25,7 +22,7 @@ sealed abstract class TestRunningnessCriteria[T, U <: TestRunningnessFlag](testG
 class TestRunningnessValue(testGuide: Int, testFlag: TestRunningnessFlag) extends TestRunningnessCriteria(testGuide, testFlag) {
 
   override def getKey   = guide
-  override def toString = "(%s)".format(guide)
+  override def toString = s"($guide)"
 
   override def hashCode            =  41 * (4111 + guide) + flag.hashCode()
   override def canEqual(that: Any) = that.isInstanceOf[TestRunningnessValue]
@@ -60,7 +57,7 @@ class TestRunningnessRange(testBounds: (Int, Int), testFlag: TestRunningnessFlag
   }
 
   override def getKey   = guide._1
-  override def toString = "(%s, %s)".format(guide._1, guide._2)
+  override def toString = guide match { case (start, end) => s"($start, $end)" }
 
   override def hashCode            = 41 * (41 * (4111 + guide._1) + guide._2) + flag.hashCode()
   override def canEqual(that: Any) = that.isInstanceOf[TestRunningnessRange]
@@ -90,7 +87,7 @@ object TestRunningnessRange {
 class TestCriteriaToggleFlag(criteriaFlag: TestToggleFlag) extends TestFlagCriteria(criteriaFlag) with Equals {
   override def hashCode            = 4111 + flag.hashCode
   override def canEqual(that: Any) = that.isInstanceOf[TestCriteriaToggleFlag]
-  override def equals(that: Any) =
+  override def equals(that: Any)   =
     that match {
       case thatToggle: TestCriteriaToggleFlag => (thatToggle canEqual this) && (flag == thatToggle.flag)
       case _                                  => false
