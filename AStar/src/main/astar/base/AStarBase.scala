@@ -1,7 +1,7 @@
 package astar.base
 
 import
-  collection.mutable.ListBuffer
+  scala.collection.mutable.ListBuffer
 
 import
   pathfinding.{ coordinate, PathFinder, pathingmap, PathingStatus },

@@ -1,7 +1,7 @@
 package astar.base
 
 import
-  collection.mutable.PriorityQueue
+  scala.collection.mutable.PriorityQueue
 
 import
   shapeless._

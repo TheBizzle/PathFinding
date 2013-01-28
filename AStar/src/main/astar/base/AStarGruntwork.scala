@@ -1,10 +1,9 @@
 package astar.base
 
 import
-  annotation.tailrec
-
-import
-  collection.mutable.PriorityQueue
+  scala.{ annotation, collection },
+    annotation.tailrec,
+    collection.mutable.PriorityQueue
 
 import
   pathfinding.coordinate.{ Coordinate2D, PriorityCoordinate }

@@ -1,7 +1,7 @@
 package datastructure.mutable
 
 import
-  collection.{ GenTraversableOnce, mutable },
+  scala.collection.{ GenTraversableOnce, mutable },
     mutable.ListBuffer
 
 import

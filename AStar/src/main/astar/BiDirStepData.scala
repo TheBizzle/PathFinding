@@ -1,7 +1,7 @@
 package astar
 
 import
-  collection.mutable.PriorityQueue
+  scala.collection.mutable.PriorityQueue
 
 import
   pathfinding.{ coordinate, pathingmap, StepDataSingleton },

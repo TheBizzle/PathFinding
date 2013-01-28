@@ -1,7 +1,7 @@
 package datastructure.mutable
 
 import
-  collection.{ CustomParallelizable, generic, mutable },
+  scala.collection.{ CustomParallelizable, generic, mutable },
     generic.{ CanBuildFrom, MutableMapFactory },
     mutable.HashMap
 

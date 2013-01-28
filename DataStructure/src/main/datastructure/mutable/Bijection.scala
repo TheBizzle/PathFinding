@@ -1,10 +1,8 @@
 package datastructure.mutable
 
 import
-  scala.deprecated
-
-import
-  collection.mutable.{ Map => MMap, MapLike }
+  scala.{ collection, deprecated },
+    collection.mutable.{ Map => MMap, MapLike }
 
 /**
  * Created by IntelliJ IDEA.

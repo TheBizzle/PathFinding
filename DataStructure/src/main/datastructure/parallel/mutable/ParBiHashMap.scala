@@ -9,7 +9,7 @@ package mutable
 */
 
 import
-  collection.{ generic, GenIterable, GenTraversableOnce, mutable, parallel },
+  scala.collection.{ generic, GenIterable, GenTraversableOnce, mutable, parallel },
     generic._,
     mutable.{ DefaultEntry, HashMap },
     parallel.{ Combiner, mutable => pmutable },

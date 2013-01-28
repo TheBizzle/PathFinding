@@ -1,7 +1,7 @@
 package tester
 
 import
-  util.matching.Regex
+  scala.util.matching.Regex
 
 import
   org.scalatest.{ FunSuite, matchers },

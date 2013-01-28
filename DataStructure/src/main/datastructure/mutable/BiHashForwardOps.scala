@@ -1,7 +1,7 @@
 package datastructure.mutable
 
 import
-  collection.mutable.HashMap
+  scala.collection.mutable.HashMap
 
 /**
  * Created by IntelliJ IDEA.

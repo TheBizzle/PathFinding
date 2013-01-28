@@ -1,7 +1,7 @@
 package datastructure.mutable
 
 import
-  collection.{ mutable, Set },
+  scala.collection.{ mutable, Set },
     mutable.{ Map => MMap }
 
 /**

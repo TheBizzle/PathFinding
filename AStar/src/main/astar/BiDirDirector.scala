@@ -1,9 +1,10 @@
 package astar
 
 import
-  annotation.tailrec,
-  concurrent.{ Await, duration },
-    duration._
+  scala.{ annotation, concurrent },
+    annotation.tailrec,
+    concurrent.{ Await, duration },
+      duration._
 
 import
   akka.{ actor, pattern, util },

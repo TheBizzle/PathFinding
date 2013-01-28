@@ -1,7 +1,7 @@
 package astar
 
 import
-  annotation.tailrec
+  scala.annotation.tailrec
 
 import
   pathfinding.{ coordinate, pathingmap, PathingStatus },

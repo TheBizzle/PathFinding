@@ -1,7 +1,7 @@
 package datastructure.mutable
 
 import
-  collection.{ generic, GenTraversableOnce, mutable },
+  scala.collection.{ generic, GenTraversableOnce, mutable },
     generic.CanBuildFrom,
     mutable.{ Map => MMap }
 

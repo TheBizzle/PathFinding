@@ -1,7 +1,7 @@
 package tester
 
 import
-  collection.mutable.ListBuffer
+  scala.collection.mutable.ListBuffer
 
 import
   tester.criteria._

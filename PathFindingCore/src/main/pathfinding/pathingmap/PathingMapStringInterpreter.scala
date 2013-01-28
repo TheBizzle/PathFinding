@@ -1,7 +1,7 @@
 package pathfinding.pathingmap
 
 import
-  collection.mutable.ListBuffer
+  scala.collection.mutable.ListBuffer
 
 import
   pathfinding.coordinate.{ Coordinate, Coordinate2D }

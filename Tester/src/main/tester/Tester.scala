@@ -1,8 +1,9 @@
 package tester
 
 import
-  annotation.tailrec,
-  collection.immutable.Map
+  scala.{ annotation, collection },
+    annotation.tailrec,
+    collection.immutable.Map
 
 import
   org.scalatest.Suite

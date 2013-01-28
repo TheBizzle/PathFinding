@@ -1,7 +1,7 @@
 package tester
 
 import
-  collection.immutable.HashMap
+  scala.collection.immutable.HashMap
 
 import
   org.scalatest.{ FunSuite, matchers },
