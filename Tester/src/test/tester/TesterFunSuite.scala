@@ -1,7 +1,7 @@
 package tester
 
 import
-  scala.collection.immutable.HashMap
+  scala.collection.immutable.Map
 
 import
   org.scalatest.{ FunSuite, matchers },
@@ -52,41 +52,41 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("assessPathingDesire - Empty map") {
-    val inMap = HashMap[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](),
-    Tester.ArgKeyRange  -> Seq[TestRunningnessRange](),
-    Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag]())
+    val inMap = Map[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](),
+                                               Tester.ArgKeyRange  -> Seq[TestRunningnessRange](),
+                                               Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag]())
     val result = Tester.assessExternalityDesire(inMap)
     result should equal (false)
   }
 
   test("assessPathingDesire - Map without values/ranges") {
-    val inMap = HashMap[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](),
-    Tester.ArgKeyRange  -> Seq[TestRunningnessRange](),
-    Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag](SkipExternalTests))
+    val inMap = Map[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](),
+                                               Tester.ArgKeyRange  -> Seq[TestRunningnessRange](),
+                                               Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag](SkipExternalTests))
     val result = Tester.assessExternalityDesire(inMap)
     result should equal (false)
   }
 
   test("assessPathingDesire - Map without ranges") {
-    val inMap = HashMap[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](TestRunningnessValue(1, RunTest)),
-    Tester.ArgKeyRange  -> Seq[TestRunningnessRange](),
-    Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag](SkipExternalTests))
+    val inMap = Map[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](TestRunningnessValue(1, RunTest)),
+                                               Tester.ArgKeyRange  -> Seq[TestRunningnessRange](),
+                                               Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag](SkipExternalTests))
     val result = Tester.assessExternalityDesire(inMap)
     result should equal (true)
   }
 
   test("assessPathingDesire - Map without values") {
-    val inMap = HashMap[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](),
-    Tester.ArgKeyRange  -> Seq[TestRunningnessRange](TestRunningnessRange(1, 1, RunTest)),
-    Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag](SkipExternalTests))
+    val inMap = Map[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](),
+                                               Tester.ArgKeyRange  -> Seq[TestRunningnessRange](TestRunningnessRange(1, 1, RunTest)),
+                                               Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag](SkipExternalTests))
     val result = Tester.assessExternalityDesire(inMap)
     result should equal (true)
   }
 
   test("assessPathingDesire - Mixed map") {
-    val inMap = HashMap[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](TestRunningnessValue(3, RunTest)),
-    Tester.ArgKeyRange  -> Seq[TestRunningnessRange](TestRunningnessRange(1, 1, RunTest), TestRunningnessRange(2, 2, RunTest)),
-    Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag]())
+    val inMap = Map[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](TestRunningnessValue(3, RunTest)),
+                                               Tester.ArgKeyRange  -> Seq[TestRunningnessRange](TestRunningnessRange(1, 1, RunTest), TestRunningnessRange(2, 2, RunTest)),
+                                               Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag]())
     val result = Tester.assessExternalityDesire(inMap)
     result should equal (true)
   }
