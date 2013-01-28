@@ -10,7 +10,7 @@ package tester.cluster
 trait Testable
 trait TestSubject
 trait TestCluster[T <: TestFunction[_, U, _, _, _], U <: TestSubject, V <: TestFuncConstructionBundle] extends TestFunctionFactory[T, U, V] {
-  protected def TestFunctionRegex : String
-  def getTestsToRun(testNums: Seq[Int]) : Seq[T]
-  def getSize : Int
+  protected def TestFunctionRegex                 : String
+  /*none */ def getSize                           : Int
+  /*none */ def getTestsToRun(testNums: Seq[Int]) : Seq[T]
 }
