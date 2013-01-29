@@ -11,7 +11,7 @@ trait PriorityCoordinate {
   self: Coordinate =>
   def priority: Int
   override def hashCode             = 41 * super.hashCode + priority
-  override def toString             = "%s:%s".format(super.toString, priority)
+  override def toString             = s"${super.toString}:$priority"
   override def canEqual(other: Any) = other.isInstanceOf[this.type]
   override def equals  (that: Any)  = {
     that match {

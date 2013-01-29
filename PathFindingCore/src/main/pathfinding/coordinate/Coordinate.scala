@@ -18,8 +18,8 @@ sealed trait Coordinate extends Equals {
   def isValid = true
   def overlaps(that: Coordinate with DimensionSet) = that.isInstanceOf[CoordType] && this.axisCollection == that.axisCollection
 
-  override def toString : String    = axisCollection.mkString("(", ",", ")")
-  override def hashCode             = {
+  override def toString = axisCollection.mkString("(", ",", ")")
+  override def hashCode = {
     axisCollection.foldLeft((4111, true)) {
       case ((hash, isFirst), x) =>
         val h = if (isFirst) hash else 41 * hash
@@ -77,8 +77,8 @@ object BadCoordinate2D extends Coordinate2D with BadCoordinate {
 }
 
 object Coordinate {
-  def apply(_x: Int)                   = new Coordinate1D { override val x = _x }
-  def apply(_x: Int, _y: Int)          = new Coordinate2D { override val (x, y) = (_x, _y) }
+  def apply(_x: Int)                   = new Coordinate1D { override val  x        =  _x }
+  def apply(_x: Int, _y: Int)          = new Coordinate2D { override val (x, y)    = (_x, _y) }
   def apply(_x: Int, _y: Int, _z: Int) = new Coordinate3D { override val (x, y, z) = (_x, _y, _z) }
 }
 

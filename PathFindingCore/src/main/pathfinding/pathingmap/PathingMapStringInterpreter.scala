@@ -19,10 +19,10 @@ object PathingMapStringInterpreter {
 
   def apply(mapString: PathingMapString) : PathingMapData = {
 
-    val splitArr = mapString.str.split(mapString.delim)
-    val rows = splitArr.length
-    val cols = splitArr(0).length
-    val outArr = convertArray(cols, rows, splitArr)
+    val splitArr      = mapString.str.split(mapString.delim)
+    val rows          = splitArr.length
+    val cols          = splitArr(0).length
+    val outArr        = convertArray(cols, rows, splitArr)
     val (start, goal) = findStartAndGoal(outArr, cols, rows)
 
     PathingMapData(start, goal, cols, rows, outArr)
@@ -55,6 +55,7 @@ object PathingMapStringInterpreter {
 
   private def findStartAndGoal(arr: Array[Array[Terrain]], cols: Int, rows: Int) : (Coordinate2D, Coordinate2D) = {
 
+    // It's tempting to get rid of the mutable state here, but I'm finding it difficult to express this idea functionally without butchering readability
     val selfCoords = new ListBuffer[Coordinate2D]()
     val goalCoords = new ListBuffer[Coordinate2D]()
 

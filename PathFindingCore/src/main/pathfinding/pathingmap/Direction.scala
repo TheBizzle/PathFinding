@@ -8,7 +8,7 @@ package pathfinding.pathingmap
  */
 
 sealed trait Direction {
-  override def toString = this.getClass.getName.dropRight(1)
+  override def toString = this.getClass.getName.init
 }
 
 private[pathingmap] object Direction {

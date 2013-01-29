@@ -44,6 +44,7 @@ trait StepDataGenerator[T] {
 
     val stepData = new AStarStepData(start, goal, beenThere, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, 0, goal)
     val extras   = generateExtras(stepData)
+
     mixinExtras(stepData, extras)
 
   }

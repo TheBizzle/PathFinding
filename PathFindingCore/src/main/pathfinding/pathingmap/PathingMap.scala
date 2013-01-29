@@ -4,11 +4,14 @@ import
   scala.collection.mutable.ListBuffer
 
 import
-  pathfinding.coordinate.{ Coordinate, Coordinate2D }
+  tester.cluster.TestSubject
 
 import
-  Direction._,
-  Terrain._
+  pathfinding.{ coordinate, pathingmap },
+    coordinate.{ Coordinate, Coordinate2D },
+    pathingmap.{ Direction, Terrain },
+      Direction._,
+      Terrain._
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,6 +24,7 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
 
   val colCount = cols
   val rowCount = rows
+
   private val pathingMap = inArr
 
   def getTerrain(coord: Coordinate2D) : Terrain = {
@@ -40,7 +44,7 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
 
   def step(start: Coordinate2D, end: Coordinate2D) {
     pathingMap(start.x)(start.y) = Query
-    pathingMap(end.x)(end.y) = Self
+    pathingMap(end.x)  (end.y)   = Self
   }
 
   def markAsGoal(coordinate: Coordinate2D) {
@@ -62,9 +66,7 @@ class PathingMap private (cols: Int, rows: Int, inArr: Array[Array[Terrain]]) {
 
   }
 
-  override def clone() : PathingMap = {
-    new PathingMap(colCount, rowCount, pathingMap map ( _.clone() ))
-  }
+  override def clone() = new PathingMap(colCount, rowCount, pathingMap map (_.clone()))
 
 }
 
@@ -72,10 +74,10 @@ object PathingMap {
 
   val Directions = Seq(North, East, South, West)
 
-  def apply(mapString: PathingMapString) : (Coordinate2D, Coordinate2D, PathingMap) = {
-    val pathingData = PathingMapStringInterpreter(mapString); import pathingData._
-    (start, goal, new PathingMap(cols, rows, arr))
-  }
+  def apply(mapString: PathingMapString) : (Coordinate2D, Coordinate2D, PathingMap) =
+    PathingMapStringInterpreter(mapString) match {
+      case PathingMapData(start, goal, cols, rows, arr) => (start, goal, new PathingMap(cols, rows, arr))
+    }
 
   private def terrainToChar(terrain: Terrain) : Char = {
     Terrain(terrain).get
@@ -96,7 +98,7 @@ object PathingMap {
     else if (end.y == start.y - 1) South
     else if (end.x == start.x + 1) East
     else if (end.x == start.x - 1) West
-    else throw new InvalidParameterException(start.toString + " or " + end.toString + " is/are invalid")
+    else throw new InvalidParameterException(s"${start.toString} or ${end.toString} is/are invalid")
   }
 
   def generateCloneWithPath(path: Seq[Coordinate2D], inMap: PathingMap) : PathingMap = {
@@ -107,5 +109,5 @@ object PathingMap {
 
 }
 
+case class PathingMapString(str: String, delim: String) extends TestSubject
 case class PathingMapData(start: Coordinate2D, goal: Coordinate2D, cols: Int, rows: Int, arr: Array[Array[Terrain]])
-case class PathingMapString(str: String, delim: String) extends tester.cluster.TestSubject
