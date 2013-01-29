@@ -1,9 +1,9 @@
 package datastructure.mutable
 
 import
-  scala.collection.{ generic, GenTraversableOnce, mutable },
+  scala.collection.{ generic, GenTraversableOnce, IndexedSeqLike, Map => CMap, mutable, Set },
     generic.CanBuildFrom,
-    mutable.{ Map => MMap }
+    mutable.{ Buffer, Map => MMap }
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,7 +31,7 @@ private[mutable] trait BijectionForwardOps[A, B, M[X, Y] <: MMap[X, Y], R[X, Y] 
   // Satanry
   override def ++:[C >: FTup, That](that: TraversableOnce[C])(implicit bf: CanBuildFrom[Repr, C, That]) : That = {
     val b = bf(repr)
-    if (that.isInstanceOf[collection.IndexedSeqLike[_, _]]) b.sizeHint(this, that.size)
+    if (that.isInstanceOf[IndexedSeqLike[_, _]]) b.sizeHint(this, that.size)
     b ++= that
     b ++= thisCollection
     b.result
@@ -64,18 +64,18 @@ private[mutable] trait BijectionForwardOps[A, B, M[X, Y] <: MMap[X, Y], R[X, Y] 
   override def orElse[A1 <: A, B1 >: B](that: PartialFunction[A1, B1]) : PartialFunction[A1, B1] = fImplWrapper orElse that
 
   //@ Fix
-  def filterAs(p: (A) => Boolean) : collection.Map[A, B] = fImplWrapper filterKeys p
-  def mapBs[C](f: (B) => C)       : collection.Map[A, C] = fImplWrapper mapValues  f
+  def filterAs(p: (A) => Boolean) : CMap[A, B] = fImplWrapper filterKeys p
+  def mapBs[C](f: (B) => C)       : CMap[A, C] = fImplWrapper mapValues  f
 
   // Collection-morphing methods
-  def aIterator : Iterator[A]       = fImplWrapper.keysIterator
-  def aSet      : collection.Set[A] = fImplWrapper.keySet
-  def aValues   : Iterable[A]       = fImplWrapper.keys
+  def aIterator : Iterator[A] = fImplWrapper.keysIterator
+  def aSet      : Set[A]      = fImplWrapper.keySet
+  def aValues   : Iterable[A] = fImplWrapper.keys
 
   // Copying methods
-  override def copyToArray[C >: FTup] (xs: Array[C])                       { fImplWrapper.copyToArray(xs) }
-  override def copyToArray[C >: FTup] (xs: Array[C], start: Int)           { fImplWrapper.copyToArray(xs, start) }
-  override def copyToArray[C >: FTup] (xs: Array[C], start: Int, len: Int) { fImplWrapper.copyToArray(xs, start, len) }
-  override def copyToBuffer[C >: FTup](dest: collection.mutable.Buffer[C]) { fImplWrapper.copyToBuffer(dest) }
+  override def copyToArray [C >: FTup](xs: Array[C])                       { fImplWrapper.copyToArray(xs) }
+  override def copyToArray [C >: FTup](xs: Array[C], start: Int)           { fImplWrapper.copyToArray(xs, start) }
+  override def copyToArray [C >: FTup](xs: Array[C], start: Int, len: Int) { fImplWrapper.copyToArray(xs, start, len) }
+  override def copyToBuffer[C >: FTup](dest: Buffer[C])                    { fImplWrapper.copyToBuffer(dest) }
 
 }

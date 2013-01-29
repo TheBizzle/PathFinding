@@ -36,7 +36,7 @@ trait Bijection[A, B, M[X, Y] <: MMap[X, Y], Rpr[X, Y] <: Bijection[X, Y, M, Rpr
   /*new!*/ def swap       : Rpr[B, A]
 
   override def addString(b: StringBuilder, start: String, sep: String, end: String) : StringBuilder =
-    this.iterator.map { case (k, v) => k+" <-> "+v }.addString(b, start, sep, end)
+    this.iterator.map { case (k, v) => s"$k <-> $v" }.addString(b, start, sep, end)
 
   override def canEqual(other: Any) : Boolean
   override def equals(that: Any)    : Boolean  = {
@@ -80,8 +80,8 @@ trait Bijection[A, B, M[X, Y] <: MMap[X, Y], Rpr[X, Y] <: Bijection[X, Y, M, Rpr
   override def valuesIterator: Iterator[B] = throw new UnsupportedOperationException(CommonUnsupportedOpExMsgFormat("valuesIterator", "aIterator", "bIterator"))
 
   // Silly constants
-  private def CommonUnsupportedOpExMsgFormat(x: String, xs: String*) : String = ("`" + x + "` function ambiguous for " + this.getClass.getName + "; use %s instead").format(xs.mkString("`", "` or `", "`"))
-  private def CommonDeprecationStrFormat(xs: String*) : String = "Using this will throw an exception!  Use %s instead.".format(xs.mkString("`", "` or `", "`"))
-  private val CommonDeprecationSinceVersion = "forever"
+  private def CommonUnsupportedOpExMsgFormat(x: String, xs: String*) = s"`$x` function ambiguous for ${this.getClass.getName}; use ${xs.mkString("`", "` or `", "`")} instead"
+  private def CommonDeprecationStrFormat(xs: String*)                = s"Using this will throw an exception!  Use ${xs.mkString("`", "` or `", "`")} instead."
+  private val CommonDeprecationSinceVersion                          = "forever"
 
 }

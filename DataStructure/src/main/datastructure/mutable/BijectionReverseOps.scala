@@ -1,9 +1,9 @@
 package datastructure.mutable
 
 import
-  scala.collection.{ generic, GenTraversableOnce, mutable },
+  scala.collection.{ generic, GenTraversableOnce, IndexedSeqLike, Map => CMap, mutable },
     generic.CanBuildFrom,
-    mutable.{ Map => MMap }
+    mutable.{ Buffer, Map => MMap }
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,7 +31,7 @@ private[mutable] trait BijectionReverseOps[A, B, M[X, Y] <: MMap[X, Y], R[X, Y] 
   // Satanry
   def ++:[C >: BTup, That](that: TraversableOnce[C])(implicit bf: CanBuildFrom[Repr, C, That], ignore: DummyImplicit) : That = {
     val b = bf(repr)
-    if (that.isInstanceOf[collection.IndexedSeqLike[_, _]]) b.sizeHint(this, that.size)
+    if (that.isInstanceOf[IndexedSeqLike[_, _]]) b.sizeHint(this, that.size)
     b ++= that
     b ++= thisCollection map (_.swap)
     b.result
@@ -59,22 +59,22 @@ private[mutable] trait BijectionReverseOps[A, B, M[X, Y] <: MMap[X, Y], R[X, Y] 
   def updated[A1 >: A]  (bKey: B, aVal: A1)      (implicit ignore: DummyImplicit) : R[A1, B]  = this + ((bKey, aVal))
 
   // Function-chaining methods
-  def andThen[C]              (k: (A) => C)(implicit ignore: DummyImplicit)                   : PartialFunction[B, C]   = bImplWrapper andThen k
-  def compose[C]              (g: (C) => B)(implicit ignore: DummyImplicit)                   : (C) => A                = bImplWrapper compose g
+  def andThen[C]              (k: (A) => C)                  (implicit ignore: DummyImplicit) : PartialFunction[B, C]   = bImplWrapper andThen k
+  def compose[C]              (g: (C) => B)                  (implicit ignore: DummyImplicit) : (C) => A                = bImplWrapper compose g
   def orElse[B1 <: B, A1 >: A](that: PartialFunction[B1, A1])(implicit ignore: DummyImplicit) : PartialFunction[B1, A1] = bImplWrapper orElse that
 
   //@ Fix
-  def filterBs(p: (B) => Boolean) : collection.Map[A, B] = bImplWrapper filterKeys p map (_.swap)
-  def mapAs[C](f: (A) => C)       : collection.Map[C, B] = bImplWrapper mapValues  f map (_.swap)
+  def filterBs(p: (B) => Boolean) : CMap[A, B] = bImplWrapper filterKeys p map (_.swap)
+  def mapAs[C](f: (A) => C)       : CMap[C, B] = bImplWrapper mapValues  f map (_.swap)
 
   // Collection-morphing methods
   def bIterator : Iterator[B]       = bImplWrapper.keysIterator
   def bSet      : collection.Set[B] = bImplWrapper.keySet
   def bValues   : Iterable[B]       = bImplWrapper.keys
 
-  def copyToArray[C >: BTup] (xs: Array[C])                      (implicit ignore: DummyImplicit) { bImplWrapper.copyToArray(xs) }
-  def copyToArray[C >: BTup] (xs: Array[C], start: Int)          (implicit ignore: DummyImplicit) { bImplWrapper.copyToArray(xs, start) }
-  def copyToArray[C >: BTup] (xs: Array[C], start: Int, len: Int)(implicit ignore: DummyImplicit) { bImplWrapper.copyToArray(xs, start, len) }
-  def copyToBuffer[C >: BTup](dest: collection.mutable.Buffer[C])(implicit ignore: DummyImplicit) { bImplWrapper.copyToBuffer(dest) }
+  def copyToArray [C >: BTup](xs: Array[C])                      (implicit ignore: DummyImplicit) { bImplWrapper.copyToArray(xs) }
+  def copyToArray [C >: BTup](xs: Array[C], start: Int)          (implicit ignore: DummyImplicit) { bImplWrapper.copyToArray(xs, start) }
+  def copyToArray [C >: BTup](xs: Array[C], start: Int, len: Int)(implicit ignore: DummyImplicit) { bImplWrapper.copyToArray(xs, start, len) }
+  def copyToBuffer[C >: BTup](dest: Buffer[C])                   (implicit ignore: DummyImplicit) { bImplWrapper.copyToBuffer(dest) }
 
 }
