@@ -44,7 +44,6 @@ class BiDirStepData(currentLocation: Coordinate2D,
     new BiDirStepData(l.copy, g.copy, bThere map (_.clone()), q.clone(), pm.clone(),
                       cost map (_.clone()), h map (_.clone()), total map (_.clone()),
                       crumbs map (_.clone()), otherCrumbs map (_.clone()), itrs, eg.copy)
-                      //@ Concoct something for infinite deep-cloning
   }
 
   final def assimilateBreadcrumbs(crumbs: Seq[Breadcrumb]) {
@@ -77,8 +76,9 @@ object BiDirStepData extends StepDataSingleton[BiDirStepData] with StepDataGener
 
   override def apply(freshLoc: Coordinate2D, stepData: BiDirStepData, isIncingIters: Boolean = false) : BiDirStepData = {
     import stepData._
+    val iterations = if (isIncingIters) iters + 1 else iters
     new BiDirStepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr,
-                      totalArr, breadcrumbArr, othersBreadcrumbArr, if (isIncingIters) iters + 1 else iters, endGoal)
+                      totalArr, breadcrumbArr, othersBreadcrumbArr, iterations, endGoal)
   }
 
   override protected def generateExtras(stepData: AStarStepData) : Extras = {

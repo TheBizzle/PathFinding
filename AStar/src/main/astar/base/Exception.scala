@@ -7,5 +7,5 @@ package astar.base
  * Time: 1:33 PM
  */
 
-class UnexpectedDataException(s: String = "") extends Exception("Unhandlable data encountered: " + s)
+class UnexpectedDataException(s: String = "") extends Exception(s"Unhandlable data encountered: $s")
 

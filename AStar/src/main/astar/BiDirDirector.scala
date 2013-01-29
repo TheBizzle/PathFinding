@@ -48,12 +48,16 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
     val ((stgStatus, stgCrumbs), (gtsStatus, gtsCrumbs)) = runActionsForResult(stg, gts)
 
     stgStatus match {
-      case (result @ Failure(_)) => result
-      case Success(x) => mergeBreadcrumbsForForwardOnSuccess(x, gtsStatus.stepData)
+      case result @ Failure(_) =>
+        result
+      case Success(x) =>
+        mergeBreadcrumbsForForwardOnSuccess(x, gtsStatus.stepData)
       case Continue(_) =>
         gtsStatus match {
-          case (result @ Failure(_)) => result
-          case Success(x) => mergeBreadcrumbsForBackwardsOnSuccess(x, stgStatus.stepData)
+          case result @ Failure(_) =>
+            result
+          case Success(x) =>
+            mergeBreadcrumbsForBackwardsOnSuccess(x, stgStatus.stepData)
           case Continue(_) =>
             stg ! (BiDirMessage.Assimilate(gtsCrumbs))
             gts ! (BiDirMessage.Assimilate(stgCrumbs))

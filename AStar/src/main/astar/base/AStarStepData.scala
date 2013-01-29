@@ -23,7 +23,7 @@ class AStarStepData(currentLocationOpt: Coordinate2D,
                     val heuristicArr: Array[Array[Int]],
                     val totalArr: Array[Array[Int]],
                     breadcrumbs: Array[Array[Coordinate2D]],
-                    val iters: Int = 0,  // Satan's `var`
+                    val iters: Int = 0,
                     endGoalLocation: Coordinate2D = BadCoordinate2D) extends StepData(currentLocationOpt, goalLocation, pMap, breadcrumbs, endGoalLocation)
 
 object AStarStepData extends StepDataSingleton[AStarStepData] with StepDataGenerator[AStarStepData] {
@@ -32,8 +32,10 @@ object AStarStepData extends StepDataSingleton[AStarStepData] with StepDataGener
 
   override type Extras = HNil
 
-  override def apply(freshLoc: Coordinate2D, stepData: AStarStepData, isIncingIters: Boolean = false) : AStarStepData = { import stepData._
-    new AStarStepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, if (isIncingIters) iters + 1 else iters, endGoal)
+  override def apply(freshLoc: Coordinate2D, stepData: AStarStepData, isIncingIters: Boolean = false) : AStarStepData = {
+    import stepData._
+    val iterations = if (isIncingIters) iters + 1 else iters
+    new AStarStepData(freshLoc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, iterations, endGoal)
   }
 
   override protected def generateExtras(stepData: AStarStepData)                 : Extras        = HNil

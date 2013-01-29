@@ -28,6 +28,7 @@ object BiDirAStar extends AStarBase[BiDirStepData](0.8, HeuristicLib.manhattanDi
 
     val (stgStepData, stgCrumbs) = step(stepData.clone())
     val (gtsStepData, gtsCrumbs) = step(stepData.cloneForBiBackwards())
+
     stgStepData.assimilateBreadcrumbs(gtsCrumbs)
     gtsStepData.assimilateBreadcrumbs(stgCrumbs)
 
