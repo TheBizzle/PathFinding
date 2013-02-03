@@ -1,5 +1,5 @@
 Scala PathFinding Project - DataStructure Module
-Copyright (c) 2013, JASON BERTSCHE
+Copyright (c) 2013, Jason Bertsche
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
