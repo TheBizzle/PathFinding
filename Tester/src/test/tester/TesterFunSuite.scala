@@ -1,9 +1,6 @@
 package tester
 
 import
-  scala.collection.immutable.Map
-
-import
   org.scalatest.{ FunSuite, matchers },
     matchers.ShouldMatchers
 
@@ -52,94 +49,38 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("assessPathingDesire - Empty map") {
-    val inMap = Map[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](),
-                                               Tester.ArgKeyRange  -> Seq[TestRunningnessRange](),
-                                               Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag]())
-    val result = Tester.assessExternalityDesire(inMap)
+    val bundle = CriteriaBundle()
+    val result = Tester.assessExternalityDesire(bundle)
     result should equal (false)
   }
 
   test("assessPathingDesire - Map without values/ranges") {
-    val inMap = Map[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](),
-                                               Tester.ArgKeyRange  -> Seq[TestRunningnessRange](),
-                                               Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag](SkipExternalTests))
-    val result = Tester.assessExternalityDesire(inMap)
+    val bundle = CriteriaBundle(Seq(SkipExternalTests))
+    val result = Tester.assessExternalityDesire(bundle)
     result should equal (false)
   }
 
   test("assessPathingDesire - Map without ranges") {
-    val inMap = Map[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](TestRunningnessValue(1, RunTest)),
-                                               Tester.ArgKeyRange  -> Seq[TestRunningnessRange](),
-                                               Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag](SkipExternalTests))
-    val result = Tester.assessExternalityDesire(inMap)
+    val bundle = CriteriaBundle(Seq(SkipExternalTests),
+                                Seq(TestRunningnessValue(1, RunTest)))
+    val result = Tester.assessExternalityDesire(bundle)
     result should equal (true)
   }
 
   test("assessPathingDesire - Map without values") {
-    val inMap = Map[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](),
-                                               Tester.ArgKeyRange  -> Seq[TestRunningnessRange](TestRunningnessRange(1, 1, RunTest)),
-                                               Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag](SkipExternalTests))
-    val result = Tester.assessExternalityDesire(inMap)
+    val bundle = CriteriaBundle(Seq(SkipExternalTests),
+                                Seq(),
+                                Seq(TestRunningnessRange(1, 1, RunTest)))
+    val result = Tester.assessExternalityDesire(bundle)
     result should equal (true)
   }
 
   test("assessPathingDesire - Mixed map") {
-    val inMap = Map[String, Seq[TestCriteria]](Tester.ArgKeyValue  -> Seq[TestRunningnessValue](TestRunningnessValue(3, RunTest)),
-                                               Tester.ArgKeyRange  -> Seq[TestRunningnessRange](TestRunningnessRange(1, 1, RunTest), TestRunningnessRange(2, 2, RunTest)),
-                                               Tester.ArgKeyToggle -> Seq[TestCriteriaToggleFlag]())
-    val result = Tester.assessExternalityDesire(inMap)
+    val bundle = CriteriaBundle(Seq(),
+                                Seq(TestRunningnessValue(3, RunTest)),
+                                Seq(TestRunningnessRange(1, 1, RunTest), TestRunningnessRange(2, 2, RunTest)))
+    val result = Tester.assessExternalityDesire(bundle)
     result should equal (true)
-  }
-
-  test("sortCriteria - Empty") {
-    val crits = Seq()
-    val results = Tester.sortCriteria(crits)
-    val expected = Seq()
-    results should equal (expected)
-  }
-
-  test("sortCriteria - One value") {
-    val crits = Seq(TestRunningnessValue(1, RunTest))
-    val results = Tester.sortCriteria(crits)
-    val expected = crits
-    results should equal (expected)
-  }
-
-  test("sortCriteria - One range") {
-    val crits = Seq(TestRunningnessRange(1, 1, RunTest))
-    val results = Tester.sortCriteria(crits)
-    val expected = crits
-    results should equal (expected)
-  }
-
-  test("sortCriteria - Many values (presorted)") {
-    val crits = Seq(TestRunningnessValue(1, RunTest), TestRunningnessValue(3, RunTest), TestRunningnessValue(17, RunTest))
-    val results = Tester.sortCriteria(crits)
-    val expected = crits
-    results should equal (expected)
-  }
-
-  test("sortCriteria - Many ranges (presorted)") {
-    val crits = Seq(TestRunningnessRange(1, 6, RunTest), TestRunningnessRange(7, 7, RunTest),
-    TestRunningnessRange(8, 9, RunTest), TestRunningnessRange(12, 17, RunTest))
-    val results = Tester.sortCriteria(crits)
-    val expected = crits
-    results should equal (expected)
-  }
-
-  test("sortCriteria - Many values (unsorted)") {
-    val crits = Seq(TestRunningnessValue(17, RunTest), TestRunningnessValue(1, RunTest), TestRunningnessValue(3, RunTest))
-    val results = Tester.sortCriteria(crits)
-    val expected = Seq(TestRunningnessValue(1, RunTest), TestRunningnessValue(3, RunTest), TestRunningnessValue(17, RunTest))
-    results should equal (expected)
-  }
-
-  test("sortCriteria - Many ranges (reversed)") {
-    val crits = Seq(TestRunningnessRange(12, 17, RunTest), TestRunningnessRange(8, 9, RunTest),
-    TestRunningnessRange(7, 7, RunTest), TestRunningnessRange(1, 6, RunTest))
-    val results = Tester.sortCriteria(crits)
-    val expected = crits.reverse
-    results should equal (expected)
   }
 
   test("handleRanges - Empty") {
@@ -346,38 +287,34 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
   }
 
   test("sortArgLists - Empty list") {
-    val resultMap = Tester.sortArgLists(Seq())
-    val (resultValues, resultRanges, resultToggles) = (resultMap(Tester.ArgKeyValue), resultMap(Tester.ArgKeyRange), resultMap(Tester.ArgKeyToggle))
-    resultValues should equal (Seq())
-    resultRanges should equal (Seq())
-    resultToggles should equal (Seq())
+    val bundle = Tester.generateCriteriaBundle(Seq())
+    bundle.values should equal (Seq())
+    bundle.ranges should equal (Seq())
+    bundle.toggles should equal (Seq())
   }
 
   test("sortArgLists - One value") {
     val inValue = TestRunningnessValue(1, RunTest)
-    val resultMap = Tester.sortArgLists(Seq(inValue))
-    val (resultValues, resultRanges, resultToggles) = (resultMap(Tester.ArgKeyValue), resultMap(Tester.ArgKeyRange), resultMap(Tester.ArgKeyToggle))
-    resultValues should equal (Seq(inValue))
-    resultRanges should equal (Seq())
-    resultToggles should equal (Seq())
+    val bundle = Tester.generateCriteriaBundle(Seq(inValue))
+    bundle.values should equal (Seq(inValue))
+    bundle.ranges should equal (Seq())
+    bundle.toggles should equal (Seq())
   }
 
   test("sortArgLists - One range") {
     val inRange = TestRunningnessRange(1, 1, RunTest)
-    val resultMap = Tester.sortArgLists(Seq(inRange))
-    val (resultValues, resultRanges, resultToggles) = (resultMap(Tester.ArgKeyValue), resultMap(Tester.ArgKeyRange), resultMap(Tester.ArgKeyToggle))
-    resultValues should equal (Seq())
-    resultRanges should equal (Seq(inRange))
-    resultToggles should equal (Seq())
+    val bundle = Tester.generateCriteriaBundle(Seq(inRange))
+    bundle.values should equal (Seq())
+    bundle.ranges should equal (Seq(inRange))
+    bundle.toggles should equal (Seq())
   }
 
   test("sortArgLists - One toggle") {
     val inToggle = TestCriteriaToggleFlag(SkipExternalTests)
-    val resultMap = Tester.sortArgLists(Seq(inToggle))
-    val (resultValues, resultRanges, resultToggles) = (resultMap(Tester.ArgKeyValue), resultMap(Tester.ArgKeyRange), resultMap(Tester.ArgKeyToggle))
-    resultValues should equal (Seq())
-    resultRanges should equal (Seq())
-    resultToggles should equal (Seq(inToggle))
+    val bundle = Tester.generateCriteriaBundle(Seq(inToggle))
+    bundle.values should equal (Seq())
+    bundle.ranges should equal (Seq())
+    bundle.toggles should equal (Seq(inToggle))
   }
 
   test("sortArgLists - Many mixed") {
@@ -392,19 +329,18 @@ class TesterFunSuite extends FunSuite with ShouldMatchers {
     val inToggle1 = TestCriteriaToggleFlag(SkipExternalTests)
     val inToggle2 = TestCriteriaToggleFlag(SkipExternalTests)
 
-    val resultMap = Tester.sortArgLists(Seq(inValue1, inToggle1, inRange3, inRange1, inToggle2, inRange2, inValue2))
-    val (values, ranges, toggles) = (resultMap(Tester.ArgKeyValue), resultMap(Tester.ArgKeyRange), resultMap(Tester.ArgKeyToggle))
+    val bundle = Tester.generateCriteriaBundle(Seq(inValue1, inToggle1, inRange3, inRange1, inToggle2, inRange2, inValue2))
 
     // Why isn't the "should" syntax working here...?
-    values.contains(inValue1) === true
-    values.contains(inValue2) === true
+    bundle.values.contains(inValue1) === true
+    bundle.values.contains(inValue2) === true
 
-    ranges.contains(inRange1) === true
-    ranges.contains(inRange2) === true
-    ranges.contains(inRange3) === true
+    bundle.ranges.contains(inRange1) === true
+    bundle.ranges.contains(inRange2) === true
+    bundle.ranges.contains(inRange3) === true
 
-    toggles.contains(inToggle1) === true
-    toggles.contains(inToggle2) === true
+    bundle.toggles.contains(inToggle1) === true
+    bundle.toggles.contains(inToggle2) === true
 
   }
 

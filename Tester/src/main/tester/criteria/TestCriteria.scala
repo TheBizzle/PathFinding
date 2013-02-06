@@ -11,7 +11,7 @@ package tester.criteria
 
 sealed trait TestCriteria
 
-abstract class TestFlagCriteria[T <: TestingFlag](val flag: T) extends TestCriteria
+sealed abstract class TestFlagCriteria[T <: TestingFlag](val flag: T) extends TestCriteria
 
 sealed abstract class TestRunningnessCriteria[T, U <: TestRunningnessFlag](val guide: T, testFlag: U) extends TestFlagCriteria(testFlag) with Equals {
   def getKey : Int

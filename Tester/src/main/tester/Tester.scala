@@ -1,9 +1,7 @@
 package tester
 
 import
-  scala.{ annotation, collection },
-    annotation.tailrec,
-    collection.immutable.Map
+  scala.annotation.tailrec
 
 import
   org.scalatest.Suite
@@ -23,10 +21,6 @@ import
 
 object Tester {
 
-  private[tester] val ArgKeyValue  = "value"
-  private[tester] val ArgKeyRange  = "range"
-  private[tester] val ArgKeyToggle = "toggle"
-
   //@ Annoying compiler bug....  Fix this rubbish when the compiler gets fixed!
   def apply[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle, ResultFlags <: TestAnalysisResultBundle,
             TFConsBundle <: TestFuncConstructionBundle, TFunc <: TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], TCluster <: TestCluster[TFunc, Subject, TFConsBundle]]
@@ -34,22 +28,20 @@ object Tester {
             testable:  T = null,
             cluster:   TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], Subject, TFConsBundle] = null,
             baseTests: Seq[Suite] = Seq[Suite]()) {
-    val argMap = sortArgLists(args) //@ Uhh... wow.  How about, instead of wrapping these heterogenous `Seq`s up in a `Map`, I just put each as a member of one class...?
-    makeTestRunningDecisions(argMap, testable, cluster, baseTests)
+    val bundle = generateCriteriaBundle(args)
+    makeTestRunningDecisions(bundle, testable, cluster, baseTests)
   }
 
   private def makeTestRunningDecisions[T <: Testable, Subject <: TestSubject, Status <: ExecutionStatus, AnalysisFlags <: TestAnalysisFlagBundle,
                                        ResultFlags <: TestAnalysisResultBundle, TFConsBundle <: TestFuncConstructionBundle,
                                        TFunc <: TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], TCluster <: TestCluster[TFunc, Subject, TFConsBundle]]
-                                       (argMap: Map[String, Seq[TestCriteria]],
+                                       (bundle: CriteriaBundle,
                                         testable: T,
                                         cluster: TCluster with TestCluster[TFunc with TestFunction[T, Subject, Status, AnalysisFlags, ResultFlags], Subject, TFConsBundle],
                                         baseTests: Seq[Suite]) {
 
-    val rawToggles = argMap.get(ArgKeyToggle).asInstanceOf[Option[Seq[TestCriteriaToggleFlag]]] getOrElse (throw new MysteriousDataException("OMG, what did you do?!"))
-
-    val toggles             = new TestToggleFlagManager(rawToggles.toSet)
-    val wantsToRunExternals = assessExternalityDesire(argMap)
+    val toggles             = new TestToggleFlagManager(bundle.toggles.toSet)
+    val wantsToRunExternals = assessExternalityDesire(bundle)
     val (isTalkative, isRunningBaseTests, isSkippingExternalTests, isStacktracing) =
       (toggles.contains(Talkative), toggles.contains(RunBaseTests), toggles.contains(SkipExternalTests), toggles.contains(StackTrace))
 
@@ -61,11 +53,8 @@ object Tester {
 
     if (!isSkippingExternalTests && wantsToRunExternals) {
 
-      val valuesOption = argMap.get(ArgKeyValue).asInstanceOf[Option[Seq[TestRunningnessValue]]]
-      val rangesOption = argMap.get(ArgKeyRange).asInstanceOf[Option[Seq[TestRunningnessRange]]]
-
-      val values = valuesOption map (x => sortCriteria(x.toSeq)) getOrElse(Seq())
-      val ranges = rangesOption map (x => sortCriteria(x.toSeq)) getOrElse(Seq())
+      val values = bundle.values sortBy (_.getKey)
+      val ranges = bundle.ranges sortBy (_.getKey)
 
       val testToggles    = Seq(isTalkative) zip Seq[TestToggleFlag](Talkative) collect { case (true, x) => x } toSet
       val testFlagBundle = new TestFuncFlagBundle(testToggles)
@@ -197,28 +186,17 @@ object Tester {
     baseTests foreach { x => print("\n"); x.execute(stats = true) }
   }
 
-  //@ This is so hideous...
-  private[tester] def assessExternalityDesire(argMap: Map[String, Seq[TestCriteria]]) : Boolean =
-    argMap(ArgKeyValue).asInstanceOf[Seq[TestRunningnessValue]].exists(isIncludingTest) || argMap(ArgKeyRange).asInstanceOf[Seq[TestRunningnessRange]].exists(isIncludingTest)
+  private[tester] def assessExternalityDesire(bundle: CriteriaBundle) : Boolean =
+    (bundle.values exists isIncludingTest) || (bundle.ranges exists isIncludingTest)
 
-  private[tester] def sortArgLists(args: Seq[TestCriteria]) : Map[String, Seq[TestCriteria]] = {
-
-    val baseMap = Map(ArgKeyValue  -> Seq[TestRunningnessValue](),
-                      ArgKeyRange  -> Seq[TestRunningnessRange](),
-                      ArgKeyToggle -> Seq[TestCriteriaToggleFlag]())
-
-    val argMap = args.groupBy {
-      case _: TestRunningnessValue   => ArgKeyValue
-      case _: TestRunningnessRange   => ArgKeyRange
-      case _: TestCriteriaToggleFlag => ArgKeyToggle
-      case x                         => throw new MysteriousDataException("How did THAT get in there...? : " + x)
+  private[tester] def generateCriteriaBundle(args: Seq[TestCriteria]) : CriteriaBundle =
+    args.foldLeft(CriteriaBundle()) {
+      case (acc, x) => x match {
+        case y: TestCriteriaToggleFlag => acc.copy(toggles = y +: acc.toggles)
+        case y: TestRunningnessValue   => acc.copy(values  = y +: acc.values)
+        case y: TestRunningnessRange   => acc.copy(ranges  = y +: acc.ranges)
+      }
     }
-
-    baseMap ++ argMap
-
-  }
-
-  private[tester] def sortCriteria[T <: TestRunningnessCriteria[_, _] : Manifest](criteria: Seq[T]) : Seq[T] = criteria sortBy (_.getKey)
 
   // Assumes the passed-in ranges to be sorted (could be written more idiomatically, but I would then lose my pointless optimization!)
   @tailrec
