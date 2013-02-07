@@ -7,11 +7,11 @@ import
   tester.cluster.TestSubject
 
 import
-  pathfinding.{ coordinate, pathingmap },
-    coordinate.{ Coordinate, Coordinate2D },
-    pathingmap.{ Direction, Terrain },
-      Direction._,
-      Terrain._
+  pathfinding.coordinate.{ Coordinate, Coordinate2D }
+
+import
+  Direction._,
+  Terrain._
 
 /**
  * Created by IntelliJ IDEA.
