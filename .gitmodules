@@ -1,0 +1,3 @@
+[submodule "Tester"]
+	path = Tester
+	url = git@github.com:TheBizzle/Tester
