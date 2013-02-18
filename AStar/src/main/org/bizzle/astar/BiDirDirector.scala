@@ -101,8 +101,7 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
     import concurrent.ExecutionContext.Implicits.global
 
     implicit val timeout = Timeout(1.second)
-
-    val takeOneStep = (actor: ActorRef) => Await.result(actor ? Start, 1.second) match { case StepState(result: Result[T]) => result }
+    val takeOneStep = (actor: ActorRef) => Await.result(actor ? Start, timeout.duration) match { case StepState(result: Result[T]) => result }
 
     (takeOneStep(stg), takeOneStep(gts))
 
