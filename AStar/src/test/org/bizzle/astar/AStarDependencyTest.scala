@@ -16,5 +16,5 @@ import
  */
 
 object AStarDependencyTest extends TestScript {
-  Tester(Seq[TestCriteria](RunBaseTests), baseTests = AStarSuiteReporter.reporterSet.foldLeft(new SuiteReporter)(_ ++ _).suites)
+  Tester.runSuites(AStarSuiteReporter.reporterSet.foldLeft(new SuiteReporter)(_ ++ _).suites: _*)
 }

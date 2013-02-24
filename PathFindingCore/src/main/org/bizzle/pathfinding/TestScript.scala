@@ -13,6 +13,6 @@ import
 
 abstract class TestScript extends App {
   def run(criteria: Seq[TestCriteria], pf: PathFinder[_ <: StepData]) {
-    Tester(criteria, pf.asInstanceOf[PathFinder[StepData]], PathingTestCluster)
+    Tester(criteria, pf.asInstanceOf[PathFinder[StepData]], PathingTestCluster.getTestsToRun _, PathingTestCluster.size)
   }
 }
