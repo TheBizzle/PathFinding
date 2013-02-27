@@ -13,7 +13,7 @@ Scala implementation of unidirectional and bidirectional versions of the A* path
 See [here](https://github.com/TheBizzle/Tester).
 
 ## DataStructure:
-Primarily consists of a mostly-complete implementation of `BiHashMap`.  `BiHashMap` is currently utilized by `TerrainCharConverter` in the `AStar` module.
+See [here](https://github.com/TheBizzle/DataStructure).
 
 ## PathFindingCore:
 Building blocks for constructing your own pathfinding algorithm in Scala and visually representing it in ASCII.
