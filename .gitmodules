@@ -1,3 +1,6 @@
 [submodule "Tester"]
 	path = Tester
 	url = git@github.com:TheBizzle/Tester
+[submodule "DataStructure"]
+	path = DataStructure
+	url = git@github.com:TheBizzle/DataStructure
