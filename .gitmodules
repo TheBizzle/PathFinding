@@ -4,3 +4,6 @@
 [submodule "DataStructure"]
 	path = DataStructure
 	url = git@github.com:TheBizzle/DataStructure
+[submodule "PathFindingCore"]
+	path = PathFindingCore
+	url = git@github.com:TheBizzle/PathFindingCore
