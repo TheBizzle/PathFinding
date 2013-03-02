@@ -16,7 +16,7 @@ See [here](https://github.com/TheBizzle/Tester).
 See [here](https://github.com/TheBizzle/DataStructure).
 
 ## PathFindingCore:
-Building blocks for constructing your own pathfinding algorithm in Scala and visually representing it in ASCII.
+See [here](https://github.com/TheBizzle/PathFindingCore).
 
 ## AStar:
 Implementations of unidirectional A* and bidirectional A*.  The bidirectional version utilizes Akka actors for little more than learning purposes.
