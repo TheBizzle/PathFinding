@@ -34,7 +34,7 @@ trait StepDataGenerator[T] {
     val rowCount = pathingMap.rowCount
 
     val beenThere = Array.fill(colCount, rowCount)(false)
-    val queue     = new PriorityQueue[Coordinate2D with PriorityCoordinate]()(PriorityCoordinateOrdering)
+    val queue     = new PriorityQueue[PFCoord]()(PriorityCoordinateOrdering)
 
     val costArr      = Array.fill(colCount, rowCount)(BadVal)
     val heuristicArr = Array.fill(colCount, rowCount)(BadVal)

@@ -21,7 +21,7 @@ import
 class BiDirStepData(currentLocation: Coordinate2D,
                     goalLocation: Coordinate2D,
                     beenThere: Array[Array[Boolean]],
-                    pQueue: PriorityQueue[Coordinate2D with PriorityCoordinate],
+                    pQueue: PriorityQueue[PFCoord],
                     pMap: PathingMap,
                     costArray: Array[Array[Int]],
                     heuristicArray: Array[Array[Int]],
@@ -37,7 +37,7 @@ class BiDirStepData(currentLocation: Coordinate2D,
 
   // HIDEOUS!  ...But useful.
   private def cloneBase(l: Coordinate2D = loc, g: Coordinate2D = goal, bThere: Array[Array[Boolean]] = beenThereArr,
-                        q: PriorityQueue[Coordinate2D with PriorityCoordinate] = queue, pm: PathingMap = pathingMap,
+                        q: PriorityQueue[PFCoord] = queue, pm: PathingMap = pathingMap,
                         cost: Array[Array[Int]] = costArr, h: Array[Array[Int]] = heuristicArr,
                         total: Array[Array[Int]] = totalArr, crumbs: Array[Array[Coordinate2D]] = breadcrumbArr,
                         otherCrumbs: Array[Array[Coordinate2D]] = othersBreadcrumbArr, itrs: Int = iters, eg: Coordinate2D = endGoal) : BiDirStepData = {

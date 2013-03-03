@@ -17,7 +17,7 @@ import
 class AStarStepData(currentLocationOpt: Coordinate2D,
                     goalLocation: Coordinate2D,
                     val beenThereArr: Array[Array[Boolean]],
-                    val queue: PriorityQueue[Coordinate2D with PriorityCoordinate],
+                    val queue: PriorityQueue[PFCoord],
                     pMap: PathingMap,
                     val costArr: Array[Array[Int]],
                     val heuristicArr: Array[Array[Int]],
