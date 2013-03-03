@@ -9,5 +9,5 @@ import org.bizzle.pathfinding.coordinate.{ Coordinate2D, PriorityCoordinate }
  * Time: 9:47 AM
  */
 package object astar {
-  protected type PFCoord = PFCoord
+  protected type PFCoord = Coordinate2D with PriorityCoordinate
 }
