@@ -1,4 +1,4 @@
-package main.org.bizzle
+package org.bizzle.astar
 
 import org.bizzle.pathfinding.coordinate.{ Coordinate2D, PriorityCoordinate }
 
@@ -8,6 +8,6 @@ import org.bizzle.pathfinding.coordinate.{ Coordinate2D, PriorityCoordinate }
  * Date: 3/3/13
  * Time: 9:47 AM
  */
-package object astar {
-  protected type PFCoord = Coordinate2D with PriorityCoordinate
+package object base {
+  type PFCoord = Coordinate2D with PriorityCoordinate
 }

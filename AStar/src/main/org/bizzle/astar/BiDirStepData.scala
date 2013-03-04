@@ -5,11 +5,11 @@ import
 
 import
   org.bizzle.pathfinding.{ coordinate, pathingmap, StepDataSingleton },
-    coordinate.{ BadCoordinate2D, Breadcrumb, Coordinate2D, PriorityCoordinate },
+    coordinate.{ BadCoordinate2D, Breadcrumb, Coordinate2D },
     pathingmap.PathingMap
 
 import
-  base.{ AStarStepData, StepDataGenerator, UnexpectedDataException }
+  base.{ AStarStepData, PFCoord, StepDataGenerator, UnexpectedDataException }
 
 /**
  * Created by IntelliJ IDEA.
