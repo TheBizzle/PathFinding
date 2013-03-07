@@ -1,6 +1,7 @@
 package org.bizzle.astar
 
-import org.bizzle.pathfinding.coordinate.{ Coordinate2D, PriorityCoordinate }
+import
+  org.bizzle.pathfinding.coordinate.{ Coordinate2D, PriorityCoordinate }
 
 /**
  * Created with IntelliJ IDEA.
