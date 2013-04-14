@@ -1,6 +1,6 @@
 ## Summary
 
-Scala implementation of unidirectional and bidirectional versions of the A* pathfinding algorithm, along with a lot of other stuff that I've sandboxed around with whilst learning about Scala.
+Scala implementation of unidirectional and bidirectional versions of the A* pathfinding algorithm, along with plenty of other stuff that I've played around with while learning about Scala.
 
 ## Dependencies
 
