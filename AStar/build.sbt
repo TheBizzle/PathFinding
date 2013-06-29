@@ -18,3 +18,5 @@ libraryDependencies ++= Seq(
 )
 
 mainClass in Compile := None
+
+PathFindingBuild.tasks
