@@ -25,7 +25,7 @@ object PathFindingBuild extends Build {
   lazy val tasks = Seq(
     astarTest  <<= testWithMainClass("org.bizzle.astar.AStarTest"),
     astarQuiet <<= testWithMainClass("org.bizzle.astar.AStarQuiet"),
-    bidirTest  <<= testWithMainClass("org.bizzle.astar.BiDirTest"),
+    bidirTest  <<= testWithMainClass("org.bizzle.astar.BiDirAStarTest"),
     bidirQuiet <<= testWithMainClass("org.bizzle.astar.BiDirQuiet"),
     omniTest   <<= testWithMainClass("org.bizzle.astar.OmniTest"),
     omniQuiet  <<= testWithMainClass("org.bizzle.astar.OmniTestQuiet")
