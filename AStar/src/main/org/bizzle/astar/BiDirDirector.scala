@@ -8,7 +8,7 @@ import
 
 import
   akka.{ actor, pattern, util },
-    actor.{ Actor, ActorRef, ActorSystem, PoisonPill, Props },
+    actor.{ Actor, ActorRef, ActorSystem, Props },
     pattern.ask,
     util.Timeout
 
@@ -38,7 +38,7 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
     val stg    = actorSystem.actorOf(Props(new BiDirActor(Continue(forwardStepData),   decide, step)), name = "stg")
     val gts    = actorSystem.actorOf(Props(new BiDirActor(Continue(backwardsStepData), decide, step)), name = "gts")
     val outVal = evaluateActions(stg, gts)
-    terminateActors(stg, gts)
+    actorSystem.shutdown()
     outVal
   }
 
@@ -89,10 +89,6 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
     }
     mergeHelper(startLoc, myData.breadcrumbArr, thatData.breadcrumbArr)
     myData
-  }
-
-  def terminateActors(actorArgs: ActorRef*) {
-    actorArgs foreach (_ ! PoisonPill)
   }
 
   def runActionsForResult(stg: ActorRef, gts: ActorRef) : ((PathingStatus[T], Seq[Breadcrumb]), (PathingStatus[T], Seq[Breadcrumb])) = {
