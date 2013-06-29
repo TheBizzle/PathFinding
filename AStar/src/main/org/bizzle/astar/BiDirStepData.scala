@@ -89,10 +89,8 @@ object BiDirStepData extends StepDataSingleton[BiDirStepData] with StepDataGener
 
   override protected def mixinExtras(stepData: AStarStepData, extras: Extras) : BiDirStepData = {
     import stepData._
-    extras match {
-      case otherBreadcrumbs :: HNil => new BiDirStepData(loc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, otherBreadcrumbs, iters, endGoal)
-      case _                        => throw new UnexpectedDataException("Malformed HList!")
-    }
+    val otherBreadcrumbs :: HNil = extras
+    new BiDirStepData(loc, goal, beenThereArr, queue, pathingMap, costArr, heuristicArr, totalArr, breadcrumbArr, otherBreadcrumbs, iters, endGoal)
   }
 
 }
