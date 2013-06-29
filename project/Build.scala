@@ -23,12 +23,14 @@ object PathFindingBuild extends Build {
   lazy val omniQuiet  = TaskKey[Unit]("omni-quiet",  "Runs all tests (quietly)")
 
   lazy val tasks = Seq(
-    astarTest  <<= runTask(Test, "org.bizzle.astar.AStarTest"),
-    astarQuiet <<= runTask(Test, "org.bizzle.astar.AStarQuiet"),
-    bidirTest  <<= runTask(Test, "org.bizzle.astar.BiDirTest"),
-    bidirQuiet <<= runTask(Test, "org.bizzle.astar.BiDirQuiet"),
-    omniTest   <<= runTask(Test, "org.bizzle.astar.OmniTest"),
-    omniQuiet  <<= runTask(Test, "org.bizzle.astar.OmniTestQuiet")
+    astarTest  <<= testWithMainClass("org.bizzle.astar.AStarTest"),
+    astarQuiet <<= testWithMainClass("org.bizzle.astar.AStarQuiet"),
+    bidirTest  <<= testWithMainClass("org.bizzle.astar.BiDirTest"),
+    bidirQuiet <<= testWithMainClass("org.bizzle.astar.BiDirQuiet"),
+    omniTest   <<= testWithMainClass("org.bizzle.astar.OmniTest"),
+    omniQuiet  <<= testWithMainClass("org.bizzle.astar.OmniTestQuiet")
   )
+
+  private def testWithMainClass(mainClassName: String) = runTask(Test, mainClassName)
 
 }
