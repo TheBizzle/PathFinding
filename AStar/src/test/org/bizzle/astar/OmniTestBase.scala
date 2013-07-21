@@ -14,7 +14,7 @@ abstract class OmniTestBase extends TestScript {
 
   protected def tests: Seq[(TestScript, String)]
 
-  def run() {
+  def run() : Unit = {
     tests foreach {
       case (test, name) =>
         println(s"Start $name test:\n")

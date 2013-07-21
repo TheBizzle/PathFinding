@@ -46,15 +46,15 @@ class BiDirStepData(currentLocation: Coordinate2D,
                       crumbs map (_.clone()), otherCrumbs map (_.clone()), itrs, eg.copy)
   }
 
-  final def assimilateBreadcrumbs(crumbs: Seq[Breadcrumb]) {
+  final def assimilateBreadcrumbs(crumbs: Seq[Breadcrumb]) : Unit = {
     crumbs foreach (c => othersBreadcrumbArr(c.to.x)(c.to.y) = c.from)
   }
 
   def transformGoalForClone(oGoal: Coordinate2D) : BiDirStepData = cloneBase(g = oGoal)
   def hasInOthersBreadcrumbs(loc: Coordinate2D)  : Boolean       = othersBreadcrumbArr(loc.x)(loc.y).isValid
 
-  def reverseBreadcrumbs() {
-    def reversalHelper(location: Coordinate2D, crumbArr: Array[Array[Coordinate2D]]) {
+  def reverseBreadcrumbs() : Unit = {
+    def reversalHelper(location: Coordinate2D, crumbArr: Array[Array[Coordinate2D]]) : Unit = {
       val crumb = crumbArr(location.x)(location.y)
       if (crumb.isValid) {
         reversalHelper(crumb, crumbArr)

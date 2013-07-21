@@ -77,7 +77,7 @@ class BiDirDirector[T <: BiDirStepData](decisionFunc: T => PathingStatus[T], ste
   }
 
   def mergeBreadcrumbs(myData: T, thatData: T, startLoc: Coordinate2D, endLoc: Coordinate2D, isForwards: Boolean) : T = {
-    @tailrec def mergeHelper(holder: Coordinate2D, myCrumbs: Array[Array[Coordinate2D]], thoseCrumbs: Array[Array[Coordinate2D]]) {
+    @tailrec def mergeHelper(holder: Coordinate2D, myCrumbs: Array[Array[Coordinate2D]], thoseCrumbs: Array[Array[Coordinate2D]]) : Unit = {
       if (holder.isValid) {
         val crumb = thoseCrumbs(holder.x)(holder.y)
         val (indexer, updater) = if (isForwards) (crumb, holder) else (holder, crumb)
