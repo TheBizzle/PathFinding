@@ -1,5 +1,5 @@
 name := "PathFinding"
 
-version := "0.7"
+version := "1.0"
 
 scalaVersion := "2.10.1"

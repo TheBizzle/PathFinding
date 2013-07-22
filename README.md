@@ -2,6 +2,8 @@
 
 Scala implementation of unidirectional and bidirectional versions of the A* pathfinding algorithm, along with plenty of other stuff that I've played around with while learning about Scala.
 
+**This project is no longer under active development.**
+
 ## Usage
 
 To test it out (AKA watch the test suite execute), run the `astar`, `bidir`, or `omni` SBT tasks.
